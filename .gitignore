@@ -1,0 +1,47 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# next.js
+.next/
+out/
+
+# build
+dist/
+build/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# supabase local
+supabase/.temp/
+supabase/.branches/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# test
+coverage/
+test-results/
+playwright-report/
+blob-report/
+
+# misc
+*.log
+*.tsbuildinfo
+
+# migration scripts (legacy, not needed in repo)
+migrate_db.py
+migrate_sqlserver_to_postgres.py
+
+# playwright mcp
+.playwright-mcp/
