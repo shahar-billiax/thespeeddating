@@ -1,0 +1,41 @@
+create table events (
+  id serial primary key,
+  country_id integer not null references countries(id),
+  city_id integer not null references cities(id),
+  venue_id integer references venues(id),
+  event_date date not null,
+  start_time time,
+  end_time time,
+  enable_gendered_age boolean not null default false,
+  age_min integer,
+  age_max integer,
+  age_min_male integer,
+  age_max_male integer,
+  age_min_female integer,
+  age_max_female integer,
+  enable_gendered_price boolean not null default false,
+  price numeric(10,2),
+  vip_price numeric(10,2),
+  price_male numeric(10,2),
+  price_female numeric(10,2),
+  currency char(3),
+  special_offer text check (special_offer in (
+    'none', 'three_for_two', 'buy_one_get_one_free', 'bring_a_friend',
+    'discount_percentage', 'discount_nominal', 'early_bird', 'last_minute', 'bundle'
+  )),
+  special_offer_value numeric(10,2),
+  event_type text check (event_type in (
+    'jewish_general', 'jewish_traditional', 'jewish_divorcees', 'jewish_single_parents',
+    'jewish_conservative', 'jewish_modern_orthodox', 'israeli', 'party', 'singles', 'virtual'
+  )),
+  description text,
+  dress_code text,
+  limit_male integer,
+  limit_female integer,
+  match_submission_open boolean not null default true,
+  match_results_released boolean not null default false,
+  is_cancelled boolean not null default false,
+  is_published boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);

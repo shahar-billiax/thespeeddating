@@ -1,0 +1,23 @@
+create table venues (
+  id serial primary key,
+  country_id integer not null references countries(id),
+  city_id integer not null references cities(id),
+  name text not null,
+  address text,
+  latitude double precision,
+  longitude double precision,
+  map_url text,
+  website text,
+  phone text,
+  transport_info text,
+  dress_code text,
+  description text,
+  venue_type text check (venue_type in ('bar', 'restaurant', 'hotel', 'private_space', 'other')),
+  contact_person_name text,
+  contact_person_email text,
+  contact_person_phone text,
+  internal_notes text,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
