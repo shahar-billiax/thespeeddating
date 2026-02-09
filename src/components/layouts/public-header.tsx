@@ -17,6 +17,7 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
     { href: "/events", label: t("nav.events") },
     { href: "/about", label: t("nav.about") },
     { href: "/contact", label: t("nav.contact") },
+    ...(user ? [{ href: "/matches", label: t("nav.matches") }] : []),
   ];
 
   return (
@@ -44,7 +45,7 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
           {user ? (
             <div className="hidden md:flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/account">{t("nav.my_account")}</Link>
+                <Link href="/profile">{t("nav.my_account")}</Link>
               </Button>
               <form action="/auth/signout" method="post">
                 <Button variant="outline" size="sm" type="submit">
@@ -85,7 +86,7 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
                 <hr className="my-2" />
                 {user ? (
                   <>
-                    <Link href="/account" onClick={() => setOpen(false)} className="text-base font-medium py-2">
+                    <Link href="/profile" onClick={() => setOpen(false)} className="text-base font-medium py-2">
                       {t("nav.my_account")}
                     </Link>
                     <form action="/auth/signout" method="post">

@@ -8,12 +8,11 @@ import {
   Calendar,
   MapPin,
   Users,
-  Mail,
   Tag,
   Image,
   FileText,
-  Settings,
   Heart,
+  Languages,
 } from "lucide-react";
 
 const navItems = [
@@ -21,12 +20,11 @@ const navItems = [
   { href: "/admin/events", label: "Events", icon: Calendar },
   { href: "/admin/venues", label: "Venues", icon: MapPin },
   { href: "/admin/members", label: "Members", icon: Users },
-  { href: "/admin/emails", label: "Emails", icon: Mail },
   { href: "/admin/promotions", label: "Promotions", icon: Tag },
   { href: "/admin/galleries", label: "Galleries", icon: Image },
   { href: "/admin/blog", label: "Blog", icon: FileText },
   { href: "/admin/matchmaking", label: "Matchmaking", icon: Heart },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/translations", label: "Translations", icon: Languages },
 ];
 
 export function AdminSidebar() {

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { Providers } from "@/components/providers";
+import { CookieConsent } from "@/components/cookie-consent";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -16,8 +17,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Speed Dating",
-  description: "Jewish Speed Dating in the UK and Israel",
+  metadataBase: new URL("https://thespeeddating.co.uk"),
+  title: {
+    default: "TheSpeedDating - Jewish Speed Dating",
+    template: "%s | TheSpeedDating",
+  },
+  description:
+    "Jewish speed dating events in the UK and Israel. Meet like-minded singles at our fun, relaxed events.",
+  openGraph: {
+    type: "website",
+    siteName: "TheSpeedDating",
+    title: "TheSpeedDating - Jewish Speed Dating",
+    description:
+      "Jewish speed dating events in the UK and Israel. Meet like-minded singles at our fun, relaxed events.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default async function RootLayout({
@@ -68,6 +85,7 @@ export default async function RootLayout({
           country={country}
         >
           {children}
+          <CookieConsent />
         </Providers>
       </body>
     </html>

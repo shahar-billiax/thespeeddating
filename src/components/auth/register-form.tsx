@@ -7,11 +7,14 @@ import { useTranslation } from "@/hooks/use-translation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function RegisterForm() {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
+  const [consentTerms, setConsentTerms] = useState(false);
+  const [consentMarketing, setConsentMarketing] = useState(false);
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       return await signUp(formData);
@@ -72,6 +75,38 @@ export function RegisterForm() {
                   </label>
                 </div>
               </div>
+              <div className="space-y-3 pt-2">
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="consent_terms"
+                    checked={consentTerms}
+                    onCheckedChange={(checked) => setConsentTerms(checked as boolean)}
+                    required
+                  />
+                  <input type="hidden" name="consent_terms" value={consentTerms ? "true" : "false"} />
+                  <Label htmlFor="consent_terms" className="cursor-pointer text-sm leading-relaxed">
+                    I agree to the{" "}
+                    <Link href="/terms" className="text-primary hover:underline" target="_blank">
+                      Terms & Conditions
+                    </Link>
+                    {" "}and{" "}
+                    <Link href="/privacy" className="text-primary hover:underline" target="_blank">
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Checkbox
+                    id="consent_marketing"
+                    checked={consentMarketing}
+                    onCheckedChange={(checked) => setConsentMarketing(checked as boolean)}
+                  />
+                  <input type="hidden" name="consent_marketing" value={consentMarketing ? "true" : "false"} />
+                  <Label htmlFor="consent_marketing" className="cursor-pointer text-sm">
+                    I consent to receiving marketing communications
+                  </Label>
+                </div>
+              </div>
               {state?.error && (
                 <p className="text-sm text-destructive">{state.error}</p>
               )}
@@ -79,7 +114,7 @@ export function RegisterForm() {
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setStep(1)}>
                   Back
                 </Button>
-                <Button type="submit" className="flex-1" disabled={pending}>
+                <Button type="submit" className="flex-1" disabled={pending || !consentTerms}>
                   {pending ? "Creating account..." : t("nav.register")}
                 </Button>
               </div>

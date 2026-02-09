@@ -3,6 +3,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { z } from "zod/v4";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
 const signUpSchema = z.object({
   email: z.email(),
@@ -27,6 +29,13 @@ const updatePasswordSchema = z.object({
 });
 
 export async function signUp(formData: FormData) {
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for") || "unknown";
+  const { limited } = checkRateLimit(`auth:${ip}`, 10, 60000);
+  if (limited) {
+    return { error: "Too many attempts. Please try again later." };
+  }
+
   const parsed = signUpSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -75,6 +84,13 @@ export async function signUp(formData: FormData) {
 }
 
 export async function signIn(formData: FormData) {
+  const headerStore = await headers();
+  const ip = headerStore.get("x-forwarded-for") || "unknown";
+  const { limited } = checkRateLimit(`auth:${ip}`, 10, 60000);
+  if (limited) {
+    return { error: "Too many attempts. Please try again later." };
+  }
+
   const parsed = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
