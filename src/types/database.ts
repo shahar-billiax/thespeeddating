@@ -700,6 +700,56 @@ export type Database = {
           },
         ]
       }
+      pages: {
+        Row: {
+          content_html: string
+          country_id: number
+          created_at: string
+          id: number
+          is_published: boolean
+          language_code: string
+          meta_description: string | null
+          meta_title: string | null
+          page_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content_html: string
+          country_id: number
+          created_at?: string
+          id?: number
+          is_published?: boolean
+          language_code: string
+          meta_description?: string | null
+          meta_title?: string | null
+          page_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content_html?: string
+          country_id?: number
+          created_at?: string
+          id?: number
+          is_published?: boolean
+          language_code?: string
+          meta_description?: string | null
+          meta_title?: string | null
+          page_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pages_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           admin_comments: string | null
@@ -955,6 +1005,59 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      success_stories: {
+        Row: {
+          country_id: number
+          couple_names: string
+          created_at: string
+          id: number
+          is_active: boolean
+          is_featured: boolean
+          location: string | null
+          quote: string
+          sort_order: number
+          story_type: string
+          updated_at: string
+          year: string | null
+        }
+        Insert: {
+          country_id: number
+          couple_names: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          is_featured?: boolean
+          location?: string | null
+          quote: string
+          sort_order?: number
+          story_type?: string
+          updated_at?: string
+          year?: string | null
+        }
+        Update: {
+          country_id?: number
+          couple_names?: string
+          created_at?: string
+          id?: number
+          is_active?: boolean
+          is_featured?: boolean
+          location?: string | null
+          quote?: string
+          sort_order?: number
+          story_type?: string
+          updated_at?: string
+          year?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "success_stories_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
             referencedColumns: ["id"]
           },
         ]

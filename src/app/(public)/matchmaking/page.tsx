@@ -1,13 +1,51 @@
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/lib/i18n/server";
-import { Card } from "@/components/ui/card";
+import { getPage } from "@/lib/pages";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MatchmakingForm } from "@/components/matchmaking/matchmaking-form";
-import { Heart, UserSearch, Calendar, CheckCircle2 } from "lucide-react";
+import { CmsContent } from "@/components/cms/cms-content";
+import { Heart, CheckCircle2 } from "lucide-react";
+
+const FALLBACK_PACKAGES = [
+  {
+    id: "fallback-3m",
+    name: "3 Months",
+    price: 700,
+    currency: "GBP",
+    num_dates: 5,
+    duration_months: 3,
+    popular: false,
+  },
+  {
+    id: "fallback-6m",
+    name: "6 Months",
+    price: 950,
+    currency: "GBP",
+    num_dates: 10,
+    duration_months: 6,
+    popular: true,
+  },
+  {
+    id: "fallback-1y",
+    name: "1 Year",
+    price: 1450,
+    currency: "GBP",
+    num_dates: 20,
+    duration_months: 12,
+    popular: false,
+  },
+];
 
 export default async function MatchmakingPage() {
   const { t, country } = await getTranslations();
   const supabase = await createClient();
+  const page = await getPage("matchmaking");
 
   const {
     data: { user },
@@ -30,127 +68,145 @@ export default async function MatchmakingPage() {
     packages = data || [];
   }
 
-  const formatPrice = (price: number, currency: string) => {
+  const displayPackages =
+    packages.length > 0 ? packages : FALLBACK_PACKAGES;
+
+  function formatPrice(price: number, currency: string): string {
     return new Intl.NumberFormat(country === "gb" ? "en-GB" : "he-IL", {
       style: "currency",
       currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(price);
-  };
-
-  const steps = [
-    {
-      icon: UserSearch,
-      titleKey: "matchmaking.step1",
-    },
-    {
-      icon: Heart,
-      titleKey: "matchmaking.step2",
-    },
-    {
-      icon: Calendar,
-      titleKey: "matchmaking.step3",
-    },
-  ];
+  }
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-7xl">
-      {/* Hero Section */}
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center gap-2 mb-4">
-          <Heart className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">{t("matchmaking.title")}</h1>
+      {/* Hero */}
+      <div className="text-center mb-12">
+        <div className="inline-flex items-center gap-3 mb-4">
+          <div className="p-3 rounded-full bg-primary/10">
+            <Heart className="h-8 w-8 text-primary" />
+          </div>
         </div>
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          {page?.title || t("matchmaking.title")}
+        </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
           {t("matchmaking.subtitle")}
         </p>
       </div>
 
-      {/* Service Description */}
-      <Card className="p-8 mb-16 max-w-4xl mx-auto">
-        <div className="prose prose-lg max-w-none dark:prose-invert">
-          <p className="text-lg">
-            {country === "gb"
-              ? "Our personal matchmaking service connects serious daters with compatible partners. A professional matchmaker reviews your profile, understands your preferences, and introduces you to hand-picked matches who share your values and lifestyle."
-              : "שירות השידוכים האישי שלנו מחבר בין מחפשי זוגיות רציניים לבני זוג מתאימים. שדכן מקצועי בוחן את הפרופיל שלך, מבין את ההעדפות שלך, ומציג לך התאמות נבחרות בקפידה החולקות את הערכים ואורח החיים שלך."}
-          </p>
-        </div>
-      </Card>
-
-      {/* How It Works */}
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold text-center mb-8">
-          {t("matchmaking.how_title")}
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {steps.map((step, index) => (
-            <Card key={index} className="p-6">
-              <div className="flex flex-col items-center text-center gap-4">
-                <div className="relative">
-                  <div className="p-4 rounded-full bg-primary/10">
-                    <step.icon className="h-8 w-8 text-primary" />
-                  </div>
-                  <Badge className="absolute -top-2 -right-2">{index + 1}</Badge>
-                </div>
-                <h3 className="font-semibold text-lg">{t(step.titleKey)}</h3>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Packages Section */}
-      {packages.length > 0 && (
-        <div className="mb-16">
-          <h2 className="text-2xl font-bold text-center mb-8">
-            {t("matchmaking.packages_title")}
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {packages.map((pkg) => (
-              <Card key={pkg.id} className="p-6">
-                <div className="text-center">
-                  <h3 className="text-xl font-bold mb-2">{pkg.name}</h3>
-                  <div className="text-3xl font-bold text-primary mb-4">
-                    {formatPrice(pkg.price, pkg.currency)}
-                  </div>
-                  <div className="space-y-2 text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>
-                        {pkg.num_dates}{" "}
-                        {country === "gb" ? "dates" : "דייטים"}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-center gap-2">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span>
-                        {pkg.duration_months}{" "}
-                        {country === "gb" ? "months" : "חודשים"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+      {/* CMS Content */}
+      {page?.content_html && (
+        <div className="max-w-4xl mx-auto mb-16">
+          <CmsContent html={page.content_html} />
         </div>
       )}
 
-      {/* Application Form */}
-      <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-8">
-          {t("matchmaking.apply")}
+      {/* Packages / Pricing Section */}
+      <div className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-4">
+          {t("matchmaking.packages_title")}
         </h2>
+        <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
+          Choose the package that suits your needs. All packages include a
+          personal interview and dedicated matchmaker.
+        </p>
+
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {displayPackages.map((pkg) => {
+            const isPopular =
+              "popular" in pkg ? pkg.popular : pkg.duration_months === 6;
+            return (
+              <Card
+                key={pkg.id}
+                className={`relative ${isPopular ? "border-primary shadow-md" : ""}`}
+              >
+                {isPopular && (
+                  <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    Most Popular
+                  </Badge>
+                )}
+                <CardHeader className="text-center">
+                  <CardTitle className="text-xl">{pkg.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <div className="text-4xl font-bold text-primary mb-6">
+                    {formatPrice(
+                      pkg.price,
+                      pkg.currency || countryData?.currency || "GBP"
+                    )}
+                  </div>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <span>
+                        Including {pkg.num_dates}{" "}
+                        {pkg.num_dates === 1 ? "date" : "dates"}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <span>
+                        {pkg.duration_months}{" "}
+                        {pkg.duration_months === 1 ? "month" : "months"}{" "}
+                        membership
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <span>Personal interview</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                      <CheckCircle2 className="h-4 w-4 text-primary" />
+                      <span>Dedicated matchmaker</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Application Form / CTA */}
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold mb-3">
+            Register With Us Today
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            It&apos;s easy: Just give it a chance.
+          </p>
+        </div>
+
         {user ? (
           <MatchmakingForm />
         ) : (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground mb-4">
-              {country === "gb"
-                ? "Please log in to apply for matchmaking services."
-                : "אנא התחבר כדי להגיש בקשה לשירותי שידוכים."}
-            </p>
+          <Card>
+            <CardContent className="text-center py-4">
+              <Heart className="h-12 w-12 text-primary/30 mx-auto mb-4" />
+              <p className="text-muted-foreground mb-6">
+                {country === "gb"
+                  ? "Please log in or create an account to apply for our matchmaking service."
+                  : "אנא התחבר או צור חשבון כדי להגיש בקשה לשירותי שידוכים."}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <a
+                  href="/login"
+                  className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+                >
+                  Log In
+                </a>
+                <a
+                  href="/register"
+                  className="inline-flex items-center justify-center rounded-md border border-input bg-background px-8 py-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground"
+                >
+                  Create Account
+                </a>
+              </div>
+            </CardContent>
           </Card>
         )}
       </div>

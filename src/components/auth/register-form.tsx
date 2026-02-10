@@ -15,12 +15,33 @@ export function RegisterForm() {
   const [step, setStep] = useState(1);
   const [consentTerms, setConsentTerms] = useState(false);
   const [consentMarketing, setConsentMarketing] = useState(false);
+  const [stepError, setStepError] = useState("");
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       return await signUp(formData);
     },
     null
   );
+
+  function handleNext() {
+    const form = document.querySelector("form");
+    if (!form) return;
+    const firstName = (form.querySelector('[name="firstName"]') as HTMLInputElement)?.value?.trim();
+    const lastName = (form.querySelector('[name="lastName"]') as HTMLInputElement)?.value?.trim();
+    const email = (form.querySelector('[name="email"]') as HTMLInputElement)?.value?.trim();
+    const password = (form.querySelector('[name="password"]') as HTMLInputElement)?.value;
+
+    if (!firstName || !lastName || !email || !password) {
+      setStepError("Please fill in all fields before continuing.");
+      return;
+    }
+    if (password.length < 6) {
+      setStepError("Password must be at least 6 characters.");
+      return;
+    }
+    setStepError("");
+    setStep(2);
+  }
 
   return (
     <Card>
@@ -35,22 +56,25 @@ export function RegisterForm() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" name="firstName" required />
+                  <Input id="firstName" name="firstName" autoComplete="given-name" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" name="lastName" required />
+                  <Input id="lastName" name="lastName" autoComplete="family-name" required />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t("auth.email")}</Label>
-                <Input id="email" name="email" type="email" required />
+                <Input id="email" name="email" type="email" autoComplete="email" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">{t("auth.password")}</Label>
-                <Input id="password" name="password" type="password" minLength={6} required />
+                <Input id="password" name="password" type="password" autoComplete="new-password" minLength={6} required />
               </div>
-              <Button type="button" className="w-full" onClick={() => setStep(2)}>
+              {stepError && (
+                <p className="text-sm text-destructive">{stepError}</p>
+              )}
+              <Button type="button" className="w-full" onClick={handleNext}>
                 Next
               </Button>
             </>
@@ -60,7 +84,7 @@ export function RegisterForm() {
             <>
               <div className="space-y-2">
                 <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                <Input id="dateOfBirth" name="dateOfBirth" type="date" required />
+                <Input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" required />
               </div>
               <div className="space-y-2">
                 <Label>Gender</Label>

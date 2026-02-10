@@ -1,35 +1,25 @@
+import { Metadata } from "next";
 import { getPage } from "@/lib/pages";
-import { notFound } from "next/navigation";
+import { CmsPageLayout } from "@/components/cms/cms-page-layout";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage("what-is-speed-dating");
+  return {
+    title: page?.meta_title || page?.title || "What Is Speed Dating?",
+    description:
+      page?.meta_description ||
+      "Learn how Jewish speed dating works - meet professional singles through fun 7-minute dates at trendy bars.",
+  };
+}
 
 export default async function WhatIsSpeedDatingPage() {
   const page = await getPage("what-is-speed-dating");
 
-  if (!page) {
-    notFound();
-  }
-
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
-      <div
-        className="prose prose-lg max-w-none dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: page.content_html }}
-      />
-    </div>
+    <CmsPageLayout
+      title={page?.title || "What Is Speed Dating?"}
+      contentHtml={page?.content_html ?? null}
+      fallbackTitle="What Is Speed Dating?"
+    />
   );
-}
-
-export async function generateMetadata() {
-  const page = await getPage("what-is-speed-dating");
-
-  if (!page) {
-    return {
-      title: "What Is Speed Dating",
-    };
-  }
-
-  return {
-    title: page.meta_title || page.title,
-    description: page.meta_description,
-  };
 }

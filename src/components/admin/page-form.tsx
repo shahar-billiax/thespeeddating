@@ -18,13 +18,20 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const PAGE_KEY_OPTIONS = [
+  { value: "home", label: "Home" },
   { value: "about-us", label: "About Us" },
-  { value: "how-it-works", label: "How It Works" },
+  { value: "dating-tips", label: "Dating Tips" },
+  { value: "matchmaking", label: "Matchmaking" },
+  { value: "virtual-events", label: "Virtual Events" },
+  { value: "success-stories", label: "Success Stories" },
+  { value: "contact", label: "Contact" },
+  { value: "franchise-jobs", label: "Franchise / Jobs" },
+  { value: "what-is-speed-dating", label: "What Is Speed Dating" },
+  { value: "vip", label: "VIP Membership" },
+  { value: "terms", label: "Terms & Conditions" },
   { value: "faq", label: "FAQ" },
   { value: "safety", label: "Safety Guidelines" },
-  { value: "terms", label: "Terms & Conditions" },
   { value: "privacy", label: "Privacy Policy" },
-  { value: "contact", label: "Contact" },
 ];
 
 export function PageForm({
@@ -35,6 +42,7 @@ export function PageForm({
   countries: { id: number; name: string; code: string }[];
 }) {
   const [contentHtml, setContentHtml] = useState(page?.content_html ?? "");
+  const [isPublished, setIsPublished] = useState(page?.is_published ?? true);
 
   async function handleSubmit(_prev: any, formData: FormData) {
     formData.set("content_html", contentHtml);
@@ -167,12 +175,15 @@ export function PageForm({
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
+            <input type="hidden" name="is_published" value={isPublished ? "true" : "false"} />
             <Switch
               id="is_published"
-              name="is_published"
-              defaultChecked={page?.is_published ?? true}
+              checked={isPublished}
+              onCheckedChange={setIsPublished}
             />
-            <Label htmlFor="is_published">Published</Label>
+            <Label htmlFor="is_published">
+              {isPublished ? "Published" : "Draft"}
+            </Label>
           </div>
         </CardContent>
       </Card>

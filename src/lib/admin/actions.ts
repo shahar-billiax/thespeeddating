@@ -1063,3 +1063,108 @@ export async function deletePage(id: number) {
   revalidatePath("/admin/pages");
   return { success: true };
 }
+
+// ===========================================
+// Success Stories
+// ===========================================
+
+export async function getSuccessStories(params?: {
+  page?: number;
+  country?: string;
+  type?: string;
+  featured?: string;
+}) {
+  const { supabase } = await requireAdmin();
+  const page = params?.page ?? 1;
+  const perPage = 20;
+  const offset = (page - 1) * perPage;
+
+  let query = supabase
+    .from("success_stories")
+    .select("*, countries(name, code)", { count: "exact" })
+    .order("sort_order", { ascending: true })
+    .order("id", { ascending: true })
+    .range(offset, offset + perPage - 1);
+
+  if (params?.country) query = query.eq("country_id", Number(params.country));
+  if (params?.type) query = query.eq("story_type", params.type);
+  if (params?.featured === "true") query = query.eq("is_featured", true);
+
+  const { data, count, error } = await query;
+  if (error) throw new Error(error.message);
+  return { stories: data ?? [], total: count ?? 0, page, perPage };
+}
+
+export async function getSuccessStoryById(id: number) {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("success_stories")
+    .select("*, countries(id, name, code)")
+    .eq("id", id)
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function createSuccessStory(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const storyData = {
+    couple_names: formData.get("couple_names") as string,
+    quote: formData.get("quote") as string,
+    year: (formData.get("year") as string) || null,
+    location: (formData.get("location") as string) || null,
+    story_type: (formData.get("story_type") as string) || "testimonial",
+    country_id: Number(formData.get("country_id")),
+    is_featured: formData.get("is_featured") === "true",
+    is_active: formData.get("is_active") === "true",
+    sort_order: Number(formData.get("sort_order")) || 0,
+  };
+
+  const { error } = await supabase
+    .from("success_stories")
+    .insert(storyData)
+    .select()
+    .single();
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/success-stories");
+  revalidatePath("/success-stories");
+  redirect("/admin/success-stories");
+}
+
+export async function updateSuccessStory(id: number, formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const storyData = {
+    couple_names: formData.get("couple_names") as string,
+    quote: formData.get("quote") as string,
+    year: (formData.get("year") as string) || null,
+    location: (formData.get("location") as string) || null,
+    story_type: (formData.get("story_type") as string) || "testimonial",
+    country_id: Number(formData.get("country_id")),
+    is_featured: formData.get("is_featured") === "true",
+    is_active: formData.get("is_active") === "true",
+    sort_order: Number(formData.get("sort_order")) || 0,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("success_stories")
+    .update(storyData)
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/success-stories");
+  revalidatePath("/success-stories");
+  redirect("/admin/success-stories");
+}
+
+export async function deleteSuccessStory(id: number) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("success_stories").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/success-stories");
+  revalidatePath("/success-stories");
+  return { success: true };
+}

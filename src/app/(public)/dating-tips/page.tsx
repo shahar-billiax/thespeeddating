@@ -1,35 +1,25 @@
+import { Metadata } from "next";
 import { getPage } from "@/lib/pages";
-import { notFound } from "next/navigation";
+import { CmsPageLayout } from "@/components/cms/cms-page-layout";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPage("dating-tips");
+  return {
+    title: page?.meta_title || page?.title || "Dating Tips",
+    description:
+      page?.meta_description ||
+      "Speed dating tips and advice to help you make the most of your evening.",
+  };
+}
 
 export default async function DatingTipsPage() {
   const page = await getPage("dating-tips");
 
-  if (!page) {
-    notFound();
-  }
-
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
-      <h1 className="text-4xl font-bold mb-8">{page.title}</h1>
-      <div
-        className="prose prose-lg max-w-none dark:prose-invert"
-        dangerouslySetInnerHTML={{ __html: page.content_html }}
-      />
-    </div>
+    <CmsPageLayout
+      title={page?.title || "Dating Tips"}
+      contentHtml={page?.content_html ?? null}
+      fallbackTitle="Dating Tips"
+    />
   );
-}
-
-export async function generateMetadata() {
-  const page = await getPage("dating-tips");
-
-  if (!page) {
-    return {
-      title: "Dating Tips",
-    };
-  }
-
-  return {
-    title: page.meta_title || page.title,
-    description: page.meta_description,
-  };
 }

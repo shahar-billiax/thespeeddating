@@ -28,11 +28,11 @@ export function LoginForm({ redirect }: { redirect?: string }) {
           {redirect && <input type="hidden" name="redirect" value={redirect} />}
           <div className="space-y-2">
             <Label htmlFor="email">{t("auth.email")}</Label>
-            <Input id="email" name="email" type="email" required />
+            <Input id="email" name="email" type="email" autoComplete="email" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">{t("auth.password")}</Label>
-            <Input id="password" name="password" type="password" required />
+            <Input id="password" name="password" type="password" autoComplete="current-password" required />
           </div>
           {state?.error && (
             <p className="text-sm text-destructive">{state.error}</p>

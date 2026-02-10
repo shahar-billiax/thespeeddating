@@ -124,3 +124,207 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================
+   CMS Content — Enhanced styles for HTML
+   produced by TipTap editor in admin /pages.
+   All standard elements auto-styled.
+   ============================================ */
+
+.cms-content {
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--foreground);
+}
+
+/* ---- Headings ---- */
+
+.cms-content :where(h2) {
+  position: relative;
+  margin-top: 3rem;
+  margin-bottom: 1.25rem;
+  padding-left: 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--foreground);
+  border-left: 4px solid var(--primary);
+}
+
+.cms-content > :where(h2):first-child {
+  margin-top: 0;
+}
+
+.cms-content :where(h3) {
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+/* ---- Paragraphs ---- */
+
+.cms-content :where(p) {
+  margin-bottom: 1rem;
+  color: color-mix(in oklch, var(--foreground) 82%, transparent);
+}
+
+.cms-content :where(p):last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Links ---- */
+
+.cms-content :where(a) {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  font-weight: 500;
+  transition: opacity 0.15s;
+}
+
+.cms-content :where(a):hover {
+  opacity: 0.75;
+}
+
+/* ---- Strong / Bold ---- */
+
+.cms-content :where(strong) {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* ---- Unordered Lists ---- */
+
+.cms-content :where(ul) {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.cms-content :where(ul) > :where(li) {
+  position: relative;
+  padding-left: 2rem;
+  line-height: 1.65;
+}
+
+.cms-content :where(ul) > :where(li)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--primary);
+  opacity: 0.7;
+}
+
+/* ---- Ordered Lists ---- */
+
+.cms-content :where(ol) {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+  counter-reset: cms-ol;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.cms-content :where(ol) > :where(li) {
+  position: relative;
+  padding-left: 2.75rem;
+  line-height: 1.65;
+  counter-increment: cms-ol;
+}
+
+.cms-content :where(ol) > :where(li)::before {
+  content: counter(cms-ol);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* ---- Testimonials / Italic quotes ---- */
+
+.cms-content :where(p) > :where(em):only-child,
+.cms-content :where(p) > :where(em):first-child:last-of-type {
+  display: block;
+  font-style: italic;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--primary);
+  background: color-mix(in oklch, var(--muted) 60%, transparent);
+  border-radius: 0.5rem;
+  color: color-mix(in oklch, var(--foreground) 75%, transparent);
+  line-height: 1.7;
+}
+
+/* ---- Horizontal rule / break ---- */
+
+.cms-content :where(hr) {
+  margin: 2.5rem 0;
+  border: none;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ---- Blockquote ---- */
+
+.cms-content :where(blockquote) {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid var(--primary);
+  background: color-mix(in oklch, var(--muted) 50%, transparent);
+  border-radius: 0.5rem;
+  font-style: italic;
+}
+
+.cms-content :where(blockquote) :where(p) {
+  margin-bottom: 0.5rem;
+  color: color-mix(in oklch, var(--foreground) 75%, transparent);
+}
+
+.cms-content :where(blockquote) :where(p):last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Section spacing between h2-delimited blocks ---- */
+
+.cms-content :where(h2) + :where(p),
+.cms-content :where(h2) + :where(ul),
+.cms-content :where(h2) + :where(ol) {
+  margin-top: 0;
+}
+
+/* ---- Dark mode adjustments ---- */
+
+.dark .cms-content :where(p) {
+  color: color-mix(in oklch, var(--foreground) 78%, transparent);
+}
+
+.dark .cms-content :where(p) > :where(em):only-child,
+.dark .cms-content :where(p) > :where(em):first-child:last-of-type {
+  background: color-mix(in oklch, var(--muted) 40%, transparent);
+}
+
+.dark .cms-content :where(blockquote) {
+  background: color-mix(in oklch, var(--muted) 30%, transparent);
+}
