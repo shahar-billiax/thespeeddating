@@ -966,3 +966,100 @@ export async function exportParticipantsCsv(eventId: number) {
   const csv = [headers.join(","), ...rows.map(r => r.map((v: string) => `"${v}"`).join(","))].join("\n");
   return { csv, filename: `event-${eventId}-participants.csv` };
 }
+
+// ─── Pages (CMS) ─────────────────────────────────────────────
+export async function getPages(params?: {
+  page?: number;
+  country?: string;
+  language?: string;
+  pageKey?: string;
+}) {
+  const { supabase } = await requireAdmin();
+  const page = params?.page ?? 1;
+  const perPage = 20;
+  const offset = (page - 1) * perPage;
+
+  let query = supabase
+    .from("pages")
+    .select(`*, countries(name, code)`, { count: "exact" })
+    .order("page_key", { ascending: true })
+    .range(offset, offset + perPage - 1);
+
+  if (params?.country) query = query.eq("country_id", Number(params.country));
+  if (params?.language) query = query.eq("language_code", params.language);
+  if (params?.pageKey) query = query.ilike("page_key", `%${params.pageKey}%`);
+
+  const { data, count, error } = await query;
+  if (error) throw new Error(error.message);
+  return { pages: data ?? [], total: count ?? 0, page, perPage };
+}
+
+export async function getPageById(id: number) {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("pages")
+    .select(`*, countries(id, name, code)`)
+    .eq("id", id)
+    .single();
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function createPage(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const pageData = {
+    page_key: formData.get("page_key") as string,
+    country_id: Number(formData.get("country_id")),
+    language_code: formData.get("language_code") as string,
+    title: formData.get("title") as string,
+    content_html: formData.get("content_html") as string,
+    meta_title: formData.get("meta_title") as string || null,
+    meta_description: formData.get("meta_description") as string || null,
+    is_published: formData.get("is_published") === "true",
+  };
+
+  const { data, error } = await supabase
+    .from("pages")
+    .insert(pageData)
+    .select()
+    .single();
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/pages");
+  redirect("/admin/pages");
+}
+
+export async function updatePage(id: number, formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const pageData = {
+    page_key: formData.get("page_key") as string,
+    country_id: Number(formData.get("country_id")),
+    language_code: formData.get("language_code") as string,
+    title: formData.get("title") as string,
+    content_html: formData.get("content_html") as string,
+    meta_title: formData.get("meta_title") as string || null,
+    meta_description: formData.get("meta_description") as string || null,
+    is_published: formData.get("is_published") === "true",
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("pages")
+    .update(pageData)
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/pages");
+  revalidatePath(`/${pageData.page_key}`);
+  redirect("/admin/pages");
+}
+
+export async function deletePage(id: number) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("pages").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/pages");
+  return { success: true };
+}

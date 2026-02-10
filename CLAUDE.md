@@ -234,3 +234,4 @@ Test environment configured in `tests/env.ts` (loads `.env.test`).
 - **RTL support**: Hebrew text must be properly handled (use `dir="rtl"` when `locale=he`)
 - **RLS enabled**: All tables have Row Level Security; use admin client only when necessary
 - **Seeded data**: Local DB includes UK/Israel countries, London/Manchester/Tel Aviv/Jerusalem cities, and test users (see `supabase/seed.sql`)
+- **Playwright testing**: Do NOT test implementations with Playwright unless explicitly requested by the user. Only use Playwright for testing when asked.

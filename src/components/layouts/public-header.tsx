@@ -15,6 +15,10 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
   const navLinks = [
     { href: "/", label: t("nav.home") },
     { href: "/events", label: t("nav.events") },
+    { href: "/what-is-speed-dating", label: "What Is Speed Dating" },
+    { href: "/dating-tips", label: "Dating Tips" },
+    { href: "/matchmaking", label: "Matchmaking" },
+    { href: "/online-dating", label: "Online Dating" },
     { href: "/about", label: t("nav.about") },
     { href: "/contact", label: t("nav.contact") },
     ...(user ? [{ href: "/matches", label: t("nav.matches") }] : []),
