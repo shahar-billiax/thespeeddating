@@ -1,0 +1,266 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - link "Navigate to home page" [ref=e5] [cursor=pointer]:
+      - /url: ./
+    - generic [ref=e7]:
+      - combobox [ref=e8]:
+        - option "EnglishUS"
+        - option "French"
+        - option "EnglishUK" [selected]
+        - option "Hebrew"
+      - combobox [ref=e9]:
+        - option "France"
+        - option "United Kingdom" [selected]
+        - option "Israel"
+        - option "United States"
+    - generic [ref=e10]: Professional evenings for Professional Jewish People
+    - generic [ref=e11]: Tuesday 10-Feb-2026
+  - generic [ref=e12]:
+    - list:
+      - listitem [ref=e13] [cursor=pointer]:
+        - link "Home" [ref=e14]:
+          - /url: TheSpeed.aspx
+      - listitem [ref=e15] [cursor=pointer]:
+        - link "Dating Tips" [ref=e16]:
+          - /url: DatingTips.aspx
+      - listitem [ref=e17] [cursor=pointer]:
+        - link "Matchmaking" [ref=e18]:
+          - /url: MatchMaking.aspx
+      - listitem [ref=e19] [cursor=pointer]:
+        - link "Online Dating" [ref=e20]:
+          - /url: OnlineDating.aspx
+      - listitem [ref=e21] [cursor=pointer]:
+        - link "Virtual events" [ref=e22]:
+          - /url: Parties.aspx
+      - listitem [ref=e23] [cursor=pointer]:
+        - link "Success Stories" [ref=e24]:
+          - /url: Success.aspx
+      - listitem [ref=e25] [cursor=pointer]:
+        - link "Contact Us" [ref=e26]:
+          - /url: ContactUs.aspx
+      - listitem [ref=e27] [cursor=pointer]:
+        - link "Franchise/Jobs" [ref=e28]:
+          - /url: Jobs.aspx
+  - generic [ref=e29]:
+    - generic [ref=e30]:
+      - list [ref=e31]:
+        - listitem [ref=e32] [cursor=pointer]:
+          - link "UPCOMING EVENTS" [ref=e33]:
+            - /url: Events18.aspx
+        - listitem [ref=e34] [cursor=pointer]:
+          - link "REGISTER" [ref=e35]:
+            - /url: Register.aspx
+        - listitem [ref=e36] [cursor=pointer]:
+          - link "VIP MEMBERSHIP" [ref=e37]:
+            - /url: VIPMembership.aspx
+        - listitem [ref=e38] [cursor=pointer]:
+          - link "WHAT IS SPEED DATING" [ref=e39]:
+            - /url: WhatIsSpeedDating.aspx
+        - listitem [ref=e40] [cursor=pointer]:
+          - link "ABOUT US" [ref=e41]:
+            - /url: AboutUs.aspx
+      - generic [ref=e42]: Login
+      - generic [ref=e43]:
+        - table [ref=e44]:
+          - rowgroup [ref=e45]:
+            - row "Email address" [ref=e46]:
+              - cell "Email address" [ref=e47]
+              - cell [ref=e48]:
+                - textbox [ref=e49]
+            - row "Password" [ref=e50]:
+              - cell "Password" [ref=e51]
+              - cell [ref=e52]:
+                - textbox [ref=e53]
+        - generic [ref=e54]:
+          - checkbox "Remember Me" [ref=e55]
+          - text: Remember Me
+        - generic [ref=e56]:
+          - link "Login" [ref=e57] [cursor=pointer]:
+            - /url: javascript:__doPostBack('ctl00$LoginBtn','')
+            - generic [ref=e58]: Login
+          - link "Forgotten Password" [ref=e59] [cursor=pointer]:
+            - /url: ForgotPassword.aspx
+      - generic [ref=e60]:
+        - text: Our Branches
+        - table [ref=e61]:
+          - rowgroup [ref=e62]:
+            - row "United States" [ref=e63]:
+              - cell [ref=e64]:
+                - link [ref=e65] [cursor=pointer]:
+                  - /url: https://www.thespeeddating.us
+              - cell "United States" [ref=e66]:
+                - link "United States" [ref=e67] [cursor=pointer]:
+                  - /url: https://www.thespeeddating.us
+            - row "France" [ref=e68]:
+              - cell [ref=e69]:
+                - link [ref=e70] [cursor=pointer]:
+                  - /url: https://www.thespeeddating.fr
+              - cell "France" [ref=e71]:
+                - link "France" [ref=e72] [cursor=pointer]:
+                  - /url: https://www.thespeeddating.fr
+            - row "Israel" [ref=e73]:
+              - cell [ref=e74]:
+                - link [ref=e75] [cursor=pointer]:
+                  - /url: https://www.thespeeddating.co.il
+              - cell "Israel" [ref=e76]:
+                - link "Israel" [ref=e77] [cursor=pointer]:
+                  - /url: https://www.thespeeddating.co.il
+        - generic [ref=e78]:
+          - generic [ref=e79]: Testimonials
+          - 'heading "2 recent WEDDINGS from our London Speed Dating events: Josh B and Naomi W and Jonny Simmons with Mia S. Mazal Tov!!! \"Hi - thank you all for a very enjoyable evening in London on 29 April. I''ve been telling friends what a genius system it is, and how well-organised\" Louise, April 2019 London \"Hi Michal, Just wanted to let you know that my husband, Ehud, and I met at one of the speed dating events May 1, 2011 at bar luna on the upper west side. He proposed one year later at slightly Oliver (which was where bar luna was). We now live together on the uws with our 2 month old daughter, Ella. We thank you so much for having this event! !!\" March 2014 NYC" [level=3] [ref=e80]':
+            - generic [ref=e81]:
+              - text: "2 recent WEDDINGS from our London Speed Dating events:"
+              - text: Josh B and Naomi W and Jonny Simmons with Mia S.
+              - text: Mazal Tov!!!
+            - generic [ref=e82]:
+              - text: "\"Hi - thank you all for a very enjoyable evening in London on 29 April. I've been telling friends what a genius system it is, and how well-organised\" Louise, April 2019 London"
+              - text: "\"Hi Michal, Just wanted to let you know that my husband, Ehud, and I met at one of the speed dating events May 1, 2011 at bar luna on the upper west side. He proposed one year later at slightly Oliver (which was where bar luna was). We now live together on the uws with our 2 month old daughter, Ella. We thank you so much for having this event! !!\" March 2014 NYC"
+          - paragraph [ref=e83]:
+            - img [ref=e84]
+          - text: "\""
+          - generic [ref=e85]:
+            - text: Hi Michal
+            - text: Thank you for inviting me to the Valentine's Day Speed dating event (Feb 13th) at Gilgamesh.
+            - text: It was the best event by far, beautifully organised and in the most dreamy romantic room. I really enjoyed the night out, and the whole evening was so much fun. I am so pleased that I went and made some new friends.
+            - text: It was lovely to go even for the social side of things! I went to other events for Valentine's Day but this one was absolutely perfect in every way!!
+            - text: Sending you all the best, lots of love, A, London
+          - text: "\""
+          - paragraph [ref=e86]: "\"You do well at organising events and have that drive in you, you get the results and everyone says \"this is the real jdate without the onlinenonsense\". D. Jan 2019"
+          - text: "\"Michal and SpeedDating Staff,"
+          - text: I wanted to thank you for a lovely time last night in Tel Aviv at Loveat. The location, participants, staff, and overall ambiance was top notch. It is clear that this is truly your calling. I had the most wonderful time...thank you! I want to nudge anyone who is hesitant to join, not to fret, as a fun night is guaranteed. Anything beyond that is an extra reward :) Looking forward to joining you again soon!"
+          - text: Best,Gilat
+          - text: "\"Thanks for the great speed dating evening it was lots of fun!\" Marc"
+          - text: "\"Just wanted to extend a big thank you! I met the perfect girl who's kind, smart funny and beautiful and im about to go on my third date with her. I hope everyone who attends your events will be as lucky as i have been :)\""
+          - text: "\"The whole event was very professional and well organised. I would definitely come again and would recommend it to my single friends. You are delivering a much needed service in a good atmosphere and environment. Thank you.\" A.E."
+          - link "Speed Dating Blog" [ref=e87] [cursor=pointer]:
+            - /url: http://thespeeddating.blogspot.com/
+        - generic [ref=e88]:
+          - paragraph [ref=e89]:
+            - iframe [ref=e92]:
+              - generic [ref=f2e3]:
+                - link:
+                  - /url: https://www.facebook.com/TheSpeedDating?ref=embed_page
+                - generic [ref=f2e8]:
+                  - generic [ref=f2e9]:
+                    - link [ref=f2e10] [cursor=pointer]:
+                      - /url: https://www.facebook.com/68229513951?ref=embed_page
+                    - generic [ref=f2e11]:
+                      - link "The Speed Dating- Jewish speed dating events worldwide" [ref=f2e13] [cursor=pointer]:
+                        - /url: https://www.facebook.com/68229513951?ref=embed_page
+                      - generic [ref=f2e14]: 1.4K followers
+                  - button "Follow Page" [ref=f2e19] [cursor=pointer]: Follow Page
+          - paragraph
+    - generic [ref=e94]:
+      - generic [ref=e96]: Dating Tips
+      - generic [ref=e97]:
+        - generic [ref=e98]:
+          - img [ref=e99]
+          - text: General Tips
+        - generic [ref=e101]:
+          - list [ref=e102]:
+            - listitem [ref=e103]:
+              - generic [ref=e105]: Be who you are
+            - listitem [ref=e106]:
+              - generic [ref=e108]: First impressions are the most powerful ones
+            - listitem [ref=e109]:
+              - generic [ref=e111]: Try to talk and listen equally
+            - listitem [ref=e112]:
+              - generic [ref=e114]: Avoid asking the same questions each time
+            - listitem [ref=e115]:
+              - generic [ref=e117]: Be creative
+            - listitem [ref=e118]:
+              - generic [ref=e120]: Try and make it entertaining
+            - listitem [ref=e123]:
+              - generic [ref=e125]: You can ask any questions you like, but remember that first impressions count and being original is a plus.
+            - listitem [ref=e126]:
+              - generic [ref=e127]: You can be creative and ask different questions to "What do you do for work?" or "Where do you live?"
+              - generic [ref=e128]: We suggest you try more surprsing set of questions, like "Where would you go for a romantic holiday?"
+              - generic [ref=e129]: or "What do you look at first when meeting someone for the first time?"
+            - listitem [ref=e130]:
+              - generic [ref=e131]: Enjoy dating for what it is, dating. It is meeting people and socializing and spending time in the company of stimulating individuals who may or may not play a bigger part in your life down the road.
+              - generic [ref=e132]: The fact is, most people have something interesting to offer. While you may not be out on the dating scene looking for new friends,
+              - generic [ref=e134]: you may well find one or two fabulous people along the way.
+          - text: Tips for Men
+          - list [ref=e135]:
+            - listitem [ref=e136]:
+              - generic [ref=e139]: Smile, Women are smile addicts. A few well-placed smiles, a happy attitude, some (non-erotic!) jokes here and there and you can win a woman's heart faster than a handsome tall guy, who is grumpy.
+            - listitem [ref=e140]:
+              - generic [ref=e142]: Stand straight and sit up. It shows that you are strong, well trained and not ill. And it will make you taller.
+            - listitem [ref=e143]:
+              - generic [ref=e145]: Use her name thruout the talks with her. This alone creates a more intimate atmosphere.
+            - listitem [ref=e146]:
+              - generic [ref=e147]: Even if you feel mentally close to the other person, keep your hands to yourself, its only a first mini date!
+            - listitem [ref=e148]:
+              - generic [ref=e149]:
+                - generic [ref=e150]: Use deodorants. Under normal circumstances most women hate sweat odor. Hate it.
+                - generic [ref=e151]: Its not even about using perfumes. Perfumes can be used additionally. The main idea is non-smelling, which is more important than good-smelling.
+            - listitem [ref=e152]:
+              - generic [ref=e154]: The reason of talking to a woman is to establish a relaxed atmosphere and to be friendly. Thus don't get involved into highly arguable subjects such as "Why death penalties for minors should be allowed" or "Why Greenpeace is doing more harm than good"
+            - listitem [ref=e155]:
+              - generic [ref=e157]: You should show a tolerant and open-minded attitude towards many subjects. Anything that can cause you a bad mood or her a bad mood should be avoided.
+            - listitem [ref=e158]:
+              - generic [ref=e161]: "Be aware that if you give vent to your feelings this can tell the woman that you are weak and she needs to be your talk friend. But to date her you need to show the direct opposite: That you are her strong shoulder; that you are self-confident; that you know what to do; and that she can rely on your emotional strength to be a help for her."
+            - listitem [ref=e162]:
+              - generic [ref=e163]:
+                - generic [ref=e164]: If a woman asks questions who you are and what you do and what you want to achieve in life, then you should know what to answer. If you begin to stutter, flush red and say "Well, I have no clue, I am too helpless for this world" then this is NOT what they want to hear.
+                - generic [ref=e165]: By mentioning your hobbies, your job, sport interests you describe yourself as someone with a stable background whom she can classify and trust.
+          - text: Tips for Women
+          - list [ref=e166]:
+            - listitem [ref=e167]:
+              - generic [ref=e169]: Always look great, whatever your income. Gorgeous hair and some lipstick with rags will still turn his head. You have the advantage. You are the woman. Look your best. Looking your best will make you feel your best.
+            - listitem [ref=e170]:
+              - generic [ref=e172]: Never reveal information you don't have to. An enigmatic woman drives men wild.
+            - listitem [ref=e173]:
+              - generic [ref=e175]: Never ever talk about previous boyfriends, particularly their prowess in the bedroom. Your ex-boyfriends are your business only.
+            - listitem [ref=e176]:
+              - generic [ref=e178]: Assume nothing about your date until you choose to know him better. You cannot always tell by looking.
+            - listitem [ref=e179]:
+              - generic [ref=e181]: Men are seeking a woman who is attractive to them. Women may despair that men can be so shallow and that looks could matter so much but be careful. Men aren't necessarily looking for a catwalk model, but men do want a woman who takes pride in their appearance (though not excessively). Men are proud of having a girlfriend who looks good and I don't believe any man who says otherwise.
+            - listitem [ref=e182]:
+              - generic [ref=e184]: Men are looking for a trustworthy girl, someone they can have faith in and someone who will be there for them.
+            - listitem [ref=e185]:
+              - generic [ref=e187]: Men are looking for women who retain their femininity and and are caring and kind.
+            - listitem [ref=e188]:
+              - generic [ref=e190]: Men love a challenging woman, someone who keeps them on their toes.
+            - listitem [ref=e191]:
+              - generic [ref=e194]: Your posture is one of the most telling signals you transmit. An open posture is evidence of an open person. Turning your body toward the man you're conversing with, keeping your feet flat on the floor and leaning forward are actions that show interest.
+          - list [ref=e195]
+  - generic [ref=e196]:
+    - generic [ref=e197]:
+      - generic [ref=e198]:
+        - text: Copyright © 2003 - 2022 www.thespeeddating.co.uk
+        - link "See our Terms and Conditions" [ref=e199] [cursor=pointer]:
+          - /url: TermsAndConditions.aspx
+        - text: for using this site www.thespeeddating.co.uk is a Direct Touch Ltd. Production
+        - link "Contact Us" [ref=e200] [cursor=pointer]:
+          - /url: ContactUs.aspx
+        - link "Links" [ref=e201] [cursor=pointer]:
+          - /url: Links.aspx
+      - paragraph [ref=e202]:
+        - text: Built by
+        - link "Shahar Ben David" [ref=e203] [cursor=pointer]:
+          - /url: http://www.linkedin.com/profile/view?id=10623266&trk=tab_pro
+        - text: "| Design by"
+        - link "www.digitalmoves.com" [ref=e204] [cursor=pointer]:
+          - /url: http://www.digitalmoves.com
+    - link "Find us listed Dating Trail - The UK's No.1 dating comparison site" [ref=e206] [cursor=pointer]:
+      - /url: http://www.datingtrail.co.uk/
+    - generic [ref=e207]:
+      - text: Find our
+      - link "Speed Dating" [ref=e208] [cursor=pointer]:
+        - /url: http://www.onlineandspeeddating.com/Events/Speed%20Dating.aspx
+      - text: events and
+      - link "Free Dating Sites" [ref=e209] [cursor=pointer]:
+        - /url: http://www.onlineandspeeddating.com/OnlineDating/Free%20Dating%20Sites.aspx
+      - text: on onlineandspeeddating.
+    - paragraph [ref=e211]:
+      - text: Listed on
+      - link "Ditch or Date" [ref=e212] [cursor=pointer]:
+        - /url: http://www.ditchordate.com
+      - text: ", singles events in UK cities like"
+      - link "Manchester" [ref=e213] [cursor=pointer]:
+        - /url: http://www.ditchordate.com/speed-dating-manchester.php
+      - text: ", and all the best"
+      - link "Speed Dating London" [ref=e214] [cursor=pointer]:
+        - /url: http://www.ditchordate.com/speed-dating-london.php
+      - text: has to offer.

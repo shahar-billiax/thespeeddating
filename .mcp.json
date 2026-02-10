@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "cmd",
+      "args": ["/c", "npx", "@playwright/mcp@latest"],
+      "env": {
+        "PLAYWRIGHT_CDP_URL": "http://localhost:9222",
+        "BROWSER_WS_ENDPOINT": "ws://localhost:9222",
+        "PLAYWRIGHT_CONNECT_OPTIONS": "{\"wsEndpoint\":\"ws://localhost:9222\"}"
+      }
+    }
+  }
+}
