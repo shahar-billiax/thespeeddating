@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { getMessages, getTranslations } from "@/lib/i18n/server";
 import { Providers } from "@/components/providers";
 import { CookieConsent } from "@/components/cookie-consent";
 import "./globals.css";
@@ -16,26 +16,38 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://thespeeddating.co.uk"),
-  title: {
-    default: "TheSpeedDating - Jewish Speed Dating",
-    template: "%s | TheSpeedDating",
-  },
-  description:
-    "Jewish speed dating events in the UK and Israel. Meet like-minded singles at our fun, relaxed events.",
-  openGraph: {
-    type: "website",
-    siteName: "TheSpeedDating",
-    title: "TheSpeedDating - Jewish Speed Dating",
-    description:
-      "Jewish speed dating events in the UK and Israel. Meet like-minded singles at our fun, relaxed events.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, country } = await getTranslations();
+  const domain = country === "il"
+    ? "https://www.thespeeddating.co.il"
+    : "https://www.thespeeddating.co.uk";
+
+  return {
+    metadataBase: new URL(domain),
+    title: {
+      default: t("meta.site_title"),
+      template: `%s | TheSpeedDating`,
+    },
+    description: t("meta.site_description"),
+    openGraph: {
+      type: "website",
+      siteName: "TheSpeedDating",
+      title: t("meta.site_title"),
+      description: t("meta.site_description"),
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+    alternates: {
+      languages: {
+        en: "https://www.thespeeddating.co.uk",
+        he: "https://www.thespeeddating.co.il",
+        "x-default": "https://www.thespeeddating.co.uk",
+      },
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -46,30 +58,7 @@ export default async function RootLayout({
   const locale = headerStore.get("x-locale") || "en";
   const country = headerStore.get("x-country") || "gb";
 
-  const supabase = await createClient();
-
-  // Fetch translations for current locale
-  const { data: currentTranslations } = await supabase
-    .from("translations")
-    .select("string_key, value")
-    .eq("language_code", locale);
-
-  const translations = Object.fromEntries(
-    (currentTranslations || []).map((t) => [t.string_key, t.value])
-  );
-
-  // Fetch English fallback if needed
-  let fallback: Record<string, string> = {};
-  if (locale !== "en") {
-    const { data: enTranslations } = await supabase
-      .from("translations")
-      .select("string_key, value")
-      .eq("language_code", "en");
-
-    fallback = Object.fromEntries(
-      (enTranslations || []).map((t) => [t.string_key, t.value])
-    );
-  }
+  const { translations, fallback } = await getMessages(locale);
 
   const dir = locale === "he" ? "rtl" : "ltr";
 

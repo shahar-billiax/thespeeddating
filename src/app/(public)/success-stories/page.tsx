@@ -3,6 +3,7 @@ import { getPage } from "@/lib/pages";
 import { getTranslations } from "@/lib/i18n/server";
 import { createClient } from "@/lib/supabase/server";
 import { CmsContent } from "@/components/cms/cms-content";
+import { getPageFallbackHtml } from "@/lib/i18n/page-fallbacks";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,18 +16,19 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
   const page = await getPage("success-stories");
   return {
-    title: page?.meta_title || page?.title || "Success Stories",
+    title: page?.meta_title || page?.title || t("meta.success_stories_title"),
     description:
       page?.meta_description ||
-      "120 weddings worldwide! Read real love stories from couples who met through TheSpeedDating.",
+      t("meta.success_stories_description"),
   };
 }
 
 export default async function SuccessStoriesPage() {
   const page = await getPage("success-stories");
-  const { country } = await getTranslations();
+  const { country, locale, t } = await getTranslations();
   const supabase = await createClient();
 
   const { data: countryData } = await supabase
@@ -41,7 +43,13 @@ export default async function SuccessStoriesPage() {
     .eq("country_id", countryData?.id ?? 0)
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
-    .order("id", { ascending: true });
+    .order("id", { ascending: true })
+    .limit(50);
+
+  const fallbackHtml =
+    (!stories || stories.length === 0) && !page?.content_html
+      ? getPageFallbackHtml("success-stories", locale)
+      : null;
 
   const featured = stories?.filter((s) => s.is_featured) ?? [];
   const rest = stories?.filter((s) => !s.is_featured) ?? [];
@@ -78,27 +86,38 @@ export default async function SuccessStoriesPage() {
           <div className="text-center text-white space-y-6 max-w-3xl mx-auto">
             <Heart className="h-16 w-16 mx-auto text-white/90 fill-white/30" />
             <h1 className="text-4xl sm:text-5xl font-bold">
-              {page?.title || "Success Stories"}
+              {page?.title || t("success_stories.title")}
             </h1>
-            <p className="text-xl text-white/90">
-              120 weddings worldwide! Goes to show Speed Dating works!
-            </p>
-            <div className="flex items-center justify-center gap-8 pt-4">
-              <div className="text-center">
-                <div className="text-4xl font-bold">120+</div>
-                <div className="text-sm text-white/70">Weddings</div>
-              </div>
-              <div className="w-px h-12 bg-white/30" />
-              <div className="text-center">
-                <div className="text-4xl font-bold">20+</div>
-                <div className="text-sm text-white/70">Years</div>
-              </div>
-              <div className="w-px h-12 bg-white/30" />
-              <div className="text-center">
-                <div className="text-4xl font-bold">5,000+</div>
-                <div className="text-sm text-white/70">Singles</div>
-              </div>
-            </div>
+            {(() => {
+              const cmsStories = page?.content_json as {
+                heroSubtitle?: string;
+                heroStats?: { value: string; label: string }[];
+              } | null;
+              const subtitle = cmsStories?.heroSubtitle || t("success_stories.hero_subtitle");
+              const FALLBACK_HERO = [
+                { value: "120+", label: t("home.stat_weddings") },
+                { value: "20+", label: t("home.stat_experience") },
+                { value: "5,000+", label: t("home.stat_singles") },
+              ];
+              const heroStats = (cmsStories?.heroStats && cmsStories.heroStats.length > 0)
+                ? cmsStories.heroStats : FALLBACK_HERO;
+              return (
+                <>
+                  <p className="text-xl text-white/90">{subtitle}</p>
+                  <div className="flex items-center justify-center gap-8 pt-4">
+                    {heroStats.map((stat, i) => (
+                      <div key={i} className="flex items-center gap-8">
+                        {i > 0 && <div className="w-px h-12 bg-white/30" />}
+                        <div className="text-center">
+                          <div className="text-4xl font-bold">{stat.value}</div>
+                          <div className="text-sm text-white/70">{stat.label}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       </section>
@@ -115,7 +134,7 @@ export default async function SuccessStoriesPage() {
         {featured.length > 0 && (
           <div className="mb-16">
             <h2 className="text-2xl font-bold text-center mb-8">
-              Featured Stories
+              {t("success_stories.featured")}
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               {featured.map((story) => (
@@ -153,7 +172,7 @@ export default async function SuccessStoriesPage() {
                         className={typeColor(story.story_type)}
                       >
                         {typeIcon(story.story_type)}
-                        <span className="ml-1 capitalize">
+                        <span className="ms-1 capitalize">
                           {story.story_type}
                         </span>
                       </Badge>
@@ -169,7 +188,7 @@ export default async function SuccessStoriesPage() {
         {rest.length > 0 && (
           <div>
             <h2 className="text-2xl font-bold text-center mb-8">
-              More Testimonials
+              {t("success_stories.more")}
             </h2>
             <div className="grid md:grid-cols-2 gap-5">
               {rest.map((story) => (
@@ -207,7 +226,7 @@ export default async function SuccessStoriesPage() {
                         className={`text-xs ${typeColor(story.story_type)}`}
                       >
                         {typeIcon(story.story_type)}
-                        <span className="ml-1 capitalize">
+                        <span className="ms-1 capitalize">
                           {story.story_type}
                         </span>
                       </Badge>
@@ -219,11 +238,17 @@ export default async function SuccessStoriesPage() {
           </div>
         )}
 
-        {/* No stories fallback */}
+        {/* No stories fallback — show CMS testimonies or coming soon */}
         {(!stories || stories.length === 0) && !page?.content_html && (
-          <p className="text-muted-foreground text-center py-12">
-            Content coming soon.
-          </p>
+          fallbackHtml ? (
+            <div className="max-w-3xl mx-auto">
+              <CmsContent html={fallbackHtml} />
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-12">
+              {t("common.content_coming_soon")}
+            </p>
+          )
         )}
       </div>
     </div>

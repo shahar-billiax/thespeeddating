@@ -49,8 +49,8 @@ export default async function ProfilePage() {
         <div className="mb-6">
           <Button asChild variant="outline">
             <Link href="/admin">
-              <Shield className="mr-2 h-4 w-4" />
-              Go to Admin Panel
+              <Shield className="me-2 h-4 w-4" />
+              {t("profile.go_to_admin")}
             </Link>
           </Button>
         </div>

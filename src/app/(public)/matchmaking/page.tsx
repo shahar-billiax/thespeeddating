@@ -1,6 +1,9 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/lib/i18n/server";
 import { getPage } from "@/lib/pages";
+import { getPageFallbackHtml } from "@/lib/i18n/page-fallbacks";
 import {
   Card,
   CardContent,
@@ -8,42 +11,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { MatchmakingForm } from "@/components/matchmaking/matchmaking-form";
 import { CmsContent } from "@/components/cms/cms-content";
 import { Heart, CheckCircle2 } from "lucide-react";
 
-const FALLBACK_PACKAGES = [
-  {
-    id: "fallback-3m",
-    name: "3 Months",
-    price: 700,
-    currency: "GBP",
-    num_dates: 5,
-    duration_months: 3,
-    popular: false,
-  },
-  {
-    id: "fallback-6m",
-    name: "6 Months",
-    price: 950,
-    currency: "GBP",
-    num_dates: 10,
-    duration_months: 6,
-    popular: true,
-  },
-  {
-    id: "fallback-1y",
-    name: "1 Year",
-    price: 1450,
-    currency: "GBP",
-    num_dates: 20,
-    duration_months: 12,
-    popular: false,
-  },
-];
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  const page = await getPage("matchmaking");
+  return {
+    title: page?.meta_title || t("meta.matchmaking_title"),
+    description: page?.meta_description || t("meta.matchmaking_description"),
+  };
+}
 
 export default async function MatchmakingPage() {
-  const { t, country } = await getTranslations();
+  const { t, country, locale } = await getTranslations();
   const supabase = await createClient();
   const page = await getPage("matchmaking");
 
@@ -68,8 +51,7 @@ export default async function MatchmakingPage() {
     packages = data || [];
   }
 
-  const displayPackages =
-    packages.length > 0 ? packages : FALLBACK_PACKAGES;
+  const displayPackages = packages;
 
   function formatPrice(price: number, currency: string): string {
     return new Intl.NumberFormat(country === "gb" ? "en-GB" : "he-IL", {
@@ -98,9 +80,9 @@ export default async function MatchmakingPage() {
       </div>
 
       {/* CMS Content */}
-      {page?.content_html && (
+      {(page?.content_html || getPageFallbackHtml("matchmaking", locale)) && (
         <div className="max-w-4xl mx-auto mb-16">
-          <CmsContent html={page.content_html} />
+          <CmsContent html={(page?.content_html || getPageFallbackHtml("matchmaking", locale))!} />
         </div>
       )}
 
@@ -110,8 +92,7 @@ export default async function MatchmakingPage() {
           {t("matchmaking.packages_title")}
         </h2>
         <p className="text-center text-muted-foreground mb-10 max-w-2xl mx-auto">
-          Choose the package that suits your needs. All packages include a
-          personal interview and dedicated matchmaker.
+          {t("matchmaking.packages_subtext")}
         </p>
 
         <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -125,7 +106,7 @@ export default async function MatchmakingPage() {
               >
                 {isPopular && (
                   <Badge className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    Most Popular
+                    {t("matchmaking.most_popular")}
                   </Badge>
                 )}
                 <CardHeader className="text-center">
@@ -142,25 +123,26 @@ export default async function MatchmakingPage() {
                     <div className="flex items-center justify-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary" />
                       <span>
-                        Including {pkg.num_dates}{" "}
-                        {pkg.num_dates === 1 ? "date" : "dates"}
+                        {pkg.num_dates === 1
+                          ? t("matchmaking.including_date", { count: String(pkg.num_dates) })
+                          : t("matchmaking.including_dates", { count: String(pkg.num_dates) })}
                       </span>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary" />
                       <span>
-                        {pkg.duration_months}{" "}
-                        {pkg.duration_months === 1 ? "month" : "months"}{" "}
-                        membership
+                        {pkg.duration_months === 1
+                          ? t("matchmaking.month_membership", { count: String(pkg.duration_months) })
+                          : t("matchmaking.months_membership", { count: String(pkg.duration_months) })}
                       </span>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary" />
-                      <span>Personal interview</span>
+                      <span>{t("matchmaking.personal_interview")}</span>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-primary" />
-                      <span>Dedicated matchmaker</span>
+                      <span>{t("matchmaking.dedicated_matchmaker")}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -174,10 +156,10 @@ export default async function MatchmakingPage() {
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold mb-3">
-            Register With Us Today
+            {t("matchmaking.register_title")}
           </h2>
           <p className="text-lg text-muted-foreground">
-            It&apos;s easy: Just give it a chance.
+            {t("matchmaking.register_subtext")}
           </p>
         </div>
 
@@ -188,23 +170,15 @@ export default async function MatchmakingPage() {
             <CardContent className="text-center py-4">
               <Heart className="h-12 w-12 text-primary/30 mx-auto mb-4" />
               <p className="text-muted-foreground mb-6">
-                {country === "gb"
-                  ? "Please log in or create an account to apply for our matchmaking service."
-                  : "אנא התחבר או צור חשבון כדי להגיש בקשה לשירותי שידוכים."}
+                {t("matchmaking.login_prompt")}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
-                  href="/login"
-                  className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
-                >
-                  Log In
-                </a>
-                <a
-                  href="/register"
-                  className="inline-flex items-center justify-center rounded-md border border-input bg-background px-8 py-3 text-sm font-medium shadow-sm hover:bg-accent hover:text-accent-foreground"
-                >
-                  Create Account
-                </a>
+                <Button asChild size="lg">
+                  <Link href="/login">{t("nav.login")}</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link href="/register">{t("nav.register")}</Link>
+                </Button>
               </div>
             </CardContent>
           </Card>

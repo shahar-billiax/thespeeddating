@@ -59,44 +59,46 @@ export default async function EventDetailPage({ params }: PageProps) {
   const country = headerStore.get("x-country") || "gb";
   const supabase = await createClient();
 
-  // Get event details
-  const { data: event } = await supabase
-    .from("events")
-    .select(`
-      *,
-      cities:city_id (
-        id,
-        name,
-        timezone
-      ),
-      venues:venue_id (
-        id,
-        name,
-        address,
-        description,
-        dress_code,
-        transport_info,
-        map_url,
-        phone,
-        website
-      ),
-      countries:country_id (
-        currency
-      )
-    `)
-    .eq("id", Number(id))
-    .single();
+  // Get event details, registration counts, and user auth in parallel
+  const eventId = Number(id);
+  const [{ data: event }, { data: registrations }, { data: { user } }] = await Promise.all([
+    supabase
+      .from("events")
+      .select(`
+        *,
+        cities:city_id (
+          id,
+          name,
+          timezone
+        ),
+        venues:venue_id (
+          id,
+          name,
+          address,
+          description,
+          dress_code,
+          transport_info,
+          map_url,
+          phone,
+          website
+        ),
+        countries:country_id (
+          currency
+        )
+      `)
+      .eq("id", eventId)
+      .single(),
+    supabase
+      .from("event_registrations")
+      .select("user_id, users:user_id(gender)")
+      .eq("event_id", eventId)
+      .eq("status", "confirmed"),
+    supabase.auth.getUser(),
+  ]);
 
   if (!event || !event.is_published) {
     notFound();
   }
-
-  // Get registration counts
-  const { data: registrations } = await supabase
-    .from("event_registrations")
-    .select("user_id, users:user_id(gender)")
-    .eq("event_id", Number(id))
-    .eq("status", "confirmed");
 
   const maleCount = registrations?.filter((r) => r.users?.gender === "male").length || 0;
   const femaleCount = registrations?.filter((r) => r.users?.gender === "female").length || 0;
@@ -205,6 +207,10 @@ export default async function EventDetailPage({ params }: PageProps) {
           }),
         }}
       />
+      <Link href="/events" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
+        {t("events.back_to_events")}
+      </Link>
+
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
@@ -375,10 +381,20 @@ export default async function EventDetailPage({ params }: PageProps) {
             {t("events.cancelled")}
           </Button>
         ) : eventFull ? (
-          <Button asChild size="lg" variant="secondary">
-            <Link href={`/login?redirect=/events/${id}`}>
+          user ? (
+            <Button size="lg" variant="secondary" disabled>
               {t("events.join_waitlist")}
-            </Link>
+            </Button>
+          ) : (
+            <Button asChild size="lg" variant="secondary">
+              <Link href={`/login?redirect=/events/${id}`}>
+                {t("events.join_waitlist")}
+              </Link>
+            </Button>
+          )
+        ) : user ? (
+          <Button size="lg" disabled>
+            {t("events.book_now")} — {t("vip.coming_soon")}
           </Button>
         ) : (
           <Button asChild size="lg">

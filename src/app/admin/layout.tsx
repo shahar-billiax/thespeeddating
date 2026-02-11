@@ -13,7 +13,7 @@ export default async function AdminLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen" dir="ltr">
       <AdminSidebar />
       <div className="flex-1 flex flex-col">
         <AdminTopbar user={{ email: user?.email || "" }} />

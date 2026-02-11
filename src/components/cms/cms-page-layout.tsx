@@ -1,3 +1,4 @@
+import { getTranslations } from "@/lib/i18n/server";
 import { CmsContent } from "./cms-content";
 
 interface CmsPageLayoutProps {
@@ -6,11 +7,12 @@ interface CmsPageLayoutProps {
   fallbackTitle?: string;
 }
 
-export function CmsPageLayout({
+export async function CmsPageLayout({
   title,
   contentHtml,
   fallbackTitle,
 }: CmsPageLayoutProps) {
+  const { t } = await getTranslations();
   return (
     <div>
       {/* Hero */}
@@ -31,7 +33,7 @@ export function CmsPageLayout({
             <CmsContent html={contentHtml} />
           ) : (
             <p className="text-muted-foreground text-center">
-              Content coming soon.
+              {t("common.content_coming_soon")}
             </p>
           )}
         </div>

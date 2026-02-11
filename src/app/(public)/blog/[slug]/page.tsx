@@ -81,7 +81,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <div className="mb-8">
         <Button asChild variant="ghost" size="sm">
           <Link href="/blog" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             {t("blog.back")}
           </Link>
         </Button>
@@ -122,7 +122,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <div className="mt-12 pt-8 border-t">
         <Button asChild variant="outline">
           <Link href="/blog" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
             {t("blog.back")}
           </Link>
         </Button>

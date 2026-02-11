@@ -27,7 +27,7 @@ export function MatchmakingForm() {
       toast.success(t("matchmaking.submitted"));
       router.push("/profile");
     } else {
-      toast.error(result.error || "Submission failed");
+      toast.error(result.error || t("contact.error"));
     }
 
     setIsSubmitting(false);
@@ -85,7 +85,7 @@ export function MatchmakingForm() {
         </div>
 
         <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? "Submitting..." : t("matchmaking.apply")}
+          {isSubmitting ? t("matchmaking.submitting") : t("matchmaking.apply")}
         </Button>
       </form>
     </Card>

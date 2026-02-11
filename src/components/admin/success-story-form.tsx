@@ -19,15 +19,30 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function SuccessStoryForm({
   story,
   countries,
+  returnTo,
+  defaultCountryId,
 }: {
   story?: any;
   countries: { id: number; name: string; code: string }[];
+  returnTo?: string;
+  defaultCountryId?: number;
 }) {
   const router = useRouter();
   const [isFeatured, setIsFeatured] = useState(story?.is_featured ?? false);
@@ -44,17 +59,18 @@ export function SuccessStoryForm({
 
   async function handleDelete() {
     if (!story) return;
-    if (!confirm("Are you sure you want to delete this story?")) return;
     const result = await deleteSuccessStory(story.id);
     if (result?.error) {
-      alert(result.error);
+      console.error("Failed to delete story:", result.error);
     } else {
-      router.push("/admin/success-stories");
+      router.push(returnTo || "/admin/success-stories");
     }
   }
 
   return (
     <form action={formAction} className="space-y-6 max-w-3xl">
+      {returnTo && <input type="hidden" name="return_to" value={returnTo} />}
+
       {state?.error && (
         <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">
           {state.error}
@@ -128,7 +144,11 @@ export function SuccessStoryForm({
               <Select
                 name="country_id"
                 defaultValue={
-                  story?.country_id ? String(story.country_id) : ""
+                  story?.country_id
+                    ? String(story.country_id)
+                    : defaultCountryId
+                      ? String(defaultCountryId)
+                      : ""
                 }
                 required
               >
@@ -208,14 +228,27 @@ export function SuccessStoryForm({
           {isPending ? "Saving..." : story ? "Update Story" : "Create Story"}
         </Button>
         {story && (
-          <Button
-            type="button"
-            variant="destructive"
-            size="lg"
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button type="button" variant="destructive" size="lg">
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete this story and all its content.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         )}
       </div>
     </form>

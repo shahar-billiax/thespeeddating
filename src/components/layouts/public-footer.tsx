@@ -5,25 +5,25 @@ import { useTranslation } from "@/hooks/use-translation";
 import { Heart, Mail, Phone } from "lucide-react";
 
 export function PublicFooter() {
-  const { t } = useTranslation();
+  const { t, country } = useTranslation();
 
   return (
     <footer className="border-t bg-muted/30">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-3">The Speed Dating</h3>
+            <h3 className="font-bold text-lg mb-3">{t("footer.brand")}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Professional evenings for Professional Jewish People. Running Jewish speed dating events since 2003 in the UK and Israel.
+              {t("footer.description")}
             </p>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Heart className="h-4 w-4 text-pink-500" />
-              <span>120+ weddings worldwide</span>
+              <Heart className="h-4 w-4 text-pink-500" aria-hidden="true" />
+              <span>{t("footer.weddings_worldwide")}</span>
             </div>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-3">Quick Links</h4>
+            <h4 className="font-semibold mb-3">{t("footer.quick_links")}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/events" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -32,106 +32,108 @@ export function PublicFooter() {
               </li>
               <li>
                 <Link href="/dating-tips" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Dating Tips
+                  {t("nav.dating_tips")}
                 </Link>
               </li>
               <li>
                 <Link href="/matchmaking" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Matchmaking
+                  {t("nav.matchmaking")}
                 </Link>
               </li>
               <li>
                 <Link href="/virtual-events" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Virtual Events
+                  {t("nav.virtual_events")}
                 </Link>
               </li>
               <li>
                 <Link href="/success-stories" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Success Stories
+                  {t("nav.success_stories")}
                 </Link>
               </li>
               <li>
-                <Link href="/franchise" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Franchise/Jobs
+                <Link href="/franchise-jobs" className="text-muted-foreground hover:text-foreground transition-colors">
+                  {t("nav.franchise")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-3">More</h4>
+            <h4 className="font-semibold mb-3">{t("footer.more")}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/about" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/about-us" className="text-muted-foreground hover:text-foreground transition-colors">
                   {t("nav.about")}
                 </Link>
               </li>
               <li>
                 <Link href="/what-is-speed-dating" className="text-muted-foreground hover:text-foreground transition-colors">
-                  What Is Speed Dating
+                  {t("nav.what_is_speed_dating")}
                 </Link>
               </li>
               <li>
                 <Link href="/vip" className="text-muted-foreground hover:text-foreground transition-colors">
-                  VIP Membership
+                  {t("nav.vip")}
                 </Link>
               </li>
               <li>
                 <Link href="/faqs" className="text-muted-foreground hover:text-foreground transition-colors">
-                  FAQs
+                  {t("faqs.title")}
                 </Link>
               </li>
             </ul>
 
-            <h4 className="font-semibold mb-3 mt-6">Legal</h4>
+            <h4 className="font-semibold mb-3 mt-6">{t("footer.legal")}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Terms &amp; Conditions
+                  {t("terms.title")}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Privacy Policy
+                  {t("privacy.title")}
                 </Link>
               </li>
               <li>
                 <Link href="/safety" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Safety Guidelines
+                  {t("safety.title")}
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-3">Contact Us</h4>
+            <h4 className="font-semibold mb-3">{t("contact.contact_details")}</h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4 flex-shrink-0" />
-                <a href="mailto:info@TheSpeedDating.co.uk" className="hover:text-foreground transition-colors">
-                  info@TheSpeedDating.co.uk
-                </a>
-              </li>
-              <li className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="h-4 w-4 flex-shrink-0" />
-                <a href="tel:07950272671" className="hover:text-foreground transition-colors">
-                  07950 272 671
-                </a>
-              </li>
+              {(() => {
+                const email = country === "il" ? "Info@TheSpeedDating.co.il" : "info@TheSpeedDating.co.uk";
+                const phone = country === "il" ? "052-8809879" : "07950 272 671";
+                return (
+                  <>
+                    <li className="flex items-center gap-2 text-muted-foreground">
+                      <Mail className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                      <a href={`mailto:${email}`} className="hover:text-foreground transition-colors">
+                        {email}
+                      </a>
+                    </li>
+                    <li className="flex items-center gap-2 text-muted-foreground">
+                      <Phone className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                      <a href={`tel:${phone.replace(/[\s-]/g, "")}`} className="hover:text-foreground transition-colors">
+                        {phone}
+                      </a>
+                    </li>
+                  </>
+                );
+              })()}
             </ul>
-            <div className="mt-4 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground mb-1">Opening Hours</p>
-              <p>Mon-Fri: 9:30am - 7:00pm</p>
-              <p>Sunday: 9:30am - 7:30pm</p>
-              <p className="text-xs mt-1">(Sunday: ticket booking only)</p>
-            </div>
           </div>
         </div>
 
         <div className="mt-10 pt-6 border-t">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-            <p>&copy; 2003 - {new Date().getFullYear()} TheSpeedDating.co.uk</p>
-            <p>Direct Touch Ltd. Production</p>
+            <p>{t("footer.copyright", { year: String(new Date().getFullYear()) })}</p>
+            <p>{t("footer.production")}</p>
           </div>
         </div>
       </div>

@@ -119,7 +119,7 @@ export function ScoreForm({
                     )}
                     onClick={() => setChoice(index, "date")}
                   >
-                    <Heart className="h-4 w-4 mr-1" />
+                    <Heart className="h-4 w-4 me-1" />
                     Date
                   </Button>
                   <Button
@@ -131,7 +131,7 @@ export function ScoreForm({
                     )}
                     onClick={() => setChoice(index, "friend")}
                   >
-                    <Users className="h-4 w-4 mr-1" />
+                    <Users className="h-4 w-4 me-1" />
                     Friend
                   </Button>
                   <Button
@@ -143,7 +143,7 @@ export function ScoreForm({
                     )}
                     onClick={() => setChoice(index, "no")}
                   >
-                    <X className="h-4 w-4 mr-1" />
+                    <X className="h-4 w-4 me-1" />
                     No
                   </Button>
                 </div>

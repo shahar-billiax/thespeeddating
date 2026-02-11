@@ -113,7 +113,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
               {currentPage > 1 && (
                 <Button asChild variant="outline">
                   <Link href={`/blog?page=${currentPage - 1}`}>
-                    {locale === "en" ? "Previous" : "הקודם"}
+                    {t("common.previous")}
                   </Link>
                 </Button>
               )}
@@ -134,7 +134,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
               {currentPage < totalPages && (
                 <Button asChild variant="outline">
                   <Link href={`/blog?page=${currentPage + 1}`}>
-                    {locale === "en" ? "Next" : "הבא"}
+                    {t("common.next")}
                   </Link>
                 </Button>
               )}

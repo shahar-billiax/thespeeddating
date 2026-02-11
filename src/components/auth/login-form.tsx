@@ -38,7 +38,7 @@ export function LoginForm({ redirect }: { redirect?: string }) {
             <p className="text-sm text-destructive">{state.error}</p>
           )}
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Signing in..." : t("nav.login")}
+            {pending ? t("auth.signing_in") : t("nav.login")}
           </Button>
         </form>
       </CardContent>
@@ -47,7 +47,7 @@ export function LoginForm({ redirect }: { redirect?: string }) {
           {t("auth.forgot_password")}
         </Link>
         <p className="text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          {t("auth.no_account")}{" "}
           <Link href="/register" className="text-primary hover:underline">
             {t("nav.register")}
           </Link>

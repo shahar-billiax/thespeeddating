@@ -32,11 +32,11 @@ export function RegisterForm() {
     const password = (form.querySelector('[name="password"]') as HTMLInputElement)?.value;
 
     if (!firstName || !lastName || !email || !password) {
-      setStepError("Please fill in all fields before continuing.");
+      setStepError(t("auth.fill_all_fields"));
       return;
     }
     if (password.length < 6) {
-      setStepError("Password must be at least 6 characters.");
+      setStepError(t("auth.password_min_length"));
       return;
     }
     setStepError("");
@@ -47,7 +47,7 @@ export function RegisterForm() {
     <Card>
       <CardHeader>
         <CardTitle className="text-center text-2xl">{t("auth.register_title")}</CardTitle>
-        <p className="text-center text-sm text-muted-foreground">Step {step} of 2</p>
+        <p className="text-center text-sm text-muted-foreground">{t("auth.step_of", { step: String(step), total: "2" })}</p>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
@@ -55,11 +55,11 @@ export function RegisterForm() {
             <>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">{t("profile.first_name")}</Label>
                   <Input id="firstName" name="firstName" autoComplete="given-name" required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">{t("profile.last_name")}</Label>
                   <Input id="lastName" name="lastName" autoComplete="family-name" required />
                 </div>
               </div>
@@ -75,7 +75,7 @@ export function RegisterForm() {
                 <p className="text-sm text-destructive">{stepError}</p>
               )}
               <Button type="button" className="w-full" onClick={handleNext}>
-                Next
+                {t("common.next")}
               </Button>
             </>
           )}
@@ -83,19 +83,19 @@ export function RegisterForm() {
           {step === 2 && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                <Label htmlFor="dateOfBirth">{t("profile.date_of_birth")}</Label>
                 <Input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" required />
               </div>
               <div className="space-y-2">
-                <Label>Gender</Label>
+                <Label>{t("profile.gender")}</Label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
                     <input type="radio" name="gender" value="male" required />
-                    Male
+                    {t("profile.male")}
                   </label>
                   <label className="flex items-center gap-2">
                     <input type="radio" name="gender" value="female" required />
-                    Female
+                    {t("profile.female")}
                   </label>
                 </div>
               </div>
@@ -109,13 +109,13 @@ export function RegisterForm() {
                   />
                   <input type="hidden" name="consent_terms" value={consentTerms ? "true" : "false"} />
                   <Label htmlFor="consent_terms" className="cursor-pointer text-sm leading-relaxed">
-                    I agree to the{" "}
+                    {t("auth.consent_terms_text")}{" "}
                     <Link href="/terms" className="text-primary hover:underline" target="_blank">
-                      Terms & Conditions
+                      {t("auth.terms_and_conditions")}
                     </Link>
-                    {" "}and{" "}
+                    {" "}{t("auth.and")}{" "}
                     <Link href="/privacy" className="text-primary hover:underline" target="_blank">
-                      Privacy Policy
+                      {t("auth.privacy_policy")}
                     </Link>
                   </Label>
                 </div>
@@ -127,7 +127,7 @@ export function RegisterForm() {
                   />
                   <input type="hidden" name="consent_marketing" value={consentMarketing ? "true" : "false"} />
                   <Label htmlFor="consent_marketing" className="cursor-pointer text-sm">
-                    I consent to receiving marketing communications
+                    {t("auth.consent_marketing")}
                   </Label>
                 </div>
               </div>
@@ -136,10 +136,10 @@ export function RegisterForm() {
               )}
               <div className="flex gap-3">
                 <Button type="button" variant="outline" className="flex-1" onClick={() => setStep(1)}>
-                  Back
+                  {t("common.back")}
                 </Button>
                 <Button type="submit" className="flex-1" disabled={pending || !consentTerms}>
-                  {pending ? "Creating account..." : t("nav.register")}
+                  {pending ? t("auth.creating_account") : t("nav.register")}
                 </Button>
               </div>
             </>
@@ -148,7 +148,7 @@ export function RegisterForm() {
       </CardContent>
       <CardFooter className="justify-center text-sm">
         <p className="text-muted-foreground">
-          Already have an account?{" "}
+          {t("auth.have_account")}{" "}
           <Link href="/login" className="text-primary hover:underline">
             {t("nav.login")}
           </Link>

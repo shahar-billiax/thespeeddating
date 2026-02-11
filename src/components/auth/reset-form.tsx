@@ -36,13 +36,13 @@ export function ResetForm() {
             <p className="text-sm text-green-600">{state.success}</p>
           )}
           <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? "Sending..." : t("auth.reset_password")}
+            {pending ? t("auth.sending") : t("auth.reset_password")}
           </Button>
         </form>
       </CardContent>
       <CardFooter className="justify-center text-sm">
         <Link href="/login" className="text-muted-foreground hover:text-foreground">
-          Back to login
+          {t("auth.back_to_login")}
         </Link>
       </CardFooter>
     </Card>

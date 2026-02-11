@@ -80,6 +80,7 @@ export default async function AdminPagesPage({
             <TableRow>
               <TableHead>Page Key</TableHead>
               <TableHead>Title</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Country</TableHead>
               <TableHead>Language</TableHead>
               <TableHead>Status</TableHead>
@@ -91,7 +92,7 @@ export default async function AdminPagesPage({
             {pages.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center text-muted-foreground py-8"
                 >
                   No pages found. Create your first page!
@@ -104,6 +105,15 @@ export default async function AdminPagesPage({
                     {page.page_key}
                   </TableCell>
                   <TableCell className="font-medium">{page.title}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        page.page_type === "testimony" ? "outline" : "secondary"
+                      }
+                    >
+                      {page.page_type === "testimony" ? "Testimony" : "Standard"}
+                    </Badge>
+                  </TableCell>
                   <TableCell>{page.countries?.name}</TableCell>
                   <TableCell>{page.language_code.toUpperCase()}</TableCell>
                   <TableCell>

@@ -34,6 +34,7 @@ interface EventCardProps {
     type: string;
     age_range: string;
     price_from: string;
+    free: string;
     spots_remaining: string;
     men: string;
     women: string;
@@ -84,7 +85,7 @@ export function EventCard({ event, locale, translations }: EventCardProps) {
     if (event.enable_gendered_price && event.price_male && event.price_female) {
       return `${translations.men}: ${currencyFormatter.format(event.price_male)} / ${translations.women}: ${currencyFormatter.format(event.price_female)}`;
     }
-    if (!event.price) return "Free";
+    if (!event.price) return translations.free;
     return `${translations.price_from} ${currencyFormatter.format(event.price)}`;
   };
 

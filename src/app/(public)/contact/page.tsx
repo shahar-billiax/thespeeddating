@@ -18,23 +18,45 @@ export async function generateMetadata(): Promise<Metadata> {
     title: page?.meta_title || t("contact.title"),
     description:
       page?.meta_description ||
-      "Get in touch with TheSpeedDating. Call 07950272671, email info@TheSpeedDating.co.uk, or fill in our contact form.",
+      t("meta.contact_description"),
   };
 }
 
-const OPENING_HOURS = [
+const FALLBACK_HOURS_GB = [
   { days: "Monday - Friday", hours: "9:30am - 7:00pm" },
-  {
-    days: "Sunday",
-    hours: "9:30am - 7:30pm",
-    note: "Tickets booking only",
-  },
+  { days: "Sunday", hours: "9:30am - 7:30pm", note: "Tickets booking only" },
   { days: "Saturday", hours: "Closed" },
 ] as { days: string; hours: string; note?: string }[];
 
+const FALLBACK_HOURS_IL = [
+  { days: "א'-ה'", hours: "9:30-19:00" },
+  { days: "ו'", hours: "9:30-13:00" },
+  { days: "שבת", hours: "סגור" },
+] as { days: string; hours: string; note?: string }[];
+
+const FALLBACK_CONTACT = {
+  gb: { phone: "07950 272 671", email: "info@TheSpeedDating.co.uk" },
+  il: { phone: "052-8809879", email: "Info@TheSpeedDating.co.il" },
+};
+
 export default async function ContactPage() {
-  const { t } = await getTranslations();
+  const { t, country } = await getTranslations();
   const page = await getPage("contact");
+
+  const cmsContact = page?.content_json as {
+    openingHours?: { days: string; hours: string; note?: string }[];
+    phone?: string;
+    email?: string;
+  } | null;
+
+  const fallbackHours = country === "il" ? FALLBACK_HOURS_IL : FALLBACK_HOURS_GB;
+  const fallbackContact = FALLBACK_CONTACT[country as keyof typeof FALLBACK_CONTACT] || FALLBACK_CONTACT.gb;
+
+  const openingHours = (cmsContact?.openingHours && cmsContact.openingHours.length > 0)
+    ? cmsContact.openingHours
+    : fallbackHours;
+  const phone = cmsContact?.phone || fallbackContact.phone;
+  const email = cmsContact?.email || fallbackContact.email;
 
   return (
     <div>
@@ -74,12 +96,12 @@ export default async function ContactPage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                       <Clock className="h-5 w-5 text-primary" />
                     </div>
-                    Opening Hours
+                    {t("contact.opening_hours")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {OPENING_HOURS.map((slot) => (
+                    {openingHours.map((slot) => (
                       <div
                         key={slot.days}
                         className="flex items-start justify-between gap-4"
@@ -87,7 +109,7 @@ export default async function ContactPage() {
                         <span className="text-sm font-medium">
                           {slot.days}
                         </span>
-                        <div className="text-right">
+                        <div className="text-end">
                           <span className="text-sm text-muted-foreground">
                             {slot.hours}
                           </span>
@@ -110,7 +132,7 @@ export default async function ContactPage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                       <MessageSquare className="h-5 w-5 text-primary" />
                     </div>
-                    Contact Details
+                    {t("contact.contact_details")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -120,12 +142,12 @@ export default async function ContactPage() {
                         <Mail className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Email</p>
+                        <p className="text-sm font-medium">{t("contact.email_label")}</p>
                         <a
-                          href="mailto:info@TheSpeedDating.co.uk"
+                          href={`mailto:${email}`}
                           className="text-sm text-muted-foreground transition-colors hover:text-primary"
                         >
-                          info@TheSpeedDating.co.uk
+                          {email}
                         </a>
                       </div>
                     </div>
@@ -134,15 +156,15 @@ export default async function ContactPage() {
                         <Phone className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium">Telephone</p>
+                        <p className="text-sm font-medium">{t("contact.telephone")}</p>
                         <a
-                          href="tel:07950272671"
+                          href={`tel:${phone.replace(/\s/g, "")}`}
                           className="text-sm text-muted-foreground transition-colors hover:text-primary"
                         >
-                          07950 272 671
+                          {phone}
                         </a>
                         <p className="mt-1 text-xs text-muted-foreground/70">
-                          Text messages preferred
+                          {t("contact.text_preferred")}
                         </p>
                       </div>
                     </div>
@@ -155,10 +177,9 @@ export default async function ContactPage() {
             <div className="lg:col-span-3">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">Send us a message</CardTitle>
+                  <CardTitle className="text-2xl">{t("contact.send_message")}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Or please fill in your details below and send &mdash; we
-                    will reply shortly!
+                    {t("contact.send_message_text")}
                   </p>
                 </CardHeader>
                 <CardContent>

@@ -1,10 +1,21 @@
 import { Suspense } from "react";
+import { Metadata } from "next";
+import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/lib/i18n/server";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventCard } from "@/components/events/event-card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
+  return {
+    title: t("meta.events_title"),
+    description: t("meta.events_description"),
+  };
+}
 
 interface PageProps {
   searchParams: Promise<{
@@ -157,25 +168,60 @@ async function EventsList({ searchParams }: { searchParams: Awaited<PageProps['s
     type: t(`events.type.${formattedEvents[0].event_type}`),
     age_range: t("events.age_range"),
     price_from: t("events.price_from"),
+    free: t("events.free"),
     spots_remaining: t("events.spots_remaining"),
     men: t("events.men"),
     women: t("events.women"),
   };
 
+  const totalPages = count ? Math.ceil(count / EVENTS_PER_PAGE) : 1;
+
+  function buildPageUrl(targetPage: number): string {
+    const params = new URLSearchParams(
+      searchParams as Record<string, string>
+    );
+    params.set("page", String(targetPage));
+    return `/events?${params.toString()}`;
+  }
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {formattedEvents.map((event) => (
-        <EventCard
-          key={event.id}
-          event={event}
-          locale={locale}
-          translations={{
-            ...translations,
-            type: t(`events.type.${event.event_type}`),
-          }}
-        />
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {formattedEvents.map((event) => (
+          <EventCard
+            key={event.id}
+            event={event}
+            locale={locale}
+            translations={{
+              ...translations,
+              type: t(`events.type.${event.event_type}`),
+            }}
+          />
+        ))}
+      </div>
+
+      {count && count > EVENTS_PER_PAGE && (
+        <div className="flex items-center justify-center gap-2 mt-8">
+          {page > 1 && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={buildPageUrl(page - 1)}>
+                {t("common.previous")}
+              </Link>
+            </Button>
+          )}
+          <span className="text-sm text-muted-foreground px-4">
+            {t("common.page")} {page} {t("common.of")} {totalPages}
+          </span>
+          {page < totalPages && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={buildPageUrl(page + 1)}>
+                {t("common.next")}
+              </Link>
+            </Button>
+          )}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -193,7 +239,7 @@ export default async function EventsPage({ searchParams }: PageProps) {
     .single();
 
   if (!countryData) {
-    return <div>Country not found</div>;
+    return <div>{t("events.country_not_found")}</div>;
   }
 
   // Get cities for filter

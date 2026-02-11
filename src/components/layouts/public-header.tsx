@@ -9,25 +9,30 @@ import { Menu, Crown } from "lucide-react";
 import { useState } from "react";
 
 export function PublicHeader({ user }: { user: { email: string } | null }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [open, setOpen] = useState(false);
 
   const navLinks = [
-    { href: "/", label: t("nav.home") },
-    { href: "/dating-tips", label: "Dating Tips" },
-    { href: "/matchmaking", label: "Matchmaking" },
-    { href: "/virtual-events", label: "Virtual Events" },
-    { href: "/success-stories", label: "Success Stories" },
+    { href: "/events", label: t("nav.events") },
+    { href: "/dating-tips", label: t("nav.dating_tips") },
+    { href: "/matchmaking", label: t("nav.matchmaking") },
+    { href: "/virtual-events", label: t("nav.virtual_events") },
+    { href: "/success-stories", label: t("nav.success_stories") },
     { href: "/contact", label: t("nav.contact") },
-    { href: "/franchise", label: "Franchise/Jobs" },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:bg-background focus:p-3 focus:text-foreground focus:border focus:rounded"
+      >
+        {t("nav.skip_to_content")}
+      </a>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/" className="text-xl font-bold text-primary whitespace-nowrap">
-            The Speed Dating
+            {t("nav.brand")}
           </Link>
           <nav className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
@@ -46,17 +51,17 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
           <Button
             variant="outline"
             size="sm"
-            className="hidden md:inline-flex border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10 hover:text-yellow-700 gap-1.5"
+            className="hidden lg:inline-flex border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10 hover:text-yellow-700 gap-1.5"
             asChild
           >
             <Link href="/vip">
               <Crown className="h-3.5 w-3.5" />
-              VIP
+              {t("nav.vip")}
             </Link>
           </Button>
           <CountrySwitcher />
           {user ? (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/profile">{t("nav.my_account")}</Link>
               </Button>
@@ -67,7 +72,7 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
               </form>
             </div>
           ) : (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
                 <Link href="/login">{t("nav.login")}</Link>
               </Button>
@@ -80,11 +85,11 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
           {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label={t("nav.open_menu")}>
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72">
+            <SheetContent side={locale === "he" ? "left" : "right"} className="w-72">
               <nav className="flex flex-col gap-1 mt-8">
                 {navLinks.map((link) => (
                   <Link
@@ -98,33 +103,33 @@ export function PublicHeader({ user }: { user: { email: string } | null }) {
                 ))}
                 <hr className="my-2" />
                 <Link
-                  href="/events"
-                  onClick={() => setOpen(false)}
-                  className="text-base font-medium py-2.5 px-3 rounded-md hover:bg-accent"
-                >
-                  {t("nav.events")}
-                </Link>
-                <Link
                   href="/vip"
                   onClick={() => setOpen(false)}
                   className="text-base font-medium py-2.5 px-3 rounded-md hover:bg-accent text-yellow-600 flex items-center gap-2"
                 >
                   <Crown className="h-4 w-4" />
-                  VIP Membership
+                  {t("nav.vip")}
                 </Link>
                 <Link
                   href="/what-is-speed-dating"
                   onClick={() => setOpen(false)}
                   className="text-base font-medium py-2.5 px-3 rounded-md hover:bg-accent"
                 >
-                  What Is Speed Dating
+                  {t("nav.what_is_speed_dating")}
                 </Link>
                 <Link
-                  href="/about"
+                  href="/about-us"
                   onClick={() => setOpen(false)}
                   className="text-base font-medium py-2.5 px-3 rounded-md hover:bg-accent"
                 >
-                  About Us
+                  {t("nav.about")}
+                </Link>
+                <Link
+                  href="/franchise-jobs"
+                  onClick={() => setOpen(false)}
+                  className="text-base font-medium py-2.5 px-3 rounded-md hover:bg-accent"
+                >
+                  {t("nav.franchise")}
                 </Link>
                 {user && (
                   <Link

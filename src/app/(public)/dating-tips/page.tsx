@@ -1,25 +1,28 @@
 import { Metadata } from "next";
 import { getPage } from "@/lib/pages";
+import { getTranslations } from "@/lib/i18n/server";
+import { getPageFallbackHtml } from "@/lib/i18n/page-fallbacks";
 import { CmsPageLayout } from "@/components/cms/cms-page-layout";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getTranslations();
   const page = await getPage("dating-tips");
   return {
-    title: page?.meta_title || page?.title || "Dating Tips",
+    title: page?.meta_title || t("meta.dating_tips_title"),
     description:
-      page?.meta_description ||
-      "Speed dating tips and advice to help you make the most of your evening.",
+      page?.meta_description || t("meta.dating_tips_description"),
   };
 }
 
 export default async function DatingTipsPage() {
+  const { t, locale } = await getTranslations();
   const page = await getPage("dating-tips");
 
   return (
     <CmsPageLayout
-      title={page?.title || "Dating Tips"}
-      contentHtml={page?.content_html ?? null}
-      fallbackTitle="Dating Tips"
+      title={page?.title || t("nav.dating_tips")}
+      contentHtml={page?.content_html ?? getPageFallbackHtml("dating-tips", locale)}
+      fallbackTitle={t("nav.dating_tips")}
     />
   );
 }

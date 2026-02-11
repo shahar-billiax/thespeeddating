@@ -10,13 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Globe } from "lucide-react";
 
-const countries = [
-  { code: "gb", label: "UK", flag: "🇬🇧" },
-  { code: "il", label: "Israel", flag: "🇮🇱" },
-];
-
 export function CountrySwitcher() {
-  const { country } = useTranslation();
+  const { country, t } = useTranslation();
+
+  const countries = [
+    { code: "gb", label: t("country.uk"), flag: "🇬🇧" },
+    { code: "il", label: t("country.israel"), flag: "🇮🇱" },
+  ];
+
   const current = countries.find((c) => c.code === country) || countries[0];
 
   function switchCountry(code: string) {

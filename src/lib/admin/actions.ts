@@ -764,6 +764,63 @@ export async function getTranslations(params: {
   return { translations: data ?? [], total: count ?? 0, page, perPage };
 }
 
+export async function getTranslationsPaired(params: {
+  page?: number;
+  search?: string;
+  namespace?: string;
+}) {
+  const { supabase } = await requireAdmin();
+
+  // First get all distinct keys (with optional search/namespace filter)
+  let keysQuery = supabase
+    .from("translations")
+    .select("string_key")
+    .order("string_key", { ascending: true });
+
+  if (params.search) {
+    keysQuery = keysQuery.or(
+      `string_key.ilike.%${params.search}%,value.ilike.%${params.search}%`
+    );
+  }
+  if (params.namespace) {
+    keysQuery = keysQuery.like("string_key", `${params.namespace}.%`);
+  }
+
+  const { data: allKeyRows } = await keysQuery;
+  const uniqueKeys = [...new Set((allKeyRows || []).map((r) => r.string_key))];
+
+  // Paginate by unique keys
+  const page = params.page ?? 1;
+  const perPage = 30;
+  const totalKeys = uniqueKeys.length;
+  const pageKeys = uniqueKeys.slice((page - 1) * perPage, page * perPage);
+
+  if (pageKeys.length === 0) {
+    return { pairs: [], total: totalKeys, page, perPage };
+  }
+
+  // Fetch all translations for the page's keys
+  const { data: translations } = await supabase
+    .from("translations")
+    .select("*")
+    .in("string_key", pageKeys)
+    .order("string_key", { ascending: true });
+
+  // Group into pairs: { key, en: { id, value }, he: { id, value } }
+  const map = new Map<string, { key: string; en?: { id: number; value: string }; he?: { id: number; value: string } }>();
+  for (const key of pageKeys) {
+    map.set(key, { key });
+  }
+  for (const t of translations || []) {
+    const entry = map.get(t.string_key);
+    if (entry) {
+      entry[t.language_code as "en" | "he"] = { id: t.id, value: t.value };
+    }
+  }
+
+  return { pairs: Array.from(map.values()), total: totalKeys, page, perPage };
+}
+
 export async function saveTranslation(formData: FormData) {
   const { supabase } = await requireAdmin();
   const id = formData.get("id") ? Number(formData.get("id")) : null;
@@ -820,6 +877,61 @@ export async function getMatchmakingProfiles(params: {
   const { data, count, error } = await query;
   if (error) throw new Error(error.message);
   return { profiles: data ?? [], total: count ?? 0, page, perPage };
+}
+
+// ─── Matchmaking Packages CRUD ───────────────────────────────
+export async function getMatchmakingPackages(countryId?: number) {
+  const { supabase } = await requireAdmin();
+  let query = supabase
+    .from("matchmaking_packages")
+    .select("*, countries(name, code)")
+    .order("price", { ascending: true });
+  if (countryId) query = query.eq("country_id", countryId);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function saveMatchmakingPackage(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id") ? Number(formData.get("id")) : null;
+
+  const pkg = {
+    name: formData.get("name") as string,
+    price: Number(formData.get("price")),
+    currency: formData.get("currency") as string,
+    num_dates: Number(formData.get("num_dates")),
+    duration_months: Number(formData.get("duration_months")),
+    country_id: Number(formData.get("country_id")),
+    is_active: formData.get("is_active") === "true",
+  };
+
+  if (id) {
+    const { error } = await supabase
+      .from("matchmaking_packages")
+      .update(pkg)
+      .eq("id", id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("matchmaking_packages").insert(pkg);
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/admin/matchmaking");
+  revalidatePath("/matchmaking");
+  return { success: true };
+}
+
+export async function deleteMatchmakingPackage(id: number) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase
+    .from("matchmaking_packages")
+    .delete()
+    .eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/matchmaking");
+  revalidatePath("/matchmaking");
+  return { success: true };
 }
 
 export async function updateMatchmakingProfile(
@@ -1008,6 +1120,7 @@ export async function getPageById(id: number) {
 export async function createPage(formData: FormData) {
   const { supabase } = await requireAdmin();
 
+  const contentJsonRaw = formData.get("content_json") as string;
   const pageData = {
     page_key: formData.get("page_key") as string,
     country_id: Number(formData.get("country_id")),
@@ -1017,6 +1130,8 @@ export async function createPage(formData: FormData) {
     meta_title: formData.get("meta_title") as string || null,
     meta_description: formData.get("meta_description") as string || null,
     is_published: formData.get("is_published") === "true",
+    page_type: (formData.get("page_type") as string) || "standard",
+    content_json: contentJsonRaw ? JSON.parse(contentJsonRaw) : null,
   };
 
   const { data, error } = await supabase
@@ -1033,6 +1148,7 @@ export async function createPage(formData: FormData) {
 export async function updatePage(id: number, formData: FormData) {
   const { supabase } = await requireAdmin();
 
+  const contentJsonRaw = formData.get("content_json") as string;
   const pageData = {
     page_key: formData.get("page_key") as string,
     country_id: Number(formData.get("country_id")),
@@ -1042,6 +1158,8 @@ export async function updatePage(id: number, formData: FormData) {
     meta_title: formData.get("meta_title") as string || null,
     meta_description: formData.get("meta_description") as string || null,
     is_published: formData.get("is_published") === "true",
+    page_type: (formData.get("page_type") as string) || "standard",
+    content_json: contentJsonRaw ? JSON.parse(contentJsonRaw) : null,
     updated_at: new Date().toISOString(),
   };
 
@@ -1053,7 +1171,7 @@ export async function updatePage(id: number, formData: FormData) {
   if (error) return { error: error.message };
   revalidatePath("/admin/pages");
   revalidatePath(`/${pageData.page_key}`);
-  redirect("/admin/pages");
+  redirect(`/admin/pages/${id}/edit`);
 }
 
 export async function deletePage(id: number) {
@@ -1095,6 +1213,18 @@ export async function getSuccessStories(params?: {
   return { stories: data ?? [], total: count ?? 0, page, perPage };
 }
 
+export async function getSuccessStoriesByCountry(countryId: number) {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("success_stories")
+    .select("*, countries(name, code)")
+    .eq("country_id", countryId)
+    .order("sort_order", { ascending: true })
+    .order("id", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function getSuccessStoryById(id: number) {
   const { supabase } = await requireAdmin();
   const { data, error } = await supabase
@@ -1128,9 +1258,12 @@ export async function createSuccessStory(formData: FormData) {
     .single();
 
   if (error) return { error: error.message };
+
+  const returnTo = formData.get("return_to") as string;
+  revalidatePath("/admin/pages");
   revalidatePath("/admin/success-stories");
   revalidatePath("/success-stories");
-  redirect("/admin/success-stories");
+  redirect(returnTo || "/admin/success-stories");
 }
 
 export async function updateSuccessStory(id: number, formData: FormData) {
@@ -1155,9 +1288,12 @@ export async function updateSuccessStory(id: number, formData: FormData) {
     .eq("id", id);
 
   if (error) return { error: error.message };
+
+  const returnTo = formData.get("return_to") as string;
+  revalidatePath("/admin/pages");
   revalidatePath("/admin/success-stories");
   revalidatePath("/success-stories");
-  redirect("/admin/success-stories");
+  redirect(returnTo || "/admin/success-stories");
 }
 
 export async function deleteSuccessStory(id: number) {
@@ -1166,5 +1302,141 @@ export async function deleteSuccessStory(id: number) {
   if (error) return { error: error.message };
   revalidatePath("/admin/success-stories");
   revalidatePath("/success-stories");
+  return { success: true };
+}
+
+// ─── VIP Plans ──────────────────────────────────────────────
+
+export async function getVipPlans(countryId?: number) {
+  const { supabase } = await requireAdmin();
+  let query = supabase
+    .from("vip_plans")
+    .select("*, countries(name, code, currency)")
+    .order("sort_order", { ascending: true });
+  if (countryId) query = query.eq("country_id", countryId);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function saveVipPlan(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id") ? Number(formData.get("id")) : null;
+
+  const plan = {
+    country_id: Number(formData.get("country_id")),
+    months: Number(formData.get("months")),
+    price_per_month: Number(formData.get("price_per_month")),
+    total_price: Number(formData.get("total_price")),
+    currency: formData.get("currency") as string,
+    badge: (formData.get("badge") as string) || null,
+    sort_order: Number(formData.get("sort_order")) || 0,
+    is_active: formData.get("is_active") === "true",
+    updated_at: new Date().toISOString(),
+  };
+
+  if (id) {
+    const { error } = await supabase.from("vip_plans").update(plan).eq("id", id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("vip_plans").insert(plan);
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/admin/vip");
+  revalidatePath("/vip");
+  return { success: true };
+}
+
+export async function deleteVipPlan(id: number) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("vip_plans").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/vip");
+  revalidatePath("/vip");
+  return { success: true };
+}
+
+// ─── VIP Benefits ───────────────────────────────────────────
+
+export async function getVipBenefits(countryId?: number) {
+  const { supabase } = await requireAdmin();
+  let query = supabase
+    .from("vip_benefits")
+    .select("*, countries(name, code)")
+    .order("sort_order", { ascending: true });
+  if (countryId) query = query.eq("country_id", countryId);
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function saveVipBenefit(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = formData.get("id") ? Number(formData.get("id")) : null;
+
+  const benefit = {
+    country_id: Number(formData.get("country_id")),
+    icon: formData.get("icon") as string,
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    sort_order: Number(formData.get("sort_order")) || 0,
+    is_active: formData.get("is_active") === "true",
+    updated_at: new Date().toISOString(),
+  };
+
+  if (id) {
+    const { error } = await supabase.from("vip_benefits").update(benefit).eq("id", id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("vip_benefits").insert(benefit);
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/admin/vip");
+  revalidatePath("/vip");
+  return { success: true };
+}
+
+export async function deleteVipBenefit(id: number) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("vip_benefits").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/vip");
+  revalidatePath("/vip");
+  return { success: true };
+}
+
+// ─── VIP Settings ───────────────────────────────────────────
+
+export async function getVipSettings() {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("vip_settings")
+    .select("*, countries(name, code)")
+    .order("country_id", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+export async function saveVipSettings(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const countryId = Number(formData.get("country_id"));
+  const autoRenewalNotice = formData.get("auto_renewal_notice") as string;
+
+  const { error } = await supabase
+    .from("vip_settings")
+    .upsert(
+      {
+        country_id: countryId,
+        auto_renewal_notice: autoRenewalNotice,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "country_id" }
+    );
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/vip");
+  revalidatePath("/vip");
   return { success: true };
 }

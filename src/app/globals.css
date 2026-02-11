@@ -143,12 +143,12 @@
   position: relative;
   margin-top: 3rem;
   margin-bottom: 1.25rem;
-  padding-left: 1.25rem;
+  padding-inline-start: 1.25rem;
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.025em;
   color: var(--foreground);
-  border-left: 4px solid var(--primary);
+  border-inline-start: 4px solid var(--primary);
 }
 
 .cms-content > :where(h2):first-child {
@@ -200,7 +200,7 @@
 
 .cms-content :where(ul) {
   list-style: none;
-  padding-left: 0;
+  padding-inline-start: 0;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
   display: flex;
@@ -210,14 +210,14 @@
 
 .cms-content :where(ul) > :where(li) {
   position: relative;
-  padding-left: 2rem;
+  padding-inline-start: 2rem;
   line-height: 1.65;
 }
 
 .cms-content :where(ul) > :where(li)::before {
   content: "";
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0.45em;
   width: 0.5rem;
   height: 0.5rem;
@@ -230,7 +230,7 @@
 
 .cms-content :where(ol) {
   list-style: none;
-  padding-left: 0;
+  padding-inline-start: 0;
   margin-top: 1rem;
   margin-bottom: 1.5rem;
   counter-reset: cms-ol;
@@ -241,7 +241,7 @@
 
 .cms-content :where(ol) > :where(li) {
   position: relative;
-  padding-left: 2.75rem;
+  padding-inline-start: 2.75rem;
   line-height: 1.65;
   counter-increment: cms-ol;
 }
@@ -249,7 +249,7 @@
 .cms-content :where(ol) > :where(li)::before {
   content: counter(cms-ol);
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0.05em;
   display: flex;
   align-items: center;
@@ -270,7 +270,7 @@
   display: block;
   font-style: italic;
   padding: 1rem 1.25rem;
-  border-left: 3px solid var(--primary);
+  border-inline-start: 3px solid var(--primary);
   background: color-mix(in oklch, var(--muted) 60%, transparent);
   border-radius: 0.5rem;
   color: color-mix(in oklch, var(--foreground) 75%, transparent);
@@ -291,7 +291,7 @@
 .cms-content :where(blockquote) {
   margin: 1.5rem 0;
   padding: 1.25rem 1.5rem;
-  border-left: 4px solid var(--primary);
+  border-inline-start: 4px solid var(--primary);
   background: color-mix(in oklch, var(--muted) 50%, transparent);
   border-radius: 0.5rem;
   font-style: italic;
@@ -327,4 +327,27 @@
 
 .dark .cms-content :where(blockquote) {
   background: color-mix(in oklch, var(--muted) 30%, transparent);
+}
+
+/* ---- Highlighted text (mark) ---- */
+
+.cms-content :where(mark) {
+  border-radius: 0.125rem;
+  padding: 0.125em 0.1em;
+  background-color: #fab005;
+  color: inherit;
+}
+
+/* ---- Superscript / Subscript ---- */
+
+.cms-content :where(sup) {
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.cms-content :where(sub) {
+  font-size: 0.75em;
+  vertical-align: sub;
+  line-height: 0;
 }

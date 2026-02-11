@@ -623,15 +623,15 @@ insert into translations (string_key, language_code, value) values
 
 -- VIP and Matchmaking translations (Hebrew)
 insert into translations (string_key, language_code, value) values
-  ('vip.title', 'he', 'מנוי VIP'),
-  ('vip.subtitle', 'he', 'פתחו הטבות בלעדיות ושפרו את חוויית ההיכרויות שלכם'),
+  ('vip.title', 'he', 'הצטרפו לחברות VIP וקבלו הנחות!'),
+  ('vip.subtitle', 'he', 'הצטרפו למועדון החברים שלנו עוד היום!'),
   ('vip.benefits_title', 'he', 'הטבות VIP'),
-  ('vip.benefit_1', 'he', 'הנחה על כרטיסים לאירועים'),
-  ('vip.benefit_2', 'he', 'ראו מי בחר בכם'),
-  ('vip.benefit_3', 'he', 'עדיפות בהזמנה'),
-  ('vip.benefit_4', 'he', 'הנחה על שירות שידוכים'),
-  ('vip.pricing_title', 'he', 'בחרו את התוכנית שלכם'),
-  ('vip.subscribe', 'he', 'הירשמו עכשיו'),
+  ('vip.benefit_1', 'he', 'ערבי ספיד דייט בהנחה של 25%'),
+  ('vip.benefit_2', 'he', 'אנו מגלים לכם מי בחר בכם'),
+  ('vip.benefit_3', 'he', 'הנחה של 15% לשירות השידוכים'),
+  ('vip.benefit_4', 'he', 'ועוד הנחות מפתיעות'),
+  ('vip.pricing_title', 'he', 'נא לבחור את תכנית המנוי המתאימה לך'),
+  ('vip.subscribe', 'he', 'הצטרפו עכשיו'),
   ('vip.per_month', 'he', 'חודש'),
   ('vip.best_value', 'he', 'הכי משתלם'),
   ('vip.popular', 'he', 'פופולרי'),
@@ -653,6 +653,88 @@ insert into translations (string_key, language_code, value) values
   ('blog.no_posts', 'he', 'אין פוסטים בבלוג עדיין'),
   ('blog.read_more', 'he', 'קרא עוד'),
   ('blog.back', 'he', 'חזרה לבלוג');
+
+-- Additional UI translations (English)
+insert into translations (string_key, language_code, value) values
+  ('nav.dating_tips', 'en', 'Dating Tips'),
+  ('nav.virtual_events', 'en', 'Virtual Events'),
+  ('nav.success_stories', 'en', 'Success Stories'),
+  ('nav.franchise', 'en', 'Franchise/Jobs'),
+  ('nav.what_is_speed_dating', 'en', 'What Is Speed Dating'),
+  ('home.sign_up_now', 'en', 'Sign Up Now'),
+  ('home.get_notified', 'en', 'Sign up to get notified'),
+  ('home.view_upcoming', 'en', 'View Upcoming Events'),
+  ('home.read_stories', 'en', 'Read Their Stories'),
+  ('home.cta_heading', 'en', 'Our evenings are about meeting new like-minded people in a friendly, fun evening.'),
+  ('home.cta_subtext', 'en', 'Sign up now for the next event. All our events are Jewish.'),
+  ('vip.hero_subtitle', 'en', 'Become our VIP member and get Discounts!'),
+  ('vip.benefits_heading', 'en', 'VIP Benefits'),
+  ('vip.benefits_subtext', 'en', 'Join our exclusive VIP membership today'),
+  ('vip.plans_heading', 'en', 'Select Your VIP Membership Plan'),
+  ('vip.plans_subtext', 'en', 'Choose the plan that works best for you'),
+  ('vip.buy_membership', 'en', 'Buy VIP Membership'),
+  ('vip.coming_soon', 'en', 'Coming Soon'),
+  ('vip.notice_title', 'en', 'Important Notice'),
+  ('matchmaking.packages_subtext', 'en', 'Choose the package that suits your needs. All packages include a personal interview and dedicated matchmaker.'),
+  ('matchmaking.register_title', 'en', 'Register With Us Today'),
+  ('matchmaking.register_subtext', 'en', 'It''s easy: Just give it a chance.'),
+  ('matchmaking.login_prompt', 'en', 'Please log in or create an account to apply for our matchmaking service.'),
+  ('success_stories.featured', 'en', 'Featured Stories'),
+  ('success_stories.more', 'en', 'More Testimonials'),
+  ('faqs.still_questions', 'en', 'Still Have Questions?'),
+  ('faqs.still_questions_text', 'en', 'Can''t find the answer you''re looking for? Get in touch with our friendly team.'),
+  ('faqs.hero_subtitle', 'en', 'Everything you need to know about our Jewish speed dating events'),
+  ('contact.opening_hours', 'en', 'Opening Hours'),
+  ('contact.contact_details', 'en', 'Contact Details'),
+  ('contact.send_message', 'en', 'Send us a message'),
+  ('contact.send_message_text', 'en', 'Or please fill in your details below and send — we will reply shortly!'),
+  ('contact.error', 'en', 'Failed to send message. Please try again.'),
+  ('events.back_to_events', 'en', '← Back to Events'),
+  ('common.page', 'en', 'Page'),
+  ('common.of', 'en', 'of'),
+  ('common.previous', 'en', 'Previous'),
+  ('common.next', 'en', 'Next');
+
+-- Additional UI translations (Hebrew)
+insert into translations (string_key, language_code, value) values
+  ('nav.dating_tips', 'he', 'טיפים'),
+  ('nav.virtual_events', 'he', 'אירועים וירטואליים'),
+  ('nav.success_stories', 'he', 'סיפורי הצלחה'),
+  ('nav.franchise', 'he', 'זיכיון ומשרות'),
+  ('nav.what_is_speed_dating', 'he', 'מה זה ספיד דייט'),
+  ('home.sign_up_now', 'he', 'הירשמו עכשיו'),
+  ('home.get_notified', 'he', 'קבלו עדכון'),
+  ('home.view_upcoming', 'he', 'צפו באירועים הקרובים'),
+  ('home.read_stories', 'he', 'קראו סיפורים'),
+  ('home.cta_heading', 'he', 'מוכנים למצוא את ההתאמה?'),
+  ('home.cta_subtext', 'he', 'הצטרפו לאלפי רווקים יהודים שמצאו אהבה דרך ספיד דייטינג.'),
+  ('vip.hero_subtitle', 'he', 'הצטרפו למועדון החברים שלנו עוד היום!'),
+  ('vip.benefits_heading', 'he', 'הטבות VIP'),
+  ('vip.benefits_subtext', 'he', 'הצטרפו לחברות VIP וקבלו הנחות!'),
+  ('vip.plans_heading', 'he', 'נא לבחור את תכנית המנוי המתאימה לך'),
+  ('vip.plans_subtext', 'he', 'נא לבחור את תכנית המנוי המתאימה לך'),
+  ('vip.buy_membership', 'he', 'הצטרפו עכשיו'),
+  ('vip.coming_soon', 'he', 'בקרוב'),
+  ('vip.notice_title', 'he', 'מידע חשוב'),
+  ('matchmaking.packages_subtext', 'he', 'בחרו את החבילה המתאימה לכם. כל החבילות כוללות ייעוץ אישי.'),
+  ('matchmaking.register_title', 'he', 'זה קל! הצטרפו אלינו היום!'),
+  ('matchmaking.register_subtext', 'he', 'מלאו את הטופס למטה והשדכן שלנו ייצור אתכם קשר.'),
+  ('matchmaking.login_prompt', 'he', 'אנא התחברו או הירשמו כדי להגיש בקשה לשירות השידוכים.'),
+  ('success_stories.featured', 'he', 'סיפורים מובחרים'),
+  ('success_stories.more', 'he', 'עדויות נוספות'),
+  ('faqs.still_questions', 'he', 'עדיין יש שאלות?'),
+  ('faqs.still_questions_text', 'he', 'לא מצאתם את מה שחיפשתם? צרו איתנו קשר.'),
+  ('faqs.hero_subtitle', 'he', 'כל מה שצריך לדעת על ספיד דייטינג'),
+  ('contact.opening_hours', 'he', 'שעות פעילות'),
+  ('contact.contact_details', 'he', 'פרטי התקשרות'),
+  ('contact.send_message', 'he', 'שלחו לנו הודעה'),
+  ('contact.send_message_text', 'he', 'או מלאו את הפרטים שלכם למטה ושלחו — נחזור אליכם בקרוב!'),
+  ('contact.error', 'he', 'שליחת ההודעה נכשלה. אנא נסו שוב.'),
+  ('events.back_to_events', 'he', '← חזרה לאירועים'),
+  ('common.page', 'he', 'עמוד'),
+  ('common.of', 'he', 'מתוך'),
+  ('common.previous', 'he', 'הקודם'),
+  ('common.next', 'he', 'הבא');
 
 -- CMS Pages (UK - English)
 insert into pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published) values
@@ -1078,6 +1160,375 @@ insert into pages (page_key, country_id, language_code, title, content_html, met
     true
   );
 
+-- CMS Pages: Set page_type and content_json for structured pages
+
+-- Contact (GB) → contact
+UPDATE pages SET page_type = 'contact', content_json = '{
+  "openingHours": [
+    {"days": "Monday - Friday", "hours": "9:30am - 7:00pm"},
+    {"days": "Sunday", "hours": "9:30am - 7:30pm", "note": "Tickets booking only"},
+    {"days": "Saturday", "hours": "Closed"}
+  ],
+  "phone": "07950 272 671",
+  "email": "info@TheSpeedDating.co.uk"
+}'::jsonb
+WHERE page_key = 'contact' AND country_id = (SELECT id FROM countries WHERE code = 'gb');
+
+-- Success Stories → testimony (set by migration 027, but ensure it for seed)
+UPDATE pages SET page_type = 'testimony' WHERE page_key = 'success-stories';
+
+-- FAQ (GB) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published, page_type, content_json) VALUES (
+  'faq',
+  (SELECT id FROM countries WHERE code = 'gb'),
+  'en',
+  'Frequently Asked Questions',
+  '<p>Find answers to the most common questions about our speed dating events, matching process, and more.</p>',
+  'FAQs | The Speed Dating',
+  'Frequently asked questions about TheSpeedDating Jewish speed dating events, matching, booking, and VIP membership.',
+  true,
+  'faq',
+  '{
+    "categories": [
+      {
+        "title": "About Speed Dating",
+        "questions": [
+          {"question": "What is speed dating?", "answer": "Speed dating is a fun and efficient way to meet multiple potential partners in one evening. You''ll have a series of 7-minute conversations with each person. For a modest fee, you meet around 12 professional Jewish singles in your age group at trendy bar venues. It''s a cool way of having a selection of people to choose from and say ''YES'' to the potentially right one without wasting time on the wrong one!"},
+          {"question": "How does it work?", "answer": "Women stay seated while men rotate between tables when a bell signals the time change. Each conversation lasts 7 minutes. You receive a score card and mark whether you''d like to meet each person again as a ''Date'' or ''Friend''. If both people select ''Date'' for each other, it''s a mutual match and contact details are revealed."},
+          {"question": "What happens during the evening?", "answer": "You arrive and check in at the venue, receive your score card, and have some time to mingle. The speed dating begins at 7pm — you''ll have 7-minute dates with each person, with short breaks in between for refreshments. After all the dates, there''s time for more mingling and drinks. The typical schedule is: 6:30pm Reception & Registration, 7:00-9:00pm Speed Dating, 9:00pm onwards Mingle and Drinks."},
+          {"question": "What age groups do you cater to?", "answer": "We run events for various age groups: 20s, 30s, 40s, 50s, and 60s. Each event is clearly labeled with its age range. We carefully segment events to ensure the best possible experience for everyone."},
+          {"question": "What event types do you offer?", "answer": "We offer several types of events: Jewish General (our most common), Singles, Traditional, Divorcees, Single Parents, Conservative, Virtual Events, Israeli, and Party/Mixer events. Each event type is clearly labeled so you can choose what suits you best."},
+          {"question": "What should I wear?", "answer": "The dress code is smart casual. You want to look and feel your best! Our events are held at high-class venues with a nice vibe, so avoid overly casual clothing like sportswear."}
+        ]
+      },
+      {
+        "title": "Matching & Results",
+        "questions": [
+          {"question": "How do I submit my choices?", "answer": "After the event, log in to the website with your username and password (provided when you purchased your ticket). Select the event date, view the list of people you met, and choose ''Date'' or ''Friend'' for each person. You can also select which contact details to reveal — email, phone, or both."},
+          {"question": "How do I get my match results?", "answer": "Log in to the website to view your matches. We recommend submitting your choices promptly and checking back multiple times. An email reminder is sent after 3 days if you haven''t submitted your choices. Final results are sent via email after 1 week."},
+          {"question": "What does ''No match yet'' mean?", "answer": "It simply means the other person hasn''t entered their choices yet. Once they do, if you''ve both selected ''Date'' for each other, you''ll see the match and receive their contact details. Be patient — not everyone submits right away!"},
+          {"question": "What if I can''t submit my choices online?", "answer": "You have several options: hand your completed score card to the hostess at the end of the event, email your choices to info@TheSpeedDating.co.uk, or call us at 0700 3401347."},
+          {"question": "When will I find out my matches?", "answer": "Matches appear as soon as both people have submitted their choices. If the other person hasn''t submitted yet, you''ll see ''No match yet''. We send an email reminder after 3 days and final results after 1 week."}
+        ]
+      },
+      {
+        "title": "Practical Information",
+        "questions": [
+          {"question": "Do I need to book in advance?", "answer": "Yes! We accept advance bookings only to ensure the evening''s success. This allows us to balance the number of men and women and ensure the right age group mix. Book online or contact us to reserve your spot."},
+          {"question": "Can I cancel my booking?", "answer": "Yes, you can cancel up to 48 hours before the event for a full refund. Cancellations made less than 48 hours before are non-refundable, though you may be able to transfer your ticket to another event (subject to availability)."},
+          {"question": "Is this only for Jewish people?", "answer": "Our events are primarily designed for Jewish singles, and most participants are Jewish. However, we welcome people of all backgrounds who are interested in meeting Jewish partners and are respectful of Jewish culture and traditions. All our events are Jewish-focused."},
+          {"question": "Where do you hold events?", "answer": "We hold events in London (primarily), Manchester, and Leeds in the UK, as well as Tel Aviv and Jerusalem in Israel. Our venues are high-class bars and restaurants with a nice vibe. People even travel from other European countries — Holland, Denmark, Belgium — to attend our London events!"},
+          {"question": "What are the VIP benefits?", "answer": "VIP members enjoy discounted event tickets at a special price, we reveal who chose you at events you participated in, 15% off our matchmaking service, and access to special offers and promotions. VIP membership starts from just £6 per month."},
+          {"question": "Why do so many people come to speed dating?", "answer": "You can meet many singles in one evening rather than spending months meeting people separately. The evening isn''t just about finding a date — it''s also about meeting new people, making friends, networking, and practicing your communication skills in a fun, relaxed atmosphere. With 120+ weddings to date, speed dating clearly works!"}
+        ]
+      }
+    ]
+  }'::jsonb
+);
+
+-- FAQ (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published, page_type, content_json) VALUES (
+  'faq',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'שאלות נפוצות',
+  '<p>מצאו תשובות לשאלות הנפוצות ביותר על אירועי הדייט המהיר שלנו, תהליך ההתאמה ועוד.</p>',
+  'שאלות נפוצות | The Speed Dating',
+  'שאלות נפוצות על אירועי דייט מהיר, התאמות, הזמנות וחברות VIP.',
+  true,
+  'faq',
+  '{
+    "categories": [
+      {
+        "title": "About Speed Dating",
+        "questions": [
+          {"question": "What is speed dating?", "answer": "Speed dating is a fun and efficient way to meet multiple potential partners in one evening. You''ll have a series of short conversations with each person. For a modest fee, you meet around 12 professional Jewish singles in your age group at trendy venues."},
+          {"question": "How does it work?", "answer": "Women stay seated while men rotate between tables when a bell signals the time change. Each conversation lasts about 5 minutes. You receive a score card and mark whether you''d like to meet each person again. If both people select each other, it''s a mutual match and contact details are revealed."},
+          {"question": "What age groups do you cater to?", "answer": "We run events for various age groups: 20s, 30s, 40s, and 50s. Each event is clearly labeled with its age range."},
+          {"question": "What should I wear?", "answer": "The dress code is smart casual. You want to look and feel your best!"}
+        ]
+      },
+      {
+        "title": "Matching & Results",
+        "questions": [
+          {"question": "How do I submit my choices?", "answer": "After the event, log in to the website and select the event date, view the list of people you met, and choose ''Date'' or ''Friend'' for each person."},
+          {"question": "How do I get my match results?", "answer": "Log in to the website to view your matches. We recommend submitting your choices promptly. Final results are sent via email after 1 week."},
+          {"question": "When will I find out my matches?", "answer": "Matches appear as soon as both people have submitted their choices. We send an email reminder after 3 days and final results after 1 week."}
+        ]
+      },
+      {
+        "title": "Practical Information",
+        "questions": [
+          {"question": "Do I need to book in advance?", "answer": "Yes! We accept advance bookings only to ensure the evening''s success."},
+          {"question": "Where do you hold events?", "answer": "We hold events in Tel Aviv and Jerusalem. Our venues are trendy bars and restaurants."}
+        ]
+      }
+    ]
+  }'::jsonb
+);
+
+-- VIP (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published) VALUES (
+  'vip',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'הצטרפו לחברות VIP וקבלו הנחות!',
+  '<h2>הצטרפו לחברות VIP וקבלו הנחות!</h2>
+<ul>
+<li>ערבי ספיד דייט בהנחה של 25%</li>
+<li>הנחה של 15% לשירות השידוכים האישי</li>
+<li>אנו מגלים לכם מי בחר בכם בערב הספיד דייט בו השתתפתם</li>
+<li>ועוד הנחות מפתיעות</li>
+</ul>
+<p>הצטרפו למועדון החברים שלנו עוד היום!</p>',
+  'הצטרפו לחברות VIP | The Speed Dating',
+  'הצטרפו לחברות VIP וקבלו הנחות על ערבי ספיד דייט, שירותי שידוכים והטבות בלעדיות.',
+  true
+);
+
+-- Contact (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published, page_type, content_json) VALUES (
+  'contact',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'צור קשר',
+  '<p>נשמח לשמוע מכם! בין אם יש לכם שאלה על האירועים שלנו, צריכים עזרה עם החשבון, או רוצים לשתף משוב.</p>',
+  'צור קשר | The Speed Dating',
+  'צרו קשר עם The Speed Dating. שלחו לנו הודעה או מלאו את טופס יצירת הקשר.',
+  true,
+  'contact',
+  '{
+    "openingHours": [
+      {"days": "Sunday - Thursday", "hours": "9:30 - 19:00"},
+      {"days": "Friday", "hours": "9:30 - 14:00"},
+      {"days": "Saturday", "hours": "Closed"}
+    ],
+    "phone": "03-1234567",
+    "email": "info@TheSpeedDating.co.il"
+  }'::jsonb
+);
+
+-- Home (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published) VALUES (
+  'home',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'ברוכים הבאים לספיד דייטינג',
+  '<h2>ברוכים הבאים לספיד דייטינג ישראל</h2>
+<p>ברוכים הבאים לאתר הישראלי של חברת הספיד דייטינג העולמית - ערבי ספיד דייט לאנשי קריירה ואקדמאים. <strong>חזרנו לערבי ספיד דייט בבתי הקפה!</strong></p>
+<p>לחברה שלנו יש ניסיון של 17 שנים בארץ ובעולם וסניפים מצליחים באנגליה, ארצות הברית וצרפת. אנחנו גאים להיות אחראים ל-150 חתונות ואלפי דייטים ברחבי העולם, ומבטיחים להעניק לכם חוויה נינוחה ונעימה במהלך ערב שעשוי לשנות את חייכם.</p>
+<p>כמו כן אנו מציעים שירות דייטינג אונליין באתר זיווגים ולמי שמחפש שירות שידוכים אנו מציעים שירות שידוכים אישי.</p>
+<hr>
+<h2>למה להגיע דווקא אלינו?</h2>
+<p>המון אנשים מצלצלים אלינו בחשש - האם מתאים לי להגיע לערב כזה? אילו אנשים אפגוש? יש כאלה שהיו בערבי ספיד דייט אחרים (לא שלנו) והתאכזבו קשות.</p>
+<p><strong>אנו מתחייבים בפניכם:</strong></p>
+<ul>
+<li>ערב נעים, איכותי מכל הבחינות ואסתטי</li>
+<li>לא "שוק בשר" - אלא חם וחברותי עם אנשים שתרצו לפגוש</li>
+<li>עד 14 משתתפים מכל מין - איכות ולא רק כמות</li>
+<li>סינון מוקפד של המשתתפים - אקדמאים ואנשי קריירה בלבד</li>
+</ul>
+<hr>
+<h2>איך זה עובד?</h2>
+<p>כולנו אנשים עסוקים וקשה לנו להרחיב את מעגל ההיכרויות שלנו ולהכיר אנשים חדשים. ערב הספיד דייט מציע לכם אלטרנטיבה יעילה, מהנה ובטוחה להכיר אנשים איכותיים, בעלי תחומי עניין וגיל משותפים לכם.</p>
+<p>תוכלו לדבר אחד על אחד ללא כל התחייבות מצידכם, וניתנת לכם האפשרות לומר "כן" ולהמשיך לפגישה נוספת או "לא" - מבלי לפגוע באף אחד מהאנשים איתם נפגשתם.</p>
+<h3>היתרונות שלכם</h3>
+<ul>
+<li>להגדיל בבת אחת את כמות הדייטים הפוטנציאליים שלכם</li>
+<li>להרחיב את מעגל ההיכרויות שלכם ולזכות גם בידידים חדשים</li>
+<li>להכיר חבר חדש, עמית למקצוע או לשכלל את יכולות הנטוורקינג שלכם</li>
+</ul>
+<p><em>בערב הספיד דייט לכל מפגש יש פוטנציאל חיובי עבורכם!</em></p>',
+  'ספיד דייט ישראל | The Speed Dating',
+  'ערבי ספיד דייט לרווקים יהודים בתל אביב וירושלים. מעל 120 חתונות ברחבי העולם.',
+  true
+);
+
+-- About Us (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published) VALUES (
+  'about-us',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'אודות',
+  '<p>חברת הספיד דייטינג הוקמה על ידי מיכל בחודש מאי 2003 בלונדון כחברה המארגנת ערבי ספיד דייט ליהודים.</p>
+<p>בשנתיים הראשונות התקיימו שני אירועי ספיד דייט בחודש לרווקים ורווקות יהודים בין הגילאים 20-40 אך עם הזמן הרחבנו את קבוצות הגיל. כיום מתקיימים בלונדון ערבי ספיד דייט פעמיים בשבוע לקבוצות גיל שונות בטווחי גילאים של 20-65. המקומות בהם מתקיימים ערבי הספיד דייט הם מקומות קלאסיים, אופנתיים וברמה גבוהה עם אוירה טובה וחברותית. מספטמבר 2006 אנו גם מארחים ערבים אלה בערים מנצ''סטר ולידס</p>
+<p>בינואר 2009 נפתח סניף ספיד דייט ישראל בתל אביב, סניף ספיד דייט ירושלים נפתח באוגוסט 2011 וסניף ספיד דייט חיפה באוקטובר 2011. אנו מקיימים כ 8 ערבי ספיד דייט בכל חודש לקבוצות גיל של 22-55</p>
+<p>בחודש מאי 2009 נפתח סניף ניו יורק - אנו מקיימים בין 4-6 ערבי ספיד דייט בחודש לגילאי 22-60</p>
+<p>סניף פריס נפתח בחודש פברואר 2011</p>
+<p>ב 2006 הוספנו את שירות השידוכים האישי שלנו הנקרא Jewish Matches. במסגרת שירות זה אנו משדכים על פי הצרכים והתכונות של כל לקוח. שרות השידוכים שלנו מספק ללקוחותינו גישה לקהל רחב יותר של אנשים המגיעים מדי חודש לערבי הספיד דייט שלנו כמו גם לאלה המצטרפים לשירות זה. מיוני 2010 אנו מציעים שירות זה גם בניו יורק ובישראל החל משנת 2011.</p>
+<blockquote>
+<p>"הגענו למיכל עם שאיפות וצפיות ענקיות כי שמענו על ההצלחות שלה...
+אבל הן היו כאין וכאפס לעומת מה שגילינו עליה בהמשך.
+היא אשת אשכולות, עם ראיה וזווית חדה ורחבה, הרואה לעומקן את כל תכונות האופי.
+יש לה יכולות שרק למעטים יש. יש לה את היכולת לאבחן אנשים, ולראות הרבה מעבר לכיסוי החיצוני
+וכך גם לדעת מי מתאים למי, ובמדויק.
+אלוהים חנן אותה בתכונות ייחודיות ורבות ...
+ולכן, (על פי המקורות) שמור מקומה, (לאחר 120,) בגן עדן !!
+אנו מאחלים לך המשך עבודה מוצלח, בה יזכו להקים זוגות רבים ונוספים לעמוד מתחת לחופה.
+עבודתך, היא עבודת קודש...
+ישר כוח....
+ללא היכרותנו אותך, שירן הייתה ממשיכה לתור אחר בן זוג.
+בברכת חג שמח"</p>
+</blockquote>
+<p>משנת 2003 אנו גאים בלפחות 120 חתונות (שידועות לנו) הרבה זוגות שמקיימים מערכות יחסים רציניות ואנשים שמצאו חברים חדשים כולם הכירו בערבי הספיד דייט.</p>
+<p>יש לנו לקוחות שמגיעים מארצות אחרות באירופה במיוחד לערבי הספיד דייט שלנו בלונדון- מהולנד, בלגיה, שוויץ ואף מאיטליה.</p>
+<p>שירות הספיד דייט שאנו מספקים מציע פתרון נהדר המחבר בין פנויים ופנויות יהודים ברחבי העולם וגם בישראל.</p>',
+  'אודות | The Speed Dating',
+  'חברת הספיד דייטינג הוקמה בלונדון ב-2003 ומארגנת ערבי ספיד דייט ליהודים ברחבי העולם.',
+  true
+);
+
+-- Success Stories (IL) — new page (testimonies live in success_stories table)
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published, page_type) VALUES (
+  'success-stories',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'סיפורי הצלחה',
+  '<p>אנו גאים להציג כאן מעט מסיפורי ההצלחה שלנו: 120 חתונות ברחבי העולם – ההוכחה לכך ששיטת הספיד דייטינג עובדת היטב!</p>
+<p>כמה דוגמאות מתודות שקיבלנו מזוגות שהתחתנו דרכנו:</p>',
+  'סיפורי הצלחה | The Speed Dating',
+  '120 חתונות ברחבי העולם! קראו סיפורי אהבה אמיתיים מזוגות שהכירו דרך ערבי הספיד דייט שלנו.',
+  true,
+  'testimony'
+);
+
+-- Matchmaking (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published) VALUES (
+  'matchmaking',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'שירות שידוכים',
+  '<h2>מהו שירות השידוכים?</h2>
+<p>אנשי קריירה רבים מרגישים כמה קשה לפנות זמן על מנת להכיר את המיועד או המיועדת. אנו מציעים שירות שידוכים (באיזור המרכז בלבד) מיוחד זה על מנת לחסוך לך זמן בדרך להיכרות עם האדם המתאים.</p>
+<p>שירות זה קיים משנת 2006 באנגליה וארה"ב כשירות משלים לערבי הספיד דייט שאנו מארגנים</p>
+<p>המון פעמים אנו רואים בערבי הספיד דייט אנשים אשר עשויים להתאים אחד לשני אך הם פשוט לא נרשמו לאותו הערב! כך שלא יצא להם להפגש. הרצון להפגיש בין אנשים המתאימים אחד לשני הוליד את הרעיון לשירות השידוכים שלנו.</p>
+<p>יש לנו 10 שנים של נסיון באירוח ערבי ספיד דייט בארץ ובעולם עם לפחות 74 חתונות והרבה זוגות אשר יוצאים אחד עם השני</p>
+<p>הניסיון שלנו לימד אותנו לזהות מהו האלמנט אשר מחבר בין אנשים שונים. יש לנו מאגר של יותר מ 3000 פנויים ופנויות (בכל הגילאים) אשר מחפשים להכיר את המיועד או המיועדת.</p>
+<h2>כיצד השירות עובד?</h2>
+<p>אנו נבקש ממך למלא את השאלון ולשלוח לנו את השאלון חזרה באימייל - כל פרטיך האישיים נשארים חסויים</p>
+<p>נא לשלוח את השאלון שמלאת ל michal@thespeeddating.co.il</p>
+<p>לאחר מכן אנו ניצור עמך קשר טלפוני ונתאם פגישה של כחצי שעה על מנת שנוכל להכירך טוב יותר</p>
+<p>במהלך הפגישה נשאל אותך שאלות נוספות עליך ועל מי שאת/ה מחפש/ת.</p>
+<p>עם השלמת ההרשמה נתחיל לחפש לך מועמד או מועמדת מתאימים וניצור קשר לתאום הדייט הראשון שלך!</p>
+<h2>לקוחות מרוצים כותבים:</h2>
+<blockquote><p>"הגענו למיכל עם שאיפות וצפיות ענקיות כי שמענו על ההצלחות שלה...
+אבל הן היו כאין וכאפס לעומת מה שגילינו עליה בהמשך.
+היא אשת אשכולות, עם ראיה וזווית חדה ורחבה, הרואה לעומקן את כל תכונות האופי.
+יש לה יכולות שרק למעטים יש. יש לה את היכולת לאבחן אנשים, ולראות הרבה מעבר לכיסוי החיצוני
+וכך גם לדעת מי מתאים למי, ובמדויק."</p></blockquote>
+<blockquote><p>"אני מתחתנת עם אהוב ליבי שפגשתי דרכך, מיכל! אין לי מילים לתאר כמה אני מאושרת! המלצתי עלייך לכל חברותיי!!" שירה, תל אביב</p></blockquote>
+<blockquote><p>"מאוד התרשמתי מהשירות שלכם! זו הפעם הראשונה שאני מנסה סוג כזה של שירות - זה ממש פקח את עיניי לאפשרות הזו - תודה רבה!" נורית, ראשון לציון</p></blockquote>
+<blockquote><p>"השירות מעולה ודרך מצויינת להכיר אנשים איכותיים. אני ממש אסירת תודה שעשיתי את הצעד הזה. אני עומדת להתחתן עם מישהו מקסים - אני מרגישה שזכיתי בגדול! לא הייתי מגיעה לכך בלעדי העזרה מכם - תודה!" אמיר, רמת גן</p></blockquote>
+<blockquote><p>"דרך שירות השידוכים שלכם מצאתי את אשת חלומותי!!" שלמה, תל אביב</p></blockquote>
+<blockquote><p>"התחלתי לצאת עם מישהו דרך שירות השידוכים שלכם - אז תודה רבה!! אני מאושרת!" קרן, גבעתיים</p></blockquote>
+<blockquote><p>"רק רציתי ליידע אתכם שאחרי שפגשתי 7 גברים דרך שירות השידוכים שלכם התארסתי לאחרונה עם אחד מהם. תודה רבה!" נעמי, תל אביב</p></blockquote>
+<p>ניתן לפנות לטלפון 052-8809879 לפרטים נוספים</p>',
+  'שירות שידוכים | The Speed Dating',
+  'שירות שידוכים אישי ליהודים. ניסיון של למעלה מ-10 שנים עם עשרות חתונות.',
+  true
+);
+
+-- Virtual Events (IL) — new page
+INSERT INTO pages (page_key, country_id, language_code, title, content_html, meta_title, meta_description, is_published) VALUES (
+  'virtual-events',
+  (SELECT id FROM countries WHERE code = 'il'),
+  'he',
+  'אירועים וירטואליים',
+  '<p>אנו מארגנים אירועים וירטואליים באמצעות ZOOM בעקבות המצב הנוכחי המונע מכולנו לצאת ולהפגש, בואו נפגש פנים אל פנים אונליין!</p>
+<p>אנא בקרו בעמוד האירועים שלנו והזמינו לעצמכם מקום בערב הקרוב!</p>
+<p>מאחלים בריאות לכולם!</p>',
+  'אירועים וירטואליים | The Speed Dating',
+  'אירועי ספיד דייט וירטואליים באמצעות ZOOM. בואו נפגש פנים אל פנים אונליין!',
+  true
+);
+
+-- Update existing IL/he dating-tips with correct HebrewText.md content
+UPDATE pages SET
+  title = 'טיפים',
+  content_html = '<h2>טיפים כללים:</h2>
+<ul>
+<li>לבוש: כדאי להגיע בלבוש לא רשמי מדי, אבל כזה שגורם לכם להרגיש בו נוח ושאתם יודעים שאתם נראים בו אטרקטיביים. ג''ינס עם חולצה יפה עובד מצוין.</li>
+<li>נסו לדבר ולהקשיב באופן שווה.</li>
+<li>היו קלילים. אל תגררו לשיחות מדכאות על מערכות יחסים ובעיקר לא על מערכות יחסים מן העבר שלכם. אל תדברו על פוליטיקה!</li>
+<li>נושאים טובים לשיחה: מוזיקה, סרטים, טיולים, חברים, אוכל, תחביבים, דברים שיש לכם תשוקה אליהם ואתם אוהבים במיוחד.</li>
+<li>היו יצירתיים. נסו שלא לשאול בכל פעם את אותן השאלות כמו "מה אתה עושה", איפה אתה גר", "בן כמה אתה" וכד''.</li>
+<li>אל תעירו הערות על מי שהכרתם לפני רגע בשולחן הקודם.</li>
+<li>השתמשו בשם של מי שיושב מולכם.</li>
+<li>אל תענו לטלפונים!!</li>
+</ul>
+<h2>טיפים לנשים:</h2>
+<ul>
+<li>שמרי על ראש פתוח וגם על שפת גוף פתוחה ואל תשבי בידיים משולבות. שמרי תמיד על קשר עין ואל תורידי את מבטך כלפי מטה. והכי חשוב- חייכי</li>
+<li>היי את עצמך השתדלי להיות נינוחה ופתוחה.</li>
+<li>לבשי משהו שגורם לך להרגיש נוח עם עצמך, ומאפשר לך להרגיש מושכת ובטוחה</li>
+</ul>
+<h2>טיפים לגברים:</h2>
+<ul>
+<li>אל תהיה גס רוח ואל תעיר הערות שעשויות להתפרש כהצעות מגונות. התנהג בג''נטלמניות.</li>
+<li>אם אתה נשען קדימה זה אומר שיש לך עניין ושאתה שם לב.</li>
+<li>השתדל להיות נינוח מחוייך ופתוח</li>
+<li>הומור בטעם מתקבל תמיד בברכה, נשים אוהבות שמצחיקים אותן!</li>
+</ul>',
+  meta_title = 'טיפים | The Speed Dating',
+  meta_description = 'טיפים להכנה לערב ספיד דייט - טיפים לנשים וגברים.'
+WHERE page_key = 'dating-tips' AND country_id = (SELECT id FROM countries WHERE code = 'il');
+
+-- Update existing IL/he what-is-speed-dating with correct HebrewText.md content
+UPDATE pages SET
+  title = 'מה זה ספיד דייט',
+  content_html = '<h2>מה זה ספיד דייט</h2>
+<p>יד על הלב- כמה פעמים קרה לכם שיצאתם לדייט לא מוצלח?</p>
+<p>קיבלתם טלפון של מישהו, אתם נורא עסוקים וכבר אין לכם כוח לעוד בליינד דייט ולא ממש התחשק לכם אבל... דיברתם קצת בטלפון והחלטתם להיפגש. התלבשתם, התאפרתם, חיפשתם אותו טוב טוב בגוגל, הרצתם בראש נושאים לשיחות (ונשבעתם לעצמכם שלא תדברו על האקס), הכרחתם את עצמכם לחשוב חיובי ובסוף... הגעתם והבנתם אחרי 2 דקות שעדיף היה להישאר בבית. רק בגלל שאתם אנשים מנומסים ומחונכים אתם מכריחים את עצמכם לגמור את הקפה.</p>
+<p>זה קורה להרבה מאד אנשים ברחבי העולם. זה אולי ישמע לכם מוזר, אבל רושם ראשוני נוצר תוך 30 שניות בלבד (!). 6 הדקות שיבואו אחר כך רק מחזקות את הרושם הראשוני שלכם. וזה בעצם כל הרעיון של ספיד דייטינג – 7 דקות! למה לכם לבזבז ערב שלם בניסיון להקשיב ולתקשר עם מישהו שכלל אינכם רוצים להכיר? בערב הספיד דייטינג אתם יכולים לבלות 7 דקות עם כ 10 פרטנרים פוטנציאלים. תוכלו להחליט את מי מהם תרצו לפגוש שוב לדייט ארוך ואמיתי או אולי סתם להכיר ידיד חדש. וזה לא סתם רעיון מהזמן האחרון - הספיד דייטינג נולד באמריקה לפני כ 10 שנים ומאז הפורמט הזה מצליח בכל העולם.</p>
+<h2>כיצד ספיד דייט עובד</h2>
+<p>הרעיון גאוני בפשטותו: תמורת סכום כסף קטן יחסית תוכלו לפגוש עד 10 פרטנרים פוטנציאליים בקבוצת הגיל שלכם. האירוע נערך בבארים או בתי קפה נעימים ברחבי הארץ, בהתאם למקום מגוריכם. עם הגעתכם לאירוע תתקבלו על ידי המארח/ת שלנו ותקבלו כרטיס בחירה ועט. בזמן שכולם מגיעים לאירוע יעמוד לרשותכם זמן להתרגל לאווירה, לשוחח עם אנשים שונים ולשתות משקה כלשהו. אנו נראה לך היכן לשבת לפני שנתחיל.</p>
+<p>הישיבה באירוע נעשית סביב שולחנות באופן המאפשר פרטיות בשיחה. הבנות מתיישבות על יד השולחן, כל אחת בשולחן שלה. עם צלצול הפעמון הראשון יש לכם 7 דקות של "מיני-דייט" עם האדם שמולכם. בתום 7 הדקות ישמע צלצול הפעמון ויסמן לגברים לעבור לשולחן הבא ולפגוש את הבחורה הבאה.</p>
+<p>זה הרגע בו תוכלו לסמן לעצמכם בכרטיס הבחירה האם תרצו לפגוש אדם זה שוב כ"דייט" או כ"ידיד/ה". בתום 7 הדקות הבאות ישמע שוב צלצול הפעמון- אז תמשיכו לדייט הבא וכן הלאה.</p>
+<p>הפסקה תינתן בשלב מסוים על מנת לאפשר לכם להתרענן. בסוף המפגש כולם מוזמנים להישאר, להזמין משקה וליהנות מהמשך הערב.</p>
+<h2>כניסה לאתר</h2>
+<p>כשאתם רוכשים כרטיס לאירוע, תתבקשו למלא פרטים על עצמכם ועבורכם - פרטים אלה נשמרים חסויים. אנו נשלח לך באמייל את שם המשתמש והסיסמא. מומלץ לשמור פרטים אלה כדי להיכנס לאתר בתום האירוע ולסמן את בחירותיכם.</p>
+<p>בדף הבית שלכם תוכלו למצוא את רשימת האנשים שפגשתם באירוע עם אפשרות סימון בחירה של "דייט" או "ידידות".</p>
+<p>אם השתתפתם ביותר מאירוע אחד תוכלו לראות את הפרטים של האירועים הקודמים בהם השתתפתם.</p>
+<p>בעמוד הפרופיל תוכלו לשנות ולעדכן את פרטיכם.</p>
+<h2>שכחתי סיסמא</h2>
+<p>אנא לחצו על שכחתי סיסמא בעמוד הבית ונשלח לכם אימייל תזכורת לכתובת האימייל עמה נרשמתם.</p>
+<h2>כיצד מקבלים את התוצאות</h2>
+<ul>
+<li>אנא היכנסו לאתר עם שם המשתמש והסיסמה אותה קיבלתם כשרכשתם את הכרטיס.</li>
+<li>אנו ממליצים לעדכן את בחירתכם כמה שיותר מוקדם.</li>
+<li>יש באפשרותכם לבחור לראות שוב את מי שפגשתם באירוע כדייט או כידידים או לבחור בשתי האפשרויות על ידי סימון V ליד שמם.</li>
+<li>ניתן לסמן מישהו/י כדייט וכידיד/ה.</li>
+<li>אם סימנתם מישהו והם סימנו אתכם בחזרה – תקבלו אם פרטי ההתקשרות של אותו אדם.</li>
+<li>כתובת האימייל שלכם תנתן למי שבחרתם במידה שהבחירה היא הדדית.</li>
+<li>יש באפשרותכם לחשוף גם את מספר הטלפון שלכם. אנא סמנו V לצד המילה "גלה" - פרטיכם יחשפו לאלה שעימם יש לכם התאמה הדדית. (שניכם סימנתם אחד את השני כדייט ו/או כידידים).</li>
+<li>בכל פעם שתיווצר התאמת דייט או ידידות תקבלו אימייל המודיע לכם על כך</li>
+<li>יש באפשרותכם להיכנס לאתר בכל עת כדי לעדכן ולבדוק עדכונים.</li>
+<li>תוכלו לראות את פרטי האימייל ו/או הטלפון של האנשים עמם הייתה לך התאמה כדייט ו/או כידיד/ה.</li>
+<li>במקרה שאני סימנתי מישהו/י כדייט והם סימנו אותי כידיד/ה (או להיפך) התוצאה תהיה התאמה כידידים.</li>
+</ul>
+<h2>למה דווקא ספיד דייט</h2>
+<ul>
+<li>בערב אחד ניתנת לך הזדמנות לפגוש 20 גברים ונשים (כ 10 מכל מין) בבת אחת. אם היית מנסה לפגוש כל אחד/ת בנפרד זה היה לוקח לך חודשיים-שלושה וגם עולה לך לא מעט כסף!</li>
+<li>תכלס! מי שמגיע לערב הספיד דייטינג רוצה באמת להכיר בן זוג ולקחת את העניינים לידיים, במקום לשבת בבית בפיג''מה ולצ''וטט מבלי באמת לעשות שום דבר..</li>
+<li>זהו אינו דייט אלא מיני-דייט. רק אם יש לכם עניין באדם השני תוכלו להמשיך לדייט רגיל. המפגש קצר ותכליתי אך האווירה נעימה, ותוך רגעים ספורים תוכלו להבין אם יש ביניכם כימיה, משיכה ועניין ואם תרצו לפגוש את האדם שמולכם פעם נוספת.</li>
+<li>אין מבוכה של "אחרי" כמו בדייט רגיל. אם מישהו לא מצא חן בעינכם לא תצטרכו להתנצל בטלפון, להסביר את עצמכם או להתחמק... רק אם שניכם מעוניינים זה בזה תוכלו ליצור קשר.</li>
+</ul>
+<p>אף פעם אי אפשר לדעת לאן יובילו המפגשים בערב הספיד דייטינג. גם אם לא תמצאו את בן-הזוג שלכם אתם עשויים להכיר חבר טוב, עמית חדש למקצוע, הזדמנות עסקית מעניינת או אפילו את מי שיכיר לכם את בן הזוג העתידי שלכם. מה שחשוב הוא להגדיל את מעגל החברים והמכרים שלכם ולכן כדאי להגיע תמיד עם ראש פתוח ואנרגיות חיוביות</p>
+<h2>טיפים</h2>
+<ul>
+<li>לבוש: כדאי להגיע בלבוש לא רשמי מדי, אבל כזה שגורם לכם להרגיש בו נוח ושאתם יודעים שאתם נראים בו אטרקטיביים. ג''ינס עם חולצה יפה עובד מצוין.</li>
+<li>נסו לדבר ולהקשיב באופן שווה.</li>
+<li>היו קלילים. אל תגררו לשיחות מדכאות על מערכות יחסים ובעיקר לא על מערכות יחסים מן העבר שלכם. אל תדברו על פוליטיקה!</li>
+<li>נושאים טובים לשיחה: מוזיקה, סרטים, טיולים, חברים, אוכל, תחביבים, דברים שיש לכם תשוקה אליהם ואתם אוהבים במיוחד.</li>
+<li>היו יצירתיים. נסו שלא לשאול בכל פעם את אותן השאלות כמו "מה אתה עושה", איפה אתה גר", "בן כמה אתה" וכד''.</li>
+<li>אל תעירו הערות על מי שהכרתם לפני רגע בשולחן הקודם.</li>
+<li>השתמשו בשם של מי שיושב מולכם.</li>
+<li>אל תענו לטלפונים!!</li>
+</ul>',
+  meta_title = 'מה זה ספיד דייט | The Speed Dating',
+  meta_description = 'מה זה ספיד דייט וכיצד הוא עובד. כל מה שצריך לדעת לפני ערב הספיד דייט הראשון שלכם.'
+WHERE page_key = 'what-is-speed-dating' AND country_id = (SELECT id FROM countries WHERE code = 'il');
+
 -- Matchmaking Packages
 insert into matchmaking_packages (name, country_id, num_dates, duration_months, price, currency, is_active) values
   ('3 Months membership including 5 dates', (select id from countries where code = 'gb'), 5, 3, 700, 'GBP', true),
@@ -1437,3 +1888,271 @@ insert into success_stories (couple_names, quote, year, location, story_type, is
   20,
   (select id from countries where code = 'gb')
 );
+
+-- Success Stories (Israel)
+insert into success_stories (couple_names, quote, year, location, story_type, is_featured, is_active, sort_order, country_id) values
+(
+  'הווארד ב. ולואיז',
+  'לואיז ואני נפגשנו בערב הספיד דייט שלכם בסוויס קוטג'' בלונדון והחתונה שלנו תערך ב 5.12.2004! אני חושב ששיטת הספיד דייטינג עובדת נפלא וביעילות כי אתה פוגש הרבה אנשים בערב אחד וכך מגדיל את הסיכוי שלך להצליח עם מישהי. כך קרה לנו ואנו רוצים להודות לכם מקרב הלב!',
+  'דצמבר 2004',
+  'לונדון',
+  'wedding',
+  true,
+  true,
+  1,
+  (select id from countries where code = 'il')
+),
+(
+  'ח.',
+  'מיכל תודה לך, אני כבר לא פנויה! בזכותך פגשתי את בן זוגי בספידייט שארגנת לפני חודשיים. לכן שמחה לעדכן שאני תפושה ולא פנויה להכיר אחרים :)',
+  '2019',
+  NULL,
+  'dating',
+  true,
+  true,
+  2,
+  (select id from countries where code = 'il')
+),
+(
+  'אמיר ודנה',
+  'כל הכבוד, אני לא חושב שהייתי משנה משהו. המארגנים היו נחמדים מאוד וכל הערב היה מהנה. המקום היה נעים ואינטימי וממוקם באזור מרכזי. פגשתי את דנה באותו הערב ואנחנו יוצאים מאז. איזו דרך מעולה לפגוש את האחת שלי!',
+  NULL,
+  'תל אביב',
+  'dating',
+  true,
+  true,
+  3,
+  (select id from countries where code = 'il')
+),
+(
+  'בן',
+  'הגעתי לערב שלכם ומאז אני והבחורה המקסימה שפגשתי מבלים כל ערב בבית באינטימיות על הספה. תודה רבה, אני יודע שלבוא לערב שלכם היתה ההחלטה הטובה ביותר שעשיתי עד כה בחיים!',
+  'מרץ 2011',
+  'ניו יורק',
+  'dating',
+  false,
+  true,
+  4,
+  (select id from countries where code = 'il')
+),
+(
+  'ר. ואשתו',
+  'שלום לחברת הספיד דייטינג – רק רציתי להודות לכם – אתם הצלחתם מעבר למשוער! אשתי ואני נפגשנו בערב שלכם באוגוסט 2005 ואנו מצפים כעת לתינוקת הראשונה שלנו ביוני!',
+  '2008',
+  'לונדון',
+  'wedding',
+  true,
+  true,
+  5,
+  (select id from countries where code = 'il')
+),
+(
+  'אמא של שירן',
+  'הגענו למיכל עם שאיפות וצפיות ענקיות כי שמענו על ההצלחות שלה... אבל הן היו כאין וכאפס לעומת מה שגילינו עליה בהמשך. היא אשת אשכולות, עם ראיה וזווית חדה ורחבה, הרואה לעומקן את כל תכונות האופי. יש לה יכולות שרק למעטים יש. יש לה את היכולת לאבחן אנשים, ולראות הרבה מעבר לכיסוי החיצוני וכך גם לדעת מי מתאים למי, ובמדויק.',
+  'נובמבר 2012',
+  'תל אביב',
+  'wedding',
+  true,
+  true,
+  6,
+  (select id from countries where code = 'il')
+),
+(
+  'רני',
+  'רציתי להודות לכם על ערב מהנה ביותר, הארגון היה מקצועי – עוד לפני הערב, במהלכו ולאחריו! מאוד הופתעתי לטובה ואמרתי לחבר עמו הגעתי איך אתם מציעים שירות כל כך טוב. שנינו נהנינו מאוד, היו אנשים ברמה גבוהה, המקום היה אינטימי וביתי, הערב היה מאורגן למופת, היה שווה להגיע!',
+  'דצמבר 2011',
+  'תל אביב',
+  'testimonial',
+  false,
+  true,
+  7,
+  (select id from countries where code = 'il')
+),
+(
+  'יעל',
+  'הי! רוצה להחמיא לכם ולמיכל על ערב מעולה! אני הולכת לספר לכל חברי וחברותיי – היתה אוירה כל כך טובה, אנשים יפים הרגשה לא מנוכרת – פשוט חוויה!',
+  'דצמבר 2011',
+  'תל אביב',
+  'testimonial',
+  false,
+  true,
+  8,
+  (select id from countries where code = 'il')
+),
+(
+  'אורית',
+  'לחברת הספיד דייט: תודה על ערב מקסים עם קהל איכותי ויפה! היתה לי התאמה עם כמה בחורים והתחלתי לצאת עם אחד מהם, תודה רבה!!',
+  'דצמבר 2011',
+  'חיפה',
+  'dating',
+  false,
+  true,
+  9,
+  (select id from countries where code = 'il')
+),
+(
+  'יעקב',
+  'הי מיכל, השתתפתי בערב האחרון שארגנתם ופגשתי שם מישהי! אני אראה איך הדברים זורמים לפני שאבוא שוב. תודה רבה אני בהחלט אמליץ לחברים להגיע לערבי הספיד דייט שלכם',
+  'דצמבר 2008',
+  'תל אביב',
+  'dating',
+  false,
+  true,
+  10,
+  (select id from countries where code = 'il')
+),
+(
+  'דני',
+  'רק רציתי להעביר את תודתי הענקית לך ולצוות על ארגון ערב הספיד דייט בוולנטיין דיי, פגשתי את האשה המושלמת – היא חכמה, מקסימה, מצחיקה ויפה! אני עומד לפגוש אותה לדייט שלישי. אני מקווה שכל מי שישתתף בערבי הספיד דייט שלכם יהיה בר מזל כמוני!',
+  'פברואר 2007',
+  'לונדון',
+  'dating',
+  false,
+  true,
+  11,
+  (select id from countries where code = 'il')
+),
+(
+  'ר.',
+  'פגשתי את החברה שלי בערב בהמפסטד באוגוסט 2005 אני שמח שהחלטתי ללכת, תודה רבה!!',
+  'אפריל 2006',
+  'לונדון',
+  'dating',
+  false,
+  true,
+  12,
+  (select id from countries where code = 'il')
+);
+
+-- ===========================================
+-- VIP Plans, Benefits & Settings
+-- ===========================================
+
+-- GB Plans
+INSERT INTO vip_plans (country_id, months, price_per_month, total_price, currency, badge, sort_order) VALUES
+  ((SELECT id FROM countries WHERE code = 'gb'), 1, 18, 18, 'GBP', NULL, 0),
+  ((SELECT id FROM countries WHERE code = 'gb'), 3, 12, 36, 'GBP', 'popular', 1),
+  ((SELECT id FROM countries WHERE code = 'gb'), 6, 8, 48, 'GBP', NULL, 2),
+  ((SELECT id FROM countries WHERE code = 'gb'), 12, 6, 72, 'GBP', 'best_value', 3);
+
+-- IL Plans
+INSERT INTO vip_plans (country_id, months, price_per_month, total_price, currency, badge, sort_order) VALUES
+  ((SELECT id FROM countries WHERE code = 'il'), 1, 69, 69, 'ILS', NULL, 0),
+  ((SELECT id FROM countries WHERE code = 'il'), 3, 45, 135, 'ILS', 'popular', 1),
+  ((SELECT id FROM countries WHERE code = 'il'), 6, 30, 180, 'ILS', NULL, 2),
+  ((SELECT id FROM countries WHERE code = 'il'), 12, 22, 264, 'ILS', 'best_value', 3);
+
+-- GB Benefits
+INSERT INTO vip_benefits (country_id, icon, title, description, sort_order) VALUES
+  ((SELECT id FROM countries WHERE code = 'gb'), 'Percent', 'Discounted Event Tickets', 'Speed Dating event tickets at a special price', 0),
+  ((SELECT id FROM countries WHERE code = 'gb'), 'Heart', '15% Off Matchmaking', '15% off our Match-Making service', 1),
+  ((SELECT id FROM countries WHERE code = 'gb'), 'Eye', 'See Who Chose You', 'We reveal to you who chose you at the Speed Dating event you participated', 2),
+  ((SELECT id FROM countries WHERE code = 'gb'), 'Gift', 'Special Offers & Discounts', 'MORE special offers and discounts!', 3);
+
+-- IL Benefits
+INSERT INTO vip_benefits (country_id, icon, title, description, sort_order) VALUES
+  ((SELECT id FROM countries WHERE code = 'il'), 'Percent', 'ערבי ספיד דייט בהנחה של 25%', 'כרטיסים לערבי ספיד דייט במחיר מוזל', 0),
+  ((SELECT id FROM countries WHERE code = 'il'), 'Heart', 'הנחה של 15% לשירות השידוכים', '15% הנחה על שירות השידוכים האישי שלנו', 1),
+  ((SELECT id FROM countries WHERE code = 'il'), 'Eye', 'גלו מי בחר בכם', 'אנו מגלים לכם מי בחר בכם בערב הספיד דייט בו השתתפתם', 2),
+  ((SELECT id FROM countries WHERE code = 'il'), 'Gift', 'הנחות מפתיעות נוספות', 'ועוד הנחות מפתיעות לחברי המועדון!', 3);
+
+-- Settings
+INSERT INTO vip_settings (country_id, auto_renewal_notice) VALUES
+  ((SELECT id FROM countries WHERE code = 'gb'), 'All memberships will renew automatically after duration expired. To cancel please write an email to Cancel@TheSpeedDating.co.uk'),
+  ((SELECT id FROM countries WHERE code = 'il'), 'כל תקופות המנוי יתחדשו עם תום תוקפן באופן אוטומטי. על מנת לבטל אנא כתבו אימייל ל Cancel@TheSpeedDating.co.il');
+
+-- Profile form translations (English)
+INSERT INTO translations (string_key, language_code, value) VALUES
+  ('profile.first_name', 'en', 'First Name'),
+  ('profile.last_name', 'en', 'Last Name'),
+  ('profile.date_of_birth', 'en', 'Date of Birth'),
+  ('profile.gender', 'en', 'Gender'),
+  ('profile.male', 'en', 'Male'),
+  ('profile.female', 'en', 'Female'),
+  ('profile.bio', 'en', 'Bio'),
+  ('profile.occupation', 'en', 'Occupation'),
+  ('profile.education', 'en', 'Education'),
+  ('profile.relationship_status', 'en', 'Relationship Status'),
+  ('profile.select_status', 'en', 'Select status'),
+  ('profile.status_single', 'en', 'Single'),
+  ('profile.status_divorced', 'en', 'Divorced'),
+  ('profile.status_widowed', 'en', 'Widowed'),
+  ('profile.status_separated', 'en', 'Separated'),
+  ('profile.faith', 'en', 'Faith'),
+  ('profile.select_faith', 'en', 'Select faith'),
+  ('profile.height', 'en', 'Height (cm)'),
+  ('profile.has_children', 'en', 'Has Children'),
+  ('profile.country', 'en', 'Country'),
+  ('profile.city', 'en', 'City'),
+  ('profile.phone', 'en', 'Phone'),
+  ('profile.interested_in', 'en', 'Interested In'),
+  ('profile.email_notifications', 'en', 'Email Notifications'),
+  ('profile.phone_notifications', 'en', 'Phone Notifications'),
+  ('profile.sms_notifications', 'en', 'SMS Notifications'),
+  ('profile.update_password', 'en', 'Update Password'),
+  ('profile.change_password_desc', 'en', 'Update your account password'),
+  ('profile.data_privacy', 'en', 'Data & Privacy'),
+  ('profile.data_privacy_desc', 'en', 'Manage your personal data'),
+  ('profile.export_data', 'en', 'Export My Data'),
+  ('profile.export_data_desc', 'en', 'Download all your personal data as JSON'),
+  ('profile.export', 'en', 'Export'),
+  ('profile.delete_account', 'en', 'Delete Account'),
+  ('profile.delete_account_desc', 'en', 'Permanently delete your account and all data'),
+  ('profile.delete_confirm_title', 'en', 'Are you absolutely sure?'),
+  ('profile.delete_confirm_desc', 'en', 'This action cannot be undone. This will permanently delete your account and all associated data including event history, match results, and profile information.'),
+  ('auth.signing_in', 'en', 'Signing in...'),
+  ('auth.no_account', 'en', 'Don''t have an account?'),
+  ('auth.have_account', 'en', 'Already have an account?'),
+  ('auth.creating_account', 'en', 'Creating account...'),
+  ('auth.step_of', 'en', 'Step {{step}} of {{total}}'),
+  ('common.back', 'en', 'Back'),
+  ('common.cancel', 'en', 'Cancel'),
+  ('common.saving', 'en', 'Saving...');
+
+-- Profile form translations (Hebrew)
+INSERT INTO translations (string_key, language_code, value) VALUES
+  ('profile.first_name', 'he', 'שם פרטי'),
+  ('profile.last_name', 'he', 'שם משפחה'),
+  ('profile.date_of_birth', 'he', 'תאריך לידה'),
+  ('profile.gender', 'he', 'מגדר'),
+  ('profile.male', 'he', 'זכר'),
+  ('profile.female', 'he', 'נקבה'),
+  ('profile.bio', 'he', 'ביוגרפיה'),
+  ('profile.occupation', 'he', 'עיסוק'),
+  ('profile.education', 'he', 'השכלה'),
+  ('profile.relationship_status', 'he', 'מצב משפחתי'),
+  ('profile.select_status', 'he', 'בחירת מצב'),
+  ('profile.status_single', 'he', 'רווק/ה'),
+  ('profile.status_divorced', 'he', 'גרוש/ה'),
+  ('profile.status_widowed', 'he', 'אלמן/ה'),
+  ('profile.status_separated', 'he', 'פרוד/ה'),
+  ('profile.faith', 'he', 'זרם דתי'),
+  ('profile.select_faith', 'he', 'בחירת זרם'),
+  ('profile.height', 'he', 'גובה (ס"מ)'),
+  ('profile.has_children', 'he', 'יש ילדים'),
+  ('profile.country', 'he', 'מדינה'),
+  ('profile.city', 'he', 'עיר'),
+  ('profile.phone', 'he', 'טלפון'),
+  ('profile.interested_in', 'he', 'מעוניין/ת ב'),
+  ('profile.email_notifications', 'he', 'התראות אימייל'),
+  ('profile.phone_notifications', 'he', 'התראות טלפון'),
+  ('profile.sms_notifications', 'he', 'התראות SMS'),
+  ('profile.update_password', 'he', 'עדכון סיסמה'),
+  ('profile.change_password_desc', 'he', 'עדכון סיסמת החשבון'),
+  ('profile.data_privacy', 'he', 'נתונים ופרטיות'),
+  ('profile.data_privacy_desc', 'he', 'ניהול המידע האישי שלך'),
+  ('profile.export_data', 'he', 'ייצוא הנתונים שלי'),
+  ('profile.export_data_desc', 'he', 'הורדת כל המידע האישי כ-JSON'),
+  ('profile.export', 'he', 'ייצוא'),
+  ('profile.delete_account', 'he', 'מחיקת חשבון'),
+  ('profile.delete_account_desc', 'he', 'מחיקת החשבון וכל המידע לצמיתות'),
+  ('profile.delete_confirm_title', 'he', 'האם את/ה בטוח/ה לחלוטין?'),
+  ('profile.delete_confirm_desc', 'he', 'פעולה זו לא ניתנת לביטול. החשבון וכל המידע המשויך אליו יימחקו לצמיתות, כולל היסטוריית אירועים, תוצאות התאמה ומידע פרופיל.'),
+  ('auth.signing_in', 'he', 'מתחבר...'),
+  ('auth.no_account', 'he', 'אין לך חשבון?'),
+  ('auth.have_account', 'he', 'כבר יש לך חשבון?'),
+  ('auth.creating_account', 'he', 'יוצר חשבון...'),
+  ('auth.step_of', 'he', 'שלב {{step}} מתוך {{total}}'),
+  ('common.back', 'he', 'חזרה'),
+  ('common.cancel', 'he', 'ביטול'),
+  ('common.saving', 'he', 'שומר...');

@@ -703,6 +703,7 @@ export type Database = {
       pages: {
         Row: {
           content_html: string
+          content_json: Json | null
           country_id: number
           created_at: string
           id: number
@@ -711,11 +712,13 @@ export type Database = {
           meta_description: string | null
           meta_title: string | null
           page_key: string
+          page_type: string
           title: string
           updated_at: string
         }
         Insert: {
           content_html: string
+          content_json?: Json | null
           country_id: number
           created_at?: string
           id?: number
@@ -724,11 +727,13 @@ export type Database = {
           meta_description?: string | null
           meta_title?: string | null
           page_key: string
+          page_type?: string
           title: string
           updated_at?: string
         }
         Update: {
           content_html?: string
+          content_json?: Json | null
           country_id?: number
           created_at?: string
           id?: number
@@ -737,6 +742,7 @@ export type Database = {
           meta_description?: string | null
           meta_title?: string | null
           page_key?: string
+          page_type?: string
           title?: string
           updated_at?: string
         }
@@ -1197,6 +1203,129 @@ export type Database = {
             foreignKeyName: "venues_country_id_fkey"
             columns: ["country_id"]
             isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vip_benefits: {
+        Row: {
+          country_id: number
+          created_at: string
+          description: string
+          icon: string
+          id: number
+          is_active: boolean
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          country_id: number
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: number
+          is_active?: boolean
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          country_id?: number
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: number
+          is_active?: boolean
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_benefits_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vip_plans: {
+        Row: {
+          badge: string | null
+          country_id: number
+          created_at: string
+          currency: string
+          id: number
+          is_active: boolean
+          months: number
+          price_per_month: number
+          sort_order: number
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          badge?: string | null
+          country_id: number
+          created_at?: string
+          currency?: string
+          id?: number
+          is_active?: boolean
+          months: number
+          price_per_month: number
+          sort_order?: number
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          badge?: string | null
+          country_id?: number
+          created_at?: string
+          currency?: string
+          id?: number
+          is_active?: boolean
+          months?: number
+          price_per_month?: number
+          sort_order?: number
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_plans_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: false
+            referencedRelation: "countries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vip_settings: {
+        Row: {
+          auto_renewal_notice: string
+          country_id: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          auto_renewal_notice?: string
+          country_id: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          auto_renewal_notice?: string
+          country_id?: number
+          id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vip_settings_country_id_fkey"
+            columns: ["country_id"]
+            isOneToOne: true
             referencedRelation: "countries"
             referencedColumns: ["id"]
           },

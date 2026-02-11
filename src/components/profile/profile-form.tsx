@@ -13,6 +13,17 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 interface Profile {
@@ -84,7 +95,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
         toast.success(t("profile.saved"));
         router.refresh();
       } else {
-        toast.error(result.error || "Failed to update profile");
+        toast.error(result.error || t("profile.failed_update"));
       }
     });
   };
@@ -100,7 +111,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
         toast.success(t("profile.password_updated"));
         setPasswordData({ new_password: "", confirm_password: "" });
       } else {
-        toast.error(result.error || "Failed to update password");
+        toast.error(result.error || t("profile.failed_password"));
       }
     });
   };
@@ -118,7 +129,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
               <h3 className="text-lg font-semibold">{t("profile.basic_info")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="first_name">First Name</Label>
+                  <Label htmlFor="first_name">{t("profile.first_name")}</Label>
                   <Input
                     id="first_name"
                     name="first_name"
@@ -130,7 +141,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="last_name">Last Name</Label>
+                  <Label htmlFor="last_name">{t("profile.last_name")}</Label>
                   <Input
                     id="last_name"
                     name="last_name"
@@ -142,7 +153,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="date_of_birth">Date of Birth</Label>
+                  <Label htmlFor="date_of_birth">{t("profile.date_of_birth")}</Label>
                   <Input
                     id="date_of_birth"
                     name="date_of_birth"
@@ -152,7 +163,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="gender">{t("profile.gender")}</Label>
                   <Input
                     id="gender"
                     name="gender"
@@ -161,7 +172,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t("auth.email")}</Label>
                   <Input
                     id="email"
                     name="email"
@@ -180,7 +191,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
               <h3 className="text-lg font-semibold">{t("profile.about_me")}</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio">{t("profile.bio")}</Label>
                   <Textarea
                     id="bio"
                     name="bio"
@@ -193,7 +204,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="occupation">Occupation</Label>
+                    <Label htmlFor="occupation">{t("profile.occupation")}</Label>
                     <Input
                       id="occupation"
                       name="occupation"
@@ -204,7 +215,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="education">Education</Label>
+                    <Label htmlFor="education">{t("profile.education")}</Label>
                     <Input
                       id="education"
                       name="education"
@@ -215,22 +226,21 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="relationship_status">Relationship Status</Label>
+                    <Label htmlFor="relationship_status">{t("profile.relationship_status")}</Label>
                     <Select
-                      name="relationship_status"
                       value={formData.relationship_status || ""}
                       onValueChange={(value) =>
                         setFormData({ ...formData, relationship_status: value })
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
+                        <SelectValue placeholder={t("profile.select_status")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="single">Single</SelectItem>
-                        <SelectItem value="divorced">Divorced</SelectItem>
-                        <SelectItem value="widowed">Widowed</SelectItem>
-                        <SelectItem value="separated">Separated</SelectItem>
+                        <SelectItem value="single">{t("profile.single")}</SelectItem>
+                        <SelectItem value="divorced">{t("profile.divorced")}</SelectItem>
+                        <SelectItem value="widowed">{t("profile.widowed")}</SelectItem>
+                        <SelectItem value="separated">{t("profile.separated")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <input
@@ -240,32 +250,31 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="faith">Faith</Label>
+                    <Label htmlFor="faith">{t("profile.faith")}</Label>
                     <Select
-                      name="faith"
                       value={formData.faith || ""}
                       onValueChange={(value) =>
                         setFormData({ ...formData, faith: value })
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select faith" />
+                        <SelectValue placeholder={t("profile.select_faith")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="secular">Secular</SelectItem>
-                        <SelectItem value="conservative">Conservative</SelectItem>
-                        <SelectItem value="orthodox">Orthodox</SelectItem>
-                        <SelectItem value="traditional">Traditional</SelectItem>
-                        <SelectItem value="reform">Reform</SelectItem>
-                        <SelectItem value="liberal">Liberal</SelectItem>
-                        <SelectItem value="modern_orthodox">Modern Orthodox</SelectItem>
-                        <SelectItem value="atheist">Atheist</SelectItem>
+                        <SelectItem value="secular">{t("profile.secular")}</SelectItem>
+                        <SelectItem value="conservative">{t("profile.conservative")}</SelectItem>
+                        <SelectItem value="orthodox">{t("profile.orthodox")}</SelectItem>
+                        <SelectItem value="traditional">{t("profile.traditional")}</SelectItem>
+                        <SelectItem value="reform">{t("profile.reform")}</SelectItem>
+                        <SelectItem value="liberal">{t("profile.liberal")}</SelectItem>
+                        <SelectItem value="modern_orthodox">{t("profile.modern_orthodox")}</SelectItem>
+                        <SelectItem value="atheist">{t("profile.atheist")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <input type="hidden" name="faith" value={formData.faith || ""} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="height_cm">Height (cm)</Label>
+                    <Label htmlFor="height_cm">{t("profile.height")}</Label>
                     <Input
                       id="height_cm"
                       name="height_cm"
@@ -294,7 +303,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                       value={formData.has_children ? "true" : "false"}
                     />
                     <Label htmlFor="has_children" className="cursor-pointer">
-                      Has Children
+                      {t("profile.has_children")}
                     </Label>
                   </div>
                 </div>
@@ -308,16 +317,15 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
               <h3 className="text-lg font-semibold">{t("profile.location")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="country_id">Country</Label>
+                  <Label htmlFor="country_id">{t("profile.country")}</Label>
                   <Select
-                    name="country_id"
                     value={formData.country_id ? String(formData.country_id) : ""}
                     onValueChange={(value) =>
                       setFormData({ ...formData, country_id: value, city_id: null })
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select country" />
+                      <SelectValue placeholder={t("profile.select_country")} />
                     </SelectTrigger>
                     <SelectContent>
                       {countries.map((country) => (
@@ -334,9 +342,8 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="city_id">City</Label>
+                  <Label htmlFor="city_id">{t("profile.city")}</Label>
                   <Select
-                    name="city_id"
                     value={formData.city_id ? String(formData.city_id) : ""}
                     onValueChange={(value) =>
                       setFormData({ ...formData, city_id: value })
@@ -344,7 +351,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     disabled={!formData.country_id}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select city" />
+                      <SelectValue placeholder={t("profile.select_city")} />
                     </SelectTrigger>
                     <SelectContent>
                       {filteredCities.map((city) => (
@@ -366,7 +373,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
               <h3 className="text-lg font-semibold">{t("profile.contact")}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t("profile.phone")}</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -421,21 +428,20 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
               <h3 className="text-lg font-semibold">{t("profile.preferences")}</h3>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="sexual_preference">Interested In</Label>
+                  <Label htmlFor="sexual_preference">{t("profile.interested_in")}</Label>
                   <Select
-                    name="sexual_preference"
                     value={formData.sexual_preference || ""}
                     onValueChange={(value) =>
                       setFormData({ ...formData, sexual_preference: value })
                     }
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select preference" />
+                      <SelectValue placeholder={t("profile.select_preference")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="men">Men</SelectItem>
-                      <SelectItem value="women">Women</SelectItem>
-                      <SelectItem value="both">Both</SelectItem>
+                      <SelectItem value="men">{t("profile.men")}</SelectItem>
+                      <SelectItem value="women">{t("profile.women")}</SelectItem>
+                      <SelectItem value="both">{t("profile.both")}</SelectItem>
                     </SelectContent>
                   </Select>
                   <input
@@ -446,7 +452,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="subscribed_email">Email Notifications</Label>
+                    <Label htmlFor="subscribed_email">{t("profile.email_notifications")}</Label>
                     <Switch
                       id="subscribed_email"
                       name="subscribed_email"
@@ -462,7 +468,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="subscribed_phone">Phone Notifications</Label>
+                    <Label htmlFor="subscribed_phone">{t("profile.phone_notifications")}</Label>
                     <Switch
                       id="subscribed_phone"
                       name="subscribed_phone"
@@ -478,7 +484,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="subscribed_sms">SMS Notifications</Label>
+                    <Label htmlFor="subscribed_sms">{t("profile.sms_notifications")}</Label>
                     <Switch
                       id="subscribed_sms"
                       name="subscribed_sms"
@@ -498,7 +504,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
             </div>
 
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : t("profile.save")}
+              {isPending ? t("common.saving") : t("profile.save")}
             </Button>
           </form>
         </CardContent>
@@ -508,7 +514,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
       <Card>
         <CardHeader>
           <CardTitle>{t("profile.change_password")}</CardTitle>
-          <CardDescription>Update your account password</CardDescription>
+          <CardDescription>{t("profile.change_password_desc")}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
@@ -542,7 +548,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
               />
             </div>
             <Button type="submit" disabled={isPasswordPending}>
-              {isPasswordPending ? "Updating..." : "Update Password"}
+              {isPasswordPending ? t("common.saving") : t("profile.update_password")}
             </Button>
           </form>
         </CardContent>
@@ -551,34 +557,53 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
       {/* Data & Privacy */}
       <Card>
         <CardHeader>
-          <CardTitle>Data & Privacy</CardTitle>
-          <CardDescription>Manage your personal data</CardDescription>
+          <CardTitle>{t("profile.data_privacy")}</CardTitle>
+          <CardDescription>{t("profile.data_privacy_desc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium">Export My Data</p>
-              <p className="text-sm text-muted-foreground">Download all your personal data as JSON</p>
+              <p className="font-medium">{t("profile.export_data")}</p>
+              <p className="text-sm text-muted-foreground">{t("profile.export_data_desc")}</p>
             </div>
             <Button variant="outline" asChild>
-              <a href="/api/profile/export" download>Export</a>
+              <a href="/api/profile/export" download>{t("profile.export")}</a>
             </Button>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-medium text-destructive">Delete Account</p>
-              <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
+              <p className="font-medium text-destructive">{t("profile.delete_account")}</p>
+              <p className="text-sm text-muted-foreground">{t("profile.delete_account_desc")}</p>
             </div>
-            <Button variant="destructive" onClick={() => {
-              if (confirm("Are you sure you want to permanently delete your account? This cannot be undone.")) {
-                startTransition(async () => {
-                  await deleteAccount();
-                });
-              }
-            }} disabled={isPending}>
-              Delete Account
-            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={isPending}>
+                  {t("profile.delete_account")}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>{t("profile.delete_confirm_title")}</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    {t("profile.delete_confirm_desc")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={() => {
+                      startTransition(async () => {
+                        await deleteAccount();
+                      });
+                    }}
+                  >
+                    {t("profile.delete_account")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardContent>
       </Card>

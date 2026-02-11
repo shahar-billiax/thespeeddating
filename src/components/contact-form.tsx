@@ -26,7 +26,7 @@ export function ContactForm() {
       toast.success(t("contact.sent_success"));
       e.currentTarget.reset();
     } else {
-      toast.error(result.error || "Failed to send message. Please try again.");
+      toast.error(result.error || t("contact.error"));
     }
   }
 
@@ -39,7 +39,7 @@ export function ContactForm() {
           name="name"
           type="text"
           required
-          placeholder="Your name"
+          placeholder={t("contact.name_placeholder")}
           disabled={isSubmitting}
           className="mt-1.5"
         />
@@ -52,7 +52,7 @@ export function ContactForm() {
           name="email"
           type="email"
           required
-          placeholder="your.email@example.com"
+          placeholder={t("contact.email_placeholder")}
           disabled={isSubmitting}
           className="mt-1.5"
         />
@@ -65,7 +65,7 @@ export function ContactForm() {
           name="subject"
           type="text"
           required
-          placeholder="What is your message about?"
+          placeholder={t("contact.subject_placeholder")}
           disabled={isSubmitting}
           className="mt-1.5"
         />
@@ -77,7 +77,7 @@ export function ContactForm() {
           id="message"
           name="message"
           required
-          placeholder="Your message..."
+          placeholder={t("contact.message_placeholder")}
           rows={6}
           disabled={isSubmitting}
           className="mt-1.5"
@@ -85,7 +85,7 @@ export function ContactForm() {
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Sending..." : t("contact.send")}
+        {isSubmitting ? t("contact.sending") : t("contact.send")}
       </Button>
     </form>
   );
