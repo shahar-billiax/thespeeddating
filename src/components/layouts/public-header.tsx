@@ -45,16 +45,16 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
         {t("nav.skip_to_content")}
       </a>
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-6">
+        <div className="flex items-center h-full gap-8">
           <Link href="/" className="text-xl font-bold text-primary whitespace-nowrap">
             {t("nav.brand")}
           </Link>
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden lg:flex h-full items-center gap-0.5">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-2 rounded-md hover:bg-accent"
+                className="relative flex items-center h-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 after:absolute after:bottom-0 after:inset-x-1.5 after:h-0.5 after:rounded-full after:bg-primary after:origin-center after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200"
               >
                 {link.label}
               </Link>
@@ -172,7 +172,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                       key={link.href}
                       href={link.href}
                       onClick={() => setOpen(false)}
-                      className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors"
+                      className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -195,21 +195,21 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                   <Link
                     href="/what-is-speed-dating"
                     onClick={() => setOpen(false)}
-                    className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors"
+                    className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                   >
                     {t("nav.what_is_speed_dating")}
                   </Link>
                   <Link
                     href="/about-us"
                     onClick={() => setOpen(false)}
-                    className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors"
+                    className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                   >
                     {t("nav.about")}
                   </Link>
                   <Link
                     href="/franchise-jobs"
                     onClick={() => setOpen(false)}
-                    className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors"
+                    className="flex items-center text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                   >
                     {t("nav.franchise")}
                   </Link>
@@ -226,7 +226,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                       <button
                         key={r.code}
                         onClick={() => { switchRegion(r.code); setOpen(false); }}
-                        className="flex items-center gap-2.5 w-full text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors text-start"
+                        className="flex items-center gap-2.5 w-full text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors text-start"
                       >
                         <r.Flag className="h-[14px] w-[19px] shrink-0 rounded-[2px] shadow-[0_0_0_1px_rgba(0,0,0,0.1)]" />
                         <span className={isActive ? "font-semibold" : ""}>
@@ -246,7 +246,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                       <button
                         key={lang.code}
                         onClick={() => { switchLanguage(lang.code); setOpen(false); }}
-                        className="flex items-center gap-2.5 w-full text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors text-start"
+                        className="flex items-center gap-2.5 w-full text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors text-start"
                       >
                         <span className={isActive ? "font-semibold" : ""}>
                           {lang.nativeName}
@@ -276,7 +276,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                     <Link
                       href="/profile"
                       onClick={() => setOpen(false)}
-                      className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors"
+                      className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                     >
                       <Settings className="h-4 w-4 text-muted-foreground" />
                       {t("nav.account_settings")}
@@ -284,7 +284,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                     <Link
                       href="/matches"
                       onClick={() => setOpen(false)}
-                      className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-accent transition-colors"
+                      className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                     >
                       <Heart className="h-4 w-4 text-muted-foreground" />
                       {t("nav.matches")}
