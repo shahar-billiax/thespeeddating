@@ -67,9 +67,11 @@ interface Country {
 export function VipBenefitsPanel({
   benefits,
   country,
+  languageCode,
 }: {
   benefits: Benefit[];
   country: Country;
+  languageCode: string;
 }) {
   const [editing, setEditing] = useState<Benefit | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -79,6 +81,7 @@ export function VipBenefitsPanel({
   async function handleSave(_prev: any, formData: FormData) {
     formData.set("is_active", isActive ? "true" : "false");
     formData.set("country_id", String(country.id));
+    formData.set("language_code", languageCode);
     formData.set("icon", icon);
     if (editing) formData.set("id", String(editing.id));
     const result = await saveVipBenefit(formData);

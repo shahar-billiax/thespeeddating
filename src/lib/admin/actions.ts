@@ -1364,6 +1364,7 @@ export async function getVipBenefits(countryId?: number) {
   let query = supabase
     .from("vip_benefits")
     .select("*, countries(name, code)")
+    .order("language_code", { ascending: true })
     .order("sort_order", { ascending: true });
   if (countryId) query = query.eq("country_id", countryId);
   const { data, error } = await query;
@@ -1377,6 +1378,7 @@ export async function saveVipBenefit(formData: FormData) {
 
   const benefit = {
     country_id: Number(formData.get("country_id")),
+    language_code: (formData.get("language_code") as string) || "en",
     icon: formData.get("icon") as string,
     title: formData.get("title") as string,
     description: formData.get("description") as string,
@@ -1414,7 +1416,8 @@ export async function getVipSettings() {
   const { data, error } = await supabase
     .from("vip_settings")
     .select("*, countries(name, code)")
-    .order("country_id", { ascending: true });
+    .order("country_id", { ascending: true })
+    .order("language_code", { ascending: true });
   if (error) throw new Error(error.message);
   return data ?? [];
 }
@@ -1424,15 +1427,18 @@ export async function saveVipSettings(formData: FormData) {
   const countryId = Number(formData.get("country_id"));
   const autoRenewalNotice = formData.get("auto_renewal_notice") as string;
 
+  const languageCode = (formData.get("language_code") as string) || "en";
+
   const { error } = await supabase
     .from("vip_settings")
     .upsert(
       {
         country_id: countryId,
+        language_code: languageCode,
         auto_renewal_notice: autoRenewalNotice,
         updated_at: new Date().toISOString(),
       },
-      { onConflict: "country_id" }
+      { onConflict: "country_id,language_code" }
     );
 
   if (error) return { error: error.message };

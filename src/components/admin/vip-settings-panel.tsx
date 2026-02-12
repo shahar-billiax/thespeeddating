@@ -24,12 +24,15 @@ interface Country {
 export function VipSettingsPanel({
   setting,
   country,
+  languageCode,
 }: {
   setting: Settings | null;
   country: Country;
+  languageCode: string;
 }) {
   async function handleSave(_prev: any, formData: FormData) {
     formData.set("country_id", String(country.id));
+    formData.set("language_code", languageCode);
     return await saveVipSettings(formData);
   }
 

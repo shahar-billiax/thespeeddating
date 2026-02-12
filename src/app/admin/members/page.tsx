@@ -28,17 +28,17 @@ export default async function AdminMembersPage({
 
       <MemberSearch current={params} />
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>Age</TableHead>
-              <TableHead>City</TableHead>
+              <TableHead className="hidden sm:table-cell">Email</TableHead>
+              <TableHead className="hidden sm:table-cell">Gender</TableHead>
+              <TableHead className="hidden md:table-cell">Age</TableHead>
+              <TableHead className="hidden md:table-cell">City</TableHead>
               <TableHead>Role</TableHead>
-              <TableHead>Joined</TableHead>
+              <TableHead className="hidden md:table-cell">Joined</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -64,18 +64,18 @@ export default async function AdminMembersPage({
                         {m.first_name} {m.last_name}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-sm">{m.email}</TableCell>
-                    <TableCell>
+                    <TableCell className="text-sm hidden sm:table-cell">{m.email}</TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <Badge variant="outline">{m.gender}</Badge>
                     </TableCell>
-                    <TableCell>{age ?? "—"}</TableCell>
-                    <TableCell>{m.cities?.name ?? "—"}</TableCell>
+                    <TableCell className="hidden md:table-cell">{age ?? "—"}</TableCell>
+                    <TableCell className="hidden md:table-cell">{m.cities?.name ?? "—"}</TableCell>
                     <TableCell>
                       <Badge variant={m.role === "admin" ? "default" : "secondary"}>
                         {m.role}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm hidden md:table-cell">
                       {new Date(m.created_at).toLocaleDateString()}
                     </TableCell>
                   </TableRow>

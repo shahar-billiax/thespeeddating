@@ -76,7 +76,7 @@ export default async function HomePage() {
             <p className="text-sm sm:text-base uppercase tracking-widest text-white/70 font-medium">
               {t("home.hero_subtitle")}
             </p>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight">
+            <h1 className="text-3xl font-bold tracking-tight sm:text-5xl lg:text-6xl leading-tight">
               {t("home.hero_heading")}{" "}
               <span className="text-yellow-300">{t("home.hero_heading_highlight")}</span>
             </h1>
@@ -119,7 +119,7 @@ export default async function HomePage() {
         return (
           <section className="py-12 bg-background border-b">
             <div className="container mx-auto px-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto text-center">
                 {stats.map((stat, i) => (
                   <div key={i}>
                     <div className="text-3xl sm:text-4xl font-bold text-primary">{stat.value}</div>
@@ -289,7 +289,7 @@ export default async function HomePage() {
       <section className="py-16 sm:py-20 bg-gradient-to-r from-primary to-accent">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center space-y-6 text-white">
-            <h2 className="text-3xl sm:text-4xl font-bold">
+            <h2 className="text-2xl sm:text-4xl font-bold">
               {t("home.cta_heading")}
             </h2>
             <p className="text-white/80 text-lg">

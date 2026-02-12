@@ -1216,6 +1216,7 @@ export type Database = {
           icon: string
           id: number
           is_active: boolean
+          language_code: string
           sort_order: number
           title: string
           updated_at: string
@@ -1227,6 +1228,7 @@ export type Database = {
           icon?: string
           id?: number
           is_active?: boolean
+          language_code?: string
           sort_order?: number
           title: string
           updated_at?: string
@@ -1238,6 +1240,7 @@ export type Database = {
           icon?: string
           id?: number
           is_active?: boolean
+          language_code?: string
           sort_order?: number
           title?: string
           updated_at?: string
@@ -1307,25 +1310,28 @@ export type Database = {
           auto_renewal_notice: string
           country_id: number
           id: number
+          language_code: string
           updated_at: string
         }
         Insert: {
           auto_renewal_notice?: string
           country_id: number
           id?: number
+          language_code?: string
           updated_at?: string
         }
         Update: {
           auto_renewal_notice?: string
           country_id?: number
           id?: number
+          language_code?: string
           updated_at?: string
         }
         Relationships: [
           {
             foreignKeyName: "vip_settings_country_id_fkey"
             columns: ["country_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "countries"
             referencedColumns: ["id"]
           },

@@ -11,6 +11,16 @@ const COUNTRY_LOCALE_MAP: Record<string, string> = {
   il: "he",
 };
 
+const VALID_LOCALES = new Set(Object.values(COUNTRY_LOCALE_MAP));
+
+function detectLocale(request: NextRequest, country: string): string {
+  const cookieLocale = request.cookies.get("locale")?.value;
+  if (cookieLocale && VALID_LOCALES.has(cookieLocale)) {
+    return cookieLocale;
+  }
+  return COUNTRY_LOCALE_MAP[country] || "en";
+}
+
 function detectCountry(request: NextRequest): string {
   // Cookie override (for dev)
   const cookieCountry = request.cookies.get("country")?.value;
@@ -26,7 +36,7 @@ function detectCountry(request: NextRequest): string {
 export async function middleware(request: NextRequest) {
   // 1. Country detection
   const country = detectCountry(request);
-  const locale = COUNTRY_LOCALE_MAP[country] || "en";
+  const locale = detectLocale(request, country);
 
   // 2. Create Supabase client with cookie handling
   let response = NextResponse.next({ request });

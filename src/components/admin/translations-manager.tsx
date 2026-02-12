@@ -140,12 +140,12 @@ export function TranslationsManager({
   return (
     <>
       <div className="flex flex-wrap gap-3 items-end">
-        <form onSubmit={handleSearch} className="flex gap-2">
+        <form onSubmit={handleSearch} className="flex gap-2 w-full sm:w-auto">
           <Input
             placeholder="Search key or value..."
             value={searchVal}
             onChange={(e) => setSearchVal(e.target.value)}
-            className="w-[300px]"
+            className="w-full sm:w-[300px]"
           />
           <Button type="submit" variant="outline">Search</Button>
         </form>
@@ -172,7 +172,7 @@ export function TranslationsManager({
                 <Label>Key</Label>
                 <Input name="string_key" required placeholder="e.g. nav.home" />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>English</Label>
                   <Textarea name="en_value" rows={3} placeholder="English text" />
@@ -192,7 +192,7 @@ export function TranslationsManager({
         {pairs.length} translation keys shown
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -261,7 +261,7 @@ export function TranslationsManager({
                             <input type="hidden" name="string_key" value={pair.key} />
                             {pair.en && <input type="hidden" name="en_id" value={pair.en.id} />}
                             {pair.he && <input type="hidden" name="he_id" value={pair.he.id} />}
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <Label>English</Label>
                                 <Textarea

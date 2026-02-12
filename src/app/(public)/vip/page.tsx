@@ -36,11 +36,11 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 export default async function VIPPage() {
-  const { t, country } = await getTranslations();
+  const { t, country, locale } = await getTranslations();
   const supabase = await createClient();
   const [page, vipData] = await Promise.all([
     getPage("vip"),
-    getVipData(country),
+    getVipData(country, locale),
   ]);
 
   const {
@@ -61,7 +61,7 @@ export default async function VIPPage() {
   const { plans, benefits: benefitsData, notice, currency } = vipData;
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat(country === "gb" ? "en-GB" : "he-IL", {
+    return new Intl.NumberFormat(locale === "he" ? "he-IL" : "en-GB", {
       style: "currency",
       currency,
       minimumFractionDigits: 0,

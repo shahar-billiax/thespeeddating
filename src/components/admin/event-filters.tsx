@@ -56,12 +56,12 @@ export function AdminEventFilters({
     : cities;
 
   return (
-    <div className="flex flex-wrap gap-3 items-center">
+    <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 items-center">
       <Select
         value={current.country ?? "all"}
         onValueChange={(v) => setFilter("country", v)}
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-full sm:w-[150px]">
           <SelectValue placeholder="Country" />
         </SelectTrigger>
         <SelectContent>
@@ -78,7 +78,7 @@ export function AdminEventFilters({
         value={current.city ?? "all"}
         onValueChange={(v) => setFilter("city", v)}
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-full sm:w-[150px]">
           <SelectValue placeholder="City" />
         </SelectTrigger>
         <SelectContent>
@@ -95,7 +95,7 @@ export function AdminEventFilters({
         value={current.status ?? "all"}
         onValueChange={(v) => setFilter("status", v)}
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-full sm:w-[150px]">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -110,7 +110,7 @@ export function AdminEventFilters({
         value={current.type ?? "all"}
         onValueChange={(v) => setFilter("type", v)}
       >
-        <SelectTrigger className="w-[150px]">
+        <SelectTrigger className="w-full sm:w-[150px]">
           <SelectValue placeholder="Type" />
         </SelectTrigger>
         <SelectContent>

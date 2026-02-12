@@ -14,8 +14,8 @@ export function AdminTopbar({ user }: { user: { email: string } }) {
   const initials = user.email.slice(0, 2).toUpperCase();
 
   return (
-    <header className="h-14 border-b bg-background flex items-center justify-between px-6">
-      <div />
+    <header className="h-14 border-b bg-background flex items-center justify-between px-4 md:px-6">
+      <div className="md:hidden w-10" />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="gap-2">

@@ -17,7 +17,7 @@ export default async function AdminLayout({
       <AdminSidebar />
       <div className="flex-1 flex flex-col">
         <AdminTopbar user={{ email: user?.email || "" }} />
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

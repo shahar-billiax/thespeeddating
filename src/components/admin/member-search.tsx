@@ -38,12 +38,12 @@ export function MemberSearch({ current }: { current: Record<string, string> }) {
 
   return (
     <div className="flex flex-wrap gap-3 items-end">
-      <form onSubmit={handleSearch} className="flex gap-2">
+      <form onSubmit={handleSearch} className="flex gap-2 w-full sm:w-auto">
         <Input
           placeholder="Search by name or email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-[300px]"
+          className="w-full sm:w-[300px]"
         />
         <Button type="submit" variant="outline">
           Search

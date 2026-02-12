@@ -1,9 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/use-translation";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   LayoutDashboard,
   Calendar,
@@ -16,13 +23,14 @@ import {
   Crown,
   Languages,
   File,
+  Menu,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-export function AdminSidebar() {
-  const pathname = usePathname();
+function useNavGroups() {
   const { t } = useTranslation();
 
-  const navGroups = [
+  return [
     {
       label: null,
       items: [
@@ -60,48 +68,107 @@ export function AdminSidebar() {
       ],
     },
   ];
+}
+
+function SidebarNav({
+  navGroups,
+  pathname,
+  onLinkClick,
+}: {
+  navGroups: ReturnType<typeof useNavGroups>;
+  pathname: string;
+  onLinkClick?: () => void;
+}) {
+  return (
+    <nav className="space-y-6">
+      {navGroups.map((group, gi) => (
+        <div key={gi}>
+          {group.label && (
+            <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-3 mb-2">
+              {group.label}
+            </p>
+          )}
+          <div className="space-y-1">
+            {group.items.map((item) => {
+              const isActive =
+                item.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname.startsWith(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onLinkClick}
+                  className={cn(
+                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+  const navGroups = useNavGroups();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <aside className="w-64 border-r bg-sidebar min-h-screen p-4">
-      <div className="mb-8">
-        <Link href="/admin" className="text-lg font-bold text-sidebar-primary">
-          TSD Admin
-        </Link>
-      </div>
-      <nav className="space-y-6">
-        {navGroups.map((group, gi) => (
-          <div key={gi}>
-            {group.label && (
-              <p className="text-xs font-semibold text-sidebar-foreground/50 uppercase tracking-wider px-3 mb-2">
-                {group.label}
-              </p>
-            )}
-            <div className="space-y-1">
-              {group.items.map((item) => {
-                const isActive =
-                  item.href === "/admin"
-                    ? pathname === "/admin"
-                    : pathname.startsWith(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                      isActive
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground hover:bg-sidebar-accent/50"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </div>
+    <>
+      {/* Mobile hamburger button - fixed to top-left */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="fixed top-3 left-3 z-50 md:hidden"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open menu"
+      >
+        <Menu className="h-5 w-5" />
+      </Button>
+
+      {/* Mobile sidebar sheet */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent side="left" className="w-64 p-4" showCloseButton>
+          <SheetHeader className="px-0">
+            <SheetTitle>
+              <Link
+                href="/admin"
+                className="text-lg font-bold text-sidebar-primary"
+                onClick={() => setMobileOpen(false)}
+              >
+                TSD Admin
+              </Link>
+            </SheetTitle>
+          </SheetHeader>
+          <div className="mt-4">
+            <SidebarNav
+              navGroups={navGroups}
+              pathname={pathname}
+              onLinkClick={() => setMobileOpen(false)}
+            />
           </div>
-        ))}
-      </nav>
-    </aside>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop sidebar */}
+      <aside className="hidden md:block w-64 border-r bg-sidebar min-h-screen p-4 shrink-0">
+        <div className="mb-8">
+          <Link href="/admin" className="text-lg font-bold text-sidebar-primary">
+            TSD Admin
+          </Link>
+        </div>
+        <SidebarNav navGroups={navGroups} pathname={pathname} />
+      </aside>
+    </>
   );
 }

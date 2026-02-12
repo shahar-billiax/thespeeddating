@@ -36,8 +36,8 @@ export default async function AdminEventsPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Events</h1>
+      <div className="flex items-center justify-between gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">Events</h1>
         <Button asChild>
           <Link href="/admin/events/new">
             <Plus className="h-4 w-4 mr-2" />
@@ -52,16 +52,16 @@ export default async function AdminEventsPage({
         current={params}
       />
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>City</TableHead>
-              <TableHead>Venue</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Age Range</TableHead>
-              <TableHead className="text-center">M/F</TableHead>
+              <TableHead className="hidden sm:table-cell">Venue</TableHead>
+              <TableHead className="hidden sm:table-cell">Type</TableHead>
+              <TableHead className="hidden md:table-cell">Age Range</TableHead>
+              <TableHead className="text-center hidden md:table-cell">M/F</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -89,20 +89,20 @@ export default async function AdminEventsPage({
                     </Link>
                   </TableCell>
                   <TableCell>{event.cities?.name}</TableCell>
-                  <TableCell>{event.venues?.name ?? "—"}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">{event.venues?.name ?? "—"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <Badge variant="outline">
                       {event.event_type?.replace("_", " ") ?? "—"}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">
                     {event.enable_gendered_age
                       ? `M: ${event.age_min_male ?? "?"}–${event.age_max_male ?? "?"} / F: ${event.age_min_female ?? "?"}–${event.age_max_female ?? "?"}`
                       : event.age_min || event.age_max
                         ? `${event.age_min ?? "?"}–${event.age_max ?? "?"}`
                         : "—"}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center hidden md:table-cell">
                     {event.limit_male ?? "—"}/{event.limit_female ?? "—"}
                   </TableCell>
                   <TableCell>

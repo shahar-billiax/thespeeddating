@@ -11,6 +11,8 @@
   "nav.franchise": "Franchise & Jobs",
   "nav.matches": "My Matches",
   "nav.my_account": "My Account",
+  "nav.account_settings": "Account Settings",
+  "nav.admin_panel": "Admin Panel",
   "nav.my_events": "My Events",
   "nav.logout": "Log Out",
   "nav.login": "Log In",
@@ -18,6 +20,7 @@
   "nav.skip_to_content": "Skip to main content",
   "nav.open_menu": "Open menu",
   "nav.brand": "The Speed Dating",
+  "nav.more": "More",
 
   "common.next": "Next",
   "common.back": "Back",
@@ -287,8 +290,13 @@
   "cookie.essential_only": "Essential Only",
   "cookie.accept_all": "Accept All",
 
-  "country.uk": "UK",
+  "country.uk": "United Kingdom",
   "country.israel": "Israel",
+
+  "switcher.region": "Region",
+  "switcher.language": "Language",
+  "language.en": "English",
+  "language.he": "\u05e2\u05d1\u05e8\u05d9\u05ea",
 
   "my_events.title": "My Events",
   "my_events.upcoming": "Upcoming",
