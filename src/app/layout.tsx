@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers } from "next/headers";
-import { getMessages, getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import { Providers } from "@/components/providers";
 import { CookieConsent } from "@/components/cookie-consent";
 import "./globals.css";
@@ -17,7 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t, country } = await getTranslations();
+  const t = await getTranslations();
+  const headerStore = await headers();
+  const country = headerStore.get("x-country") || "gb";
   const domain = country === "il"
     ? "https://www.thespeeddating.co.il"
     : "https://www.thespeeddating.co.uk";
@@ -54,11 +57,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
   const headerStore = await headers();
-  const locale = headerStore.get("x-locale") || "en";
   const country = headerStore.get("x-country") || "gb";
-
-  const { translations, fallback } = await getMessages(locale);
 
   const dir = locale === "he" ? "rtl" : "ltr";
 
@@ -68,15 +70,12 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <Providers
-          translations={translations}
-          fallback={fallback}
-          locale={locale}
-          country={country}
-        >
-          {children}
-          <CookieConsent />
-        </Providers>
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <Providers country={country}>
+            {children}
+            <CookieConsent />
+          </Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

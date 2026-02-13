@@ -4,12 +4,12 @@ import {
   getDashboardStats,
   getUpcomingEventsWithGender,
 } from "@/lib/admin/actions";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { Users, Calendar, UserPlus, Crown } from "lucide-react";
 import Link from "next/link";
 
 export default async function AdminDashboardPage() {
-  const [stats, upcomingEvents, { t }] = await Promise.all([
+  const [stats, upcomingEvents, t] = await Promise.all([
     getDashboardStats(),
     getUpcomingEventsWithGender(),
     getTranslations(),

@@ -1,10 +1,10 @@
 import { Metadata } from "next";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, Lock, AlertCircle } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   return {
     title: t("safety.title"),
     description: "Your safety is our priority - guidelines for safe speed dating",
@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SafetyPage() {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
 
   return (
     <div className="container mx-auto px-4 py-12">

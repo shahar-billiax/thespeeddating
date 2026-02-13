@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { getPage } from "@/lib/pages";
 import {
   Accordion,
@@ -12,7 +12,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   return {
     title: t("faqs.title"),
     description: t("meta.faqs_description"),
@@ -187,7 +187,8 @@ const FALLBACK_CATEGORIES_HE = [
 ];
 
 export default async function FAQsPage() {
-  const { t, locale } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const page = await getPage("faq");
 
   // Use content_json from DB if available, else fallback

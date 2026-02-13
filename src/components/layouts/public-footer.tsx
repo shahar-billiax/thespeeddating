@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
+import { useCountry } from "@/lib/country-context";
 import { Heart, Mail, Phone } from "lucide-react";
 
 export function PublicFooter() {
-  const { t, country } = useTranslation();
+  const t = useTranslations();
+  const country = useCountry();
 
   return (
     <footer className="border-t bg-muted/30">

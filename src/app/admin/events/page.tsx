@@ -1,38 +1,13 @@
 import Link from "next/link";
-import { getEvents, getCountries, getCities } from "@/lib/admin/actions";
+import { getAllEvents, getEventRegistrationCounts } from "@/lib/admin/actions";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Plus } from "lucide-react";
-import { AdminPagination } from "@/components/admin/pagination";
-import { AdminEventFilters } from "@/components/admin/event-filters";
+import { EventsTable } from "@/components/admin/events-table";
 
-export default async function AdminEventsPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string>>;
-}) {
-  const params = await searchParams;
-  const [{ events, total, page, perPage }, countries, cities] =
-    await Promise.all([
-      getEvents({
-        page: params.page ? Number(params.page) : 1,
-        country: params.country,
-        city: params.city,
-        status: params.status,
-        type: params.type,
-        search: params.search,
-      }),
-      getCountries(),
-      getCities(),
-    ]);
+export default async function AdminEventsPage() {
+  const events = await getAllEvents();
+  const eventIds = events.map((e: any) => e.id);
+  const regCounts = await getEventRegistrationCounts(eventIds);
 
   return (
     <div className="space-y-4">
@@ -46,85 +21,7 @@ export default async function AdminEventsPage({
         </Button>
       </div>
 
-      <AdminEventFilters
-        countries={countries}
-        cities={cities}
-        current={params}
-      />
-
-      <div className="border rounded-lg overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead className="hidden sm:table-cell">Venue</TableHead>
-              <TableHead className="hidden sm:table-cell">Type</TableHead>
-              <TableHead className="hidden md:table-cell">Age Range</TableHead>
-              <TableHead className="text-center hidden md:table-cell">M/F</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {events.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                  No events found
-                </TableCell>
-              </TableRow>
-            ) : (
-              events.map((event: any) => (
-                <TableRow key={event.id}>
-                  <TableCell>
-                    <Link
-                      href={`/admin/events/${event.id}`}
-                      className="font-medium hover:underline"
-                    >
-                      {event.event_date}
-                      {event.start_time && (
-                        <span className="text-muted-foreground ml-1">
-                          {event.start_time}
-                        </span>
-                      )}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{event.cities?.name}</TableCell>
-                  <TableCell className="hidden sm:table-cell">{event.venues?.name ?? "—"}</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    <Badge variant="outline">
-                      {event.event_type?.replace("_", " ") ?? "—"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    {event.enable_gendered_age
-                      ? `M: ${event.age_min_male ?? "?"}–${event.age_max_male ?? "?"} / F: ${event.age_min_female ?? "?"}–${event.age_max_female ?? "?"}`
-                      : event.age_min || event.age_max
-                        ? `${event.age_min ?? "?"}–${event.age_max ?? "?"}`
-                        : "—"}
-                  </TableCell>
-                  <TableCell className="text-center hidden md:table-cell">
-                    {event.limit_male ?? "—"}/{event.limit_female ?? "—"}
-                  </TableCell>
-                  <TableCell>
-                    {event.is_cancelled ? (
-                      <Badge variant="destructive">Cancelled</Badge>
-                    ) : !event.is_published ? (
-                      <Badge variant="secondary">Draft</Badge>
-                    ) : event.event_date <
-                      new Date().toISOString().split("T")[0] ? (
-                      <Badge variant="outline">Past</Badge>
-                    ) : (
-                      <Badge>Published</Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <AdminPagination total={total} page={page} perPage={perPage} />
+      <EventsTable events={events as any} regCounts={regCounts} />
     </div>
   );
 }

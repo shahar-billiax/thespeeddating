@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { getPage } from "@/lib/pages";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { CmsContent } from "@/components/cms/cms-content";
 import { getPageFallbackHtml } from "@/lib/i18n/page-fallbacks";
@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const page = await getPage("success-stories");
   return {
     title: page?.meta_title || page?.title || t("meta.success_stories_title"),
@@ -28,19 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function SuccessStoriesPage() {
   const page = await getPage("success-stories");
-  const { country, locale, t } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const supabase = await createClient();
-
-  const { data: countryData } = await supabase
-    .from("countries")
-    .select("id")
-    .eq("code", country)
-    .single();
 
   const { data: stories } = await supabase
     .from("success_stories")
     .select("*")
-    .eq("country_id", countryData?.id ?? 0)
+    .eq("language_code", locale)
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
     .order("id", { ascending: true })

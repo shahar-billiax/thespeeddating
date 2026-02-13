@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getSuccessStoryById, getCountries } from "@/lib/admin/actions";
+import { getSuccessStoryById } from "@/lib/admin/actions";
 import { SuccessStoryForm } from "@/components/admin/success-story-form";
 
 export default async function EditSuccessStoryPage({
@@ -8,10 +8,7 @@ export default async function EditSuccessStoryPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [story, countries] = await Promise.all([
-    getSuccessStoryById(Number(id)),
-    getCountries(),
-  ]);
+  const story = await getSuccessStoryById(Number(id));
 
   if (!story) {
     notFound();
@@ -22,7 +19,7 @@ export default async function EditSuccessStoryPage({
       <h1 className="text-3xl font-bold">
         Edit Story: {story.couple_names}
       </h1>
-      <SuccessStoryForm story={story} countries={countries} />
+      <SuccessStoryForm story={story} />
     </div>
   );
 }

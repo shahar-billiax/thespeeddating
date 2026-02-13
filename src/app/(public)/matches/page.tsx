@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { getMyEvents } from "@/lib/matches/actions";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Clock, CheckCircle } from "lucide-react";
 
 export default async function MatchesPage() {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const events = await getMyEvents();
 
   return (

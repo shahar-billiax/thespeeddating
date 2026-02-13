@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateProfile, updatePassword, deleteAccount } from "@/lib/profile/actions";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,7 +69,7 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [isPasswordPending, startPasswordTransition] = useTransition();

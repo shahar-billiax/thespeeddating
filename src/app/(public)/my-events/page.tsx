@@ -1,11 +1,11 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { MyEventsList } from "@/components/events/my-events-list";
 
 export default async function MyEventsPage() {
   const supabase = await createClient();
-  const { t } = await getTranslations();
+  const t = await getTranslations();
 
   const {
     data: { user },

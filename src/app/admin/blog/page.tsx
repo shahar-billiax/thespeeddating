@@ -16,7 +16,7 @@ export default async function AdminBlogPage({
   const params = await searchParams;
   const { posts, total, page, perPage } = await getBlogPosts({
     page: params.page ? Number(params.page) : 1,
-    country: params.country,
+    language: params.language,
     published: params.published,
   });
 
@@ -37,7 +37,6 @@ export default async function AdminBlogPage({
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
-              <TableHead>Country</TableHead>
               <TableHead>Language</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Date</TableHead>
@@ -46,7 +45,7 @@ export default async function AdminBlogPage({
           <TableBody>
             {posts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                   No blog posts
                 </TableCell>
               </TableRow>
@@ -58,8 +57,7 @@ export default async function AdminBlogPage({
                       {post.title}
                     </Link>
                   </TableCell>
-                  <TableCell>{post.countries?.name}</TableCell>
-                  <TableCell>{post.language_code.toUpperCase()}</TableCell>
+                  <TableCell>{post.language_code === "he" ? "Hebrew" : "English"}</TableCell>
                   <TableCell>
                     <Badge variant={post.is_published ? "default" : "secondary"}>
                       {post.is_published ? "Published" : "Draft"}

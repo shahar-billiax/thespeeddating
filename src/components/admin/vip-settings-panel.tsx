@@ -14,24 +14,17 @@ interface Settings {
   auto_renewal_notice: string;
 }
 
-interface Country {
-  id: number;
-  name: string;
-  code: string;
-  currency: string;
-}
-
 export function VipSettingsPanel({
   setting,
-  country,
+  countryId,
   languageCode,
 }: {
   setting: Settings | null;
-  country: Country;
+  countryId: number;
   languageCode: string;
 }) {
   async function handleSave(_prev: any, formData: FormData) {
-    formData.set("country_id", String(country.id));
+    formData.set("country_id", String(setting?.country_id ?? countryId));
     formData.set("language_code", languageCode);
     return await saveVipSettings(formData);
   }
@@ -51,7 +44,7 @@ export function VipSettingsPanel({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Settings</CardTitle>
+        <CardTitle>Auto-Renewal Notice</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
@@ -60,7 +53,7 @@ export function VipSettingsPanel({
           )}
 
           <div>
-            <Label>Auto-Renewal Notice</Label>
+            <Label>Notice Text</Label>
             <Textarea
               name="auto_renewal_notice"
               rows={3}
@@ -71,7 +64,7 @@ export function VipSettingsPanel({
 
           <div className="flex justify-end">
             <Button type="submit" size="sm" disabled={isPending}>
-              {isPending ? "Saving..." : "Save Settings"}
+              {isPending ? "Saving..." : "Save"}
             </Button>
           </div>
         </form>

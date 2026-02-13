@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MyEventCard } from "@/components/events/my-event-card";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 
 interface Event {
   id: string;
@@ -23,7 +23,7 @@ interface MyEventsListProps {
 }
 
 export function MyEventsList({ upcoming, past }: MyEventsListProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   return (
     <Tabs defaultValue="upcoming" className="w-full">

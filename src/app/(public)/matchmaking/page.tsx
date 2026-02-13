@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { getPage } from "@/lib/pages";
 import { getPageFallbackHtml } from "@/lib/i18n/page-fallbacks";
 import {
@@ -17,7 +18,7 @@ import { CmsContent } from "@/components/cms/cms-content";
 import { Heart, CheckCircle2 } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const page = await getPage("matchmaking");
   return {
     title: page?.meta_title || t("meta.matchmaking_title"),
@@ -26,7 +27,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MatchmakingPage() {
-  const { t, country, locale } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
+  const headerStore = await headers();
+  const country = headerStore.get("x-country") || "gb";
   const supabase = await createClient();
   const page = await getPage("matchmaking");
 

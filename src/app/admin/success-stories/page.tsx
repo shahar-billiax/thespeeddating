@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getSuccessStories, getCountries } from "@/lib/admin/actions";
+import { getSuccessStories } from "@/lib/admin/actions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,12 +21,10 @@ export default async function AdminSuccessStoriesPage({
   const params = await searchParams;
   const { stories, total, page, perPage } = await getSuccessStories({
     page: params.page ? Number(params.page) : 1,
-    country: params.country,
+    language: params.language,
     type: params.type,
     featured: params.featured,
   });
-
-  const countries = await getCountries();
 
   return (
     <div className="space-y-4">
@@ -43,16 +41,13 @@ export default async function AdminSuccessStoriesPage({
       <div className="flex gap-2">
         <form className="flex gap-2 flex-wrap">
           <select
-            name="country"
-            defaultValue={params.country}
+            name="language"
+            defaultValue={params.language}
             className="px-3 py-2 border rounded-md"
           >
-            <option value="">All Countries</option>
-            {countries.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
+            <option value="">All Languages</option>
+            <option value="en">English</option>
+            <option value="he">Hebrew</option>
           </select>
           <select
             name="type"
@@ -128,10 +123,10 @@ export default async function AdminSuccessStoriesPage({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm">
-                    {story.location || "—"}
+                    {story.location || "\u2014"}
                   </TableCell>
                   <TableCell className="text-sm">
-                    {story.year || "—"}
+                    {story.year || "\u2014"}
                   </TableCell>
                   <TableCell>
                     <Badge

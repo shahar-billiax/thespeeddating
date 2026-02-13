@@ -37,7 +37,7 @@ export type Database = {
       blog_posts: {
         Row: {
           body_html: string
-          country_id: number
+          country_id: number | null
           created_at: string
           featured_image: string | null
           id: number
@@ -49,7 +49,7 @@ export type Database = {
         }
         Insert: {
           body_html: string
-          country_id: number
+          country_id?: number | null
           created_at?: string
           featured_image?: string | null
           id?: number
@@ -61,7 +61,7 @@ export type Database = {
         }
         Update: {
           body_html?: string
-          country_id?: number
+          country_id?: number | null
           created_at?: string
           featured_image?: string | null
           id?: number
@@ -704,7 +704,7 @@ export type Database = {
         Row: {
           content_html: string
           content_json: Json | null
-          country_id: number
+          country_id: number | null
           created_at: string
           id: number
           is_published: boolean
@@ -719,7 +719,7 @@ export type Database = {
         Insert: {
           content_html: string
           content_json?: Json | null
-          country_id: number
+          country_id?: number | null
           created_at?: string
           id?: number
           is_published?: boolean
@@ -734,7 +734,7 @@ export type Database = {
         Update: {
           content_html?: string
           content_json?: Json | null
-          country_id?: number
+          country_id?: number | null
           created_at?: string
           id?: number
           is_published?: boolean
@@ -1017,12 +1017,13 @@ export type Database = {
       }
       success_stories: {
         Row: {
-          country_id: number
+          country_id: number | null
           couple_names: string
           created_at: string
           id: number
           is_active: boolean
           is_featured: boolean
+          language_code: string
           location: string | null
           quote: string
           sort_order: number
@@ -1031,12 +1032,13 @@ export type Database = {
           year: string | null
         }
         Insert: {
-          country_id: number
+          country_id?: number | null
           couple_names: string
           created_at?: string
           id?: number
           is_active?: boolean
           is_featured?: boolean
+          language_code?: string
           location?: string | null
           quote: string
           sort_order?: number
@@ -1045,12 +1047,13 @@ export type Database = {
           year?: string | null
         }
         Update: {
-          country_id?: number
+          country_id?: number | null
           couple_names?: string
           created_at?: string
           id?: number
           is_active?: boolean
           is_featured?: boolean
+          language_code?: string
           location?: string | null
           quote?: string
           sort_order?: number

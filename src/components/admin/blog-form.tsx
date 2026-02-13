@@ -14,10 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function BlogPostForm({
   post,
-  countries,
 }: {
   post?: any;
-  countries: { id: number; name: string; code: string }[];
 }) {
   async function handleSubmit(_prev: any, formData: FormData) {
     return await saveBlogPost(formData);
@@ -65,28 +63,15 @@ export function BlogPostForm({
       <Card>
         <CardHeader><CardTitle>Settings</CardTitle></CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Country</Label>
-              <Select name="country_id" defaultValue={post?.country_id ? String(post.country_id) : ""}>
-                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                <SelectContent>
-                  {countries.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Language</Label>
-              <Select name="language_code" defaultValue={post?.language_code ?? "en"}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="he">Hebrew</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label>Language</Label>
+            <Select name="language_code" defaultValue={post?.language_code ?? "en"}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="he">Hebrew (עברית)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex items-center gap-2">
             <Switch id="is_published" name="is_published" defaultChecked={post?.is_published ?? false} />

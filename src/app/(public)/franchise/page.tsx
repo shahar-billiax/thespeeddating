@@ -1,10 +1,10 @@
 import { Metadata } from "next";
 import { getPage } from "@/lib/pages";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { CmsPageLayout } from "@/components/cms/cms-page-layout";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const page = await getPage("franchise-jobs");
   return {
     title: page?.meta_title || t("meta.franchise_title"),
@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FranchisePage() {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const page = await getPage("franchise-jobs");
 
   return (

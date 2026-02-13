@@ -2024,6 +2024,10 @@ insert into success_stories (couple_names, quote, year, location, story_type, is
   (select id from countries where code = 'il')
 );
 
+-- Set language_code for success stories based on country
+update success_stories set language_code = 'he'
+where country_id = (select id from countries where code = 'il');
+
 -- ===========================================
 -- VIP Plans, Benefits & Settings
 -- ===========================================
@@ -2042,32 +2046,24 @@ INSERT INTO vip_plans (country_id, months, price_per_month, total_price, currenc
   ((SELECT id FROM countries WHERE code = 'il'), 6, 30, 180, 'ILS', NULL, 2),
   ((SELECT id FROM countries WHERE code = 'il'), 12, 22, 264, 'ILS', 'best_value', 3);
 
--- GB Benefits
+-- Benefits (English) — shared across all countries
 INSERT INTO vip_benefits (country_id, icon, title, description, sort_order, language_code) VALUES
   ((SELECT id FROM countries WHERE code = 'gb'), 'Percent', 'Discounted Event Tickets', 'Speed Dating event tickets at a special price', 0, 'en'),
   ((SELECT id FROM countries WHERE code = 'gb'), 'Heart', '15% Off Matchmaking', '15% off our Match-Making service', 1, 'en'),
   ((SELECT id FROM countries WHERE code = 'gb'), 'Eye', 'See Who Chose You', 'We reveal to you who chose you at the Speed Dating event you participated', 2, 'en'),
   ((SELECT id FROM countries WHERE code = 'gb'), 'Gift', 'Special Offers & Discounts', 'MORE special offers and discounts!', 3, 'en');
 
--- IL Benefits (Hebrew)
+-- Benefits (Hebrew) — shared across all countries
 INSERT INTO vip_benefits (country_id, icon, title, description, sort_order, language_code) VALUES
   ((SELECT id FROM countries WHERE code = 'il'), 'Percent', 'ערבי ספיד דייט בהנחה של 25%', 'כרטיסים לערבי ספיד דייט במחיר מוזל', 0, 'he'),
   ((SELECT id FROM countries WHERE code = 'il'), 'Heart', 'הנחה של 15% לשירות השידוכים', '15% הנחה על שירות השידוכים האישי שלנו', 1, 'he'),
   ((SELECT id FROM countries WHERE code = 'il'), 'Eye', 'גלו מי בחר בכם', 'אנו מגלים לכם מי בחר בכם בערב הספיד דייט בו השתתפתם', 2, 'he'),
   ((SELECT id FROM countries WHERE code = 'il'), 'Gift', 'הנחות מפתיעות נוספות', 'ועוד הנחות מפתיעות לחברי המועדון!', 3, 'he');
 
--- IL Benefits (English)
-INSERT INTO vip_benefits (country_id, icon, title, description, sort_order, language_code) VALUES
-  ((SELECT id FROM countries WHERE code = 'il'), 'Percent', '25% Off Speed Dating Events', 'Discounted tickets to our speed dating events', 0, 'en'),
-  ((SELECT id FROM countries WHERE code = 'il'), 'Heart', '15% Off Matchmaking Service', '15% discount on our personal matchmaking service', 1, 'en'),
-  ((SELECT id FROM countries WHERE code = 'il'), 'Eye', 'See Who Chose You', 'We reveal who chose you at the speed dating event you attended', 2, 'en'),
-  ((SELECT id FROM countries WHERE code = 'il'), 'Gift', 'More Surprise Discounts', 'And more surprise discounts for club members!', 3, 'en');
-
--- Settings
+-- Auto-renewal notices (one per language, shared across countries)
 INSERT INTO vip_settings (country_id, auto_renewal_notice, language_code) VALUES
   ((SELECT id FROM countries WHERE code = 'gb'), 'All memberships will renew automatically after duration expired. To cancel please write an email to Cancel@TheSpeedDating.co.uk', 'en'),
-  ((SELECT id FROM countries WHERE code = 'il'), 'כל תקופות המנוי יתחדשו עם תום תוקפן באופן אוטומטי. על מנת לבטל אנא כתבו אימייל ל Cancel@TheSpeedDating.co.il', 'he'),
-  ((SELECT id FROM countries WHERE code = 'il'), 'All subscription periods will auto-renew upon expiration. To cancel, please email Cancel@TheSpeedDating.co.il', 'en');
+  ((SELECT id FROM countries WHERE code = 'il'), 'כל תקופות המנוי יתחדשו עם תום תוקפן באופן אוטומטי, על מנת לבטל אנא כתבו אימייל ל Cancel@TheSpeedDating.co.il', 'he');
 
 -- Profile form translations (English)
 INSERT INTO translations (string_key, language_code, value) VALUES

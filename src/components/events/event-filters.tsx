@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 
 interface EventFiltersProps {
   cities: Array<{ id: number | string; name: string }>;
@@ -26,7 +26,7 @@ const eventTypes = [
 export function EventFilters({ cities }: EventFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const currentCity = searchParams.get("city") || "all";
   const currentType = searchParams.get("type") || "all";

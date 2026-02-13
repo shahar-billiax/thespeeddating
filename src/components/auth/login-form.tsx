@@ -3,14 +3,14 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { signIn } from "@/lib/auth/actions";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export function LoginForm({ redirect }: { redirect?: string }) {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       return await signIn(formData);

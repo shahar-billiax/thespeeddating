@@ -1,14 +1,14 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { ProfileForm } from "@/components/profile/profile-form";
 import { Button } from "@/components/ui/button";
 import { Shield } from "lucide-react";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
-  const { t } = await getTranslations();
+  const t = await getTranslations();
 
   const {
     data: { user },

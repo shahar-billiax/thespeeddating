@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -14,24 +14,12 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const { country, locale } = await getTranslations();
   const supabase = await createClient();
-
-  const { data: countryData } = await supabase
-    .from("countries")
-    .select("id")
-    .eq("code", country)
-    .single();
-
-  if (!countryData) {
-    return {};
-  }
 
   const { data: post } = await supabase
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
-    .eq("country_id", countryData.id)
     .eq("is_published", true)
     .single();
 
@@ -50,24 +38,14 @@ export async function generateMetadata({
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const { t, locale, country } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const supabase = await createClient();
-
-  const { data: countryData } = await supabase
-    .from("countries")
-    .select("id")
-    .eq("code", country)
-    .single();
-
-  if (!countryData) {
-    notFound();
-  }
 
   const { data: post } = await supabase
     .from("blog_posts")
     .select("*")
     .eq("slug", slug)
-    .eq("country_id", countryData.id)
     .eq("is_published", true)
     .single();
 

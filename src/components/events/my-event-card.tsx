@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 import { format } from "date-fns";
 
 interface MyEventCardProps {
@@ -22,7 +22,7 @@ interface MyEventCardProps {
 }
 
 export function MyEventCard({ event, isPast }: MyEventCardProps) {
-  const { t } = useTranslation();
+  const t = useTranslations();
 
   const statusColor =
     event.status === "confirmed"

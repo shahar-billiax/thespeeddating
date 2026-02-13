@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getBlogPost, getCountries } from "@/lib/admin/actions";
+import { getBlogPost } from "@/lib/admin/actions";
 import { BlogPostForm } from "@/components/admin/blog-form";
 
 export default async function EditBlogPostPage({
@@ -15,11 +15,10 @@ export default async function EditBlogPostPage({
     notFound();
   }
 
-  const countries = await getCountries();
   return (
     <div className="space-y-4">
       <h1 className="text-3xl font-bold">Edit Blog Post</h1>
-      <BlogPostForm post={post} countries={countries} />
+      <BlogPostForm post={post} />
     </div>
   );
 }

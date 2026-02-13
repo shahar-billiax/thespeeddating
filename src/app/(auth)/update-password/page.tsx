@@ -2,14 +2,14 @@
 
 import { useActionState } from "react";
 import { updatePassword } from "@/lib/auth/actions";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function UpdatePasswordPage() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [state, formAction, pending] = useActionState(
     async (_prev: { error?: string } | null, formData: FormData) => {
       return await updatePassword(formData);

@@ -596,7 +596,7 @@ export async function updateMember(id: string, formData: FormData) {
 // ─── Blog CRUD ───────────────────────────────────────────────
 export async function getBlogPosts(params: {
   page?: number;
-  country?: string;
+  language?: string;
   published?: string;
 }) {
   const { supabase } = await requireAdmin();
@@ -606,11 +606,11 @@ export async function getBlogPosts(params: {
 
   let query = supabase
     .from("blog_posts")
-    .select(`*, countries(name, code)`, { count: "exact" })
+    .select(`*`, { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + perPage - 1);
 
-  if (params.country) query = query.eq("country_id", Number(params.country));
+  if (params.language) query = query.eq("language_code", params.language);
   if (params.published === "true") query = query.eq("is_published", true);
   if (params.published === "false") query = query.eq("is_published", false);
 
@@ -623,7 +623,7 @@ export async function getBlogPost(id: number) {
   const { supabase } = await requireAdmin();
   const { data, error } = await supabase
     .from("blog_posts")
-    .select(`*, countries(id, name, code)`)
+    .select(`*`)
     .eq("id", id)
     .single();
   if (error) throw new Error(error.message);
@@ -643,7 +643,6 @@ export async function saveBlogPost(formData: FormData) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, ""),
     body_html: formData.get("body_html") as string,
-    country_id: Number(formData.get("country_id")),
     language_code: (formData.get("language_code") as string) || "en",
     featured_image: (formData.get("featured_image") as string) || null,
     is_published: formData.get("is_published") === "on",
@@ -1082,7 +1081,6 @@ export async function exportParticipantsCsv(eventId: number) {
 // ─── Pages (CMS) ─────────────────────────────────────────────
 export async function getPages(params?: {
   page?: number;
-  country?: string;
   language?: string;
   pageKey?: string;
 }) {
@@ -1093,11 +1091,10 @@ export async function getPages(params?: {
 
   let query = supabase
     .from("pages")
-    .select(`*, countries(name, code)`, { count: "exact" })
+    .select(`*`, { count: "exact" })
     .order("page_key", { ascending: true })
     .range(offset, offset + perPage - 1);
 
-  if (params?.country) query = query.eq("country_id", Number(params.country));
   if (params?.language) query = query.eq("language_code", params.language);
   if (params?.pageKey) query = query.ilike("page_key", `%${params.pageKey}%`);
 
@@ -1106,11 +1103,106 @@ export async function getPages(params?: {
   return { pages: data ?? [], total: count ?? 0, page, perPage };
 }
 
+export async function getGroupedPages(params?: {
+  page?: number;
+  pageKey?: string;
+}) {
+  const { supabase } = await requireAdmin();
+
+  let query = supabase
+    .from("pages")
+    .select("*")
+    .order("page_key", { ascending: true })
+    .order("language_code", { ascending: true });
+
+  if (params?.pageKey) query = query.ilike("page_key", `%${params.pageKey}%`);
+
+  const { data, error } = await query;
+  if (error) throw new Error(error.message);
+
+  const grouped = new Map<string, any[]>();
+  for (const p of data ?? []) {
+    if (!grouped.has(p.page_key)) grouped.set(p.page_key, []);
+    grouped.get(p.page_key)!.push(p);
+  }
+
+  const allEntries = Array.from(grouped.entries()).map(([key, versions]) => ({
+    page_key: key,
+    versions,
+    page_type: versions[0].page_type,
+    title:
+      versions.find((v: any) => v.language_code === "en")?.title ??
+      versions[0].title,
+    languages: versions.map((v: any) => v.language_code) as string[],
+    is_published: versions.some((v: any) => v.is_published),
+    updated_at: versions.reduce(
+      (latest: string, v: any) =>
+        new Date(v.updated_at) > new Date(latest) ? v.updated_at : latest,
+      versions[0].updated_at
+    ),
+  }));
+
+  const pageNum = params?.page ?? 1;
+  const perPage = 20;
+  const offset = (pageNum - 1) * perPage;
+
+  return {
+    pages: allEntries.slice(offset, offset + perPage),
+    total: allEntries.length,
+    page: pageNum,
+    perPage,
+  };
+}
+
+export async function getAllGroupedPages() {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("pages")
+    .select("*")
+    .order("page_key", { ascending: true })
+    .order("language_code", { ascending: true });
+
+  if (error) throw new Error(error.message);
+
+  const grouped = new Map<string, any[]>();
+  for (const p of data ?? []) {
+    if (!grouped.has(p.page_key)) grouped.set(p.page_key, []);
+    grouped.get(p.page_key)!.push(p);
+  }
+
+  return Array.from(grouped.entries()).map(([key, versions]) => ({
+    page_key: key,
+    page_type: versions[0].page_type as string,
+    title:
+      versions.find((v: any) => v.language_code === "en")?.title ??
+      versions[0].title,
+    languages: versions.map((v: any) => v.language_code) as string[],
+    is_published: versions.some((v: any) => v.is_published),
+    updated_at: versions.reduce(
+      (latest: string, v: any) =>
+        new Date(v.updated_at) > new Date(latest) ? v.updated_at : latest,
+      versions[0].updated_at
+    ) as string,
+  }));
+}
+
+export async function getPageVersions(pageKey: string) {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase
+    .from("pages")
+    .select("*")
+    .eq("page_key", pageKey)
+    .order("language_code", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
 export async function getPageById(id: number) {
   const { supabase } = await requireAdmin();
   const { data, error } = await supabase
     .from("pages")
-    .select(`*, countries(id, name, code)`)
+    .select(`*`)
     .eq("id", id)
     .single();
   if (error) throw new Error(error.message);
@@ -1123,7 +1215,6 @@ export async function createPage(formData: FormData) {
   const contentJsonRaw = formData.get("content_json") as string;
   const pageData = {
     page_key: formData.get("page_key") as string,
-    country_id: Number(formData.get("country_id")),
     language_code: formData.get("language_code") as string,
     title: formData.get("title") as string,
     content_html: formData.get("content_html") as string,
@@ -1142,7 +1233,7 @@ export async function createPage(formData: FormData) {
 
   if (error) return { error: error.message };
   revalidatePath("/admin/pages");
-  redirect("/admin/pages");
+  redirect(`/admin/pages/${pageData.page_key}/edit`);
 }
 
 export async function updatePage(id: number, formData: FormData) {
@@ -1151,7 +1242,6 @@ export async function updatePage(id: number, formData: FormData) {
   const contentJsonRaw = formData.get("content_json") as string;
   const pageData = {
     page_key: formData.get("page_key") as string,
-    country_id: Number(formData.get("country_id")),
     language_code: formData.get("language_code") as string,
     title: formData.get("title") as string,
     content_html: formData.get("content_html") as string,
@@ -1182,13 +1272,55 @@ export async function deletePage(id: number) {
   return { success: true };
 }
 
+export async function savePageVersion(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const pageId = formData.get("page_id") as string;
+  const contentJsonRaw = formData.get("content_json") as string;
+  const pageKey = formData.get("page_key") as string;
+
+  const pageData = {
+    page_key: pageKey,
+    language_code: formData.get("language_code") as string,
+    title: formData.get("title") as string,
+    content_html: formData.get("content_html") as string,
+    meta_title: (formData.get("meta_title") as string) || null,
+    meta_description: (formData.get("meta_description") as string) || null,
+    is_published: formData.get("is_published") === "true",
+    page_type: (formData.get("page_type") as string) || "standard",
+    content_json: contentJsonRaw ? JSON.parse(contentJsonRaw) : null,
+  };
+
+  if (pageId) {
+    const { error } = await supabase
+      .from("pages")
+      .update({ ...pageData, updated_at: new Date().toISOString() })
+      .eq("id", Number(pageId));
+    if (error) return { error: error.message };
+  } else {
+    const { data, error } = await supabase
+      .from("pages")
+      .insert(pageData)
+      .select()
+      .single();
+    if (error) return { error: error.message };
+    revalidatePath("/admin/pages");
+    revalidatePath(`/${pageKey}`);
+    return { success: true, id: data.id };
+  }
+
+  revalidatePath("/admin/pages");
+  revalidatePath(`/${pageKey}`);
+  return { success: true };
+}
+
 // ===========================================
 // Success Stories
 // ===========================================
 
 export async function getSuccessStories(params?: {
   page?: number;
-  country?: string;
+  language?: string;
   type?: string;
   featured?: string;
 }) {
@@ -1199,12 +1331,12 @@ export async function getSuccessStories(params?: {
 
   let query = supabase
     .from("success_stories")
-    .select("*, countries(name, code)", { count: "exact" })
+    .select("*", { count: "exact" })
     .order("sort_order", { ascending: true })
     .order("id", { ascending: true })
     .range(offset, offset + perPage - 1);
 
-  if (params?.country) query = query.eq("country_id", Number(params.country));
+  if (params?.language) query = query.eq("language_code", params.language);
   if (params?.type) query = query.eq("story_type", params.type);
   if (params?.featured === "true") query = query.eq("is_featured", true);
 
@@ -1213,12 +1345,12 @@ export async function getSuccessStories(params?: {
   return { stories: data ?? [], total: count ?? 0, page, perPage };
 }
 
-export async function getSuccessStoriesByCountry(countryId: number) {
+export async function getSuccessStoriesByLanguage(languageCode: string) {
   const { supabase } = await requireAdmin();
   const { data, error } = await supabase
     .from("success_stories")
-    .select("*, countries(name, code)")
-    .eq("country_id", countryId)
+    .select("*")
+    .eq("language_code", languageCode)
     .order("sort_order", { ascending: true })
     .order("id", { ascending: true });
   if (error) throw new Error(error.message);
@@ -1229,7 +1361,7 @@ export async function getSuccessStoryById(id: number) {
   const { supabase } = await requireAdmin();
   const { data, error } = await supabase
     .from("success_stories")
-    .select("*, countries(id, name, code)")
+    .select("*")
     .eq("id", id)
     .single();
   if (error) throw new Error(error.message);
@@ -1245,7 +1377,7 @@ export async function createSuccessStory(formData: FormData) {
     year: (formData.get("year") as string) || null,
     location: (formData.get("location") as string) || null,
     story_type: (formData.get("story_type") as string) || "testimonial",
-    country_id: Number(formData.get("country_id")),
+    language_code: (formData.get("language_code") as string) || "en",
     is_featured: formData.get("is_featured") === "true",
     is_active: formData.get("is_active") === "true",
     sort_order: Number(formData.get("sort_order")) || 0,
@@ -1275,7 +1407,7 @@ export async function updateSuccessStory(id: number, formData: FormData) {
     year: (formData.get("year") as string) || null,
     location: (formData.get("location") as string) || null,
     story_type: (formData.get("story_type") as string) || "testimonial",
-    country_id: Number(formData.get("country_id")),
+    language_code: (formData.get("language_code") as string) || "en",
     is_featured: formData.get("is_featured") === "true",
     is_active: formData.get("is_active") === "true",
     sort_order: Number(formData.get("sort_order")) || 0,
@@ -1407,6 +1539,191 @@ export async function deleteVipBenefit(id: number) {
   revalidatePath("/admin/vip");
   revalidatePath("/vip");
   return { success: true };
+}
+
+// ─── Venue Events (for venue detail) ────────────────────────
+
+export async function getVenueEvents(venueId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { data } = await supabase
+    .from("events")
+    .select(`id, event_date, start_time, event_type, is_published, is_cancelled, cities(name)`)
+    .eq("venue_id", venueId)
+    .order("event_date", { ascending: false });
+
+  return data ?? [];
+}
+
+// ─── All Events (no pagination, for client-side search/sort) ─
+
+export async function getAllEvents() {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("events")
+    .select(`id, event_date, start_time, event_type, is_published, is_cancelled,
+             limit_male, limit_female, price, currency,
+             enable_gendered_age, age_min, age_max, age_min_male, age_max_male, age_min_female, age_max_female,
+             cities(name), countries(name, code), venues(id, name)`)
+    .order("event_date", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// ─── All Venues (no pagination, for client-side search/sort) ─
+
+export async function getAllVenues() {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("venues")
+    .select(`id, name, address, phone, venue_type, is_active,
+             cities(name), countries(name, code)`)
+    .order("name", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// ─── All Members (no pagination, for client-side search/sort) ─
+
+export async function getAllMembers() {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select(`id, first_name, last_name, email, phone, gender, date_of_birth,
+             role, is_active, created_at,
+             cities(name), countries(name, code)`)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+// ─── Enhanced Member detail ─────────────────────────────────
+
+export async function getMemberFull(id: string) {
+  const { supabase } = await requireAdmin();
+
+  const [
+    { data: profile },
+    { data: registrations },
+    { data: vipSubs },
+    { data: matchResults },
+    { data: matchmakingProfile },
+  ] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(`*, cities(id, name), countries(id, name, code)`)
+      .eq("id", id)
+      .single(),
+    supabase
+      .from("event_registrations")
+      .select(`id, status, payment_status, attended, registered_at, amount, currency,
+               events(id, event_date, start_time, event_type, is_cancelled, cities(name), venues(name))`)
+      .eq("user_id", id)
+      .order("registered_at", { ascending: false }),
+    supabase
+      .from("vip_subscriptions")
+      .select("*")
+      .eq("user_id", id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("match_results")
+      .select(`id, result_type, computed_at, event_id,
+               user_a_id, user_b_id, user_a_shares, user_b_shares,
+               events(event_date, cities(name))`)
+      .or(`user_a_id.eq.${id},user_b_id.eq.${id}`)
+      .order("computed_at", { ascending: false }),
+    supabase
+      .from("matchmaking_profiles")
+      .select("*")
+      .eq("user_id", id)
+      .maybeSingle(),
+  ]);
+
+  // Resolve match partner names
+  const partnerIds = (matchResults ?? []).map((m: any) =>
+    m.user_a_id === id ? m.user_b_id : m.user_a_id
+  );
+  const uniquePartnerIds = [...new Set(partnerIds)];
+
+  let partners: Record<string, { first_name: string; last_name: string }> = {};
+  if (uniquePartnerIds.length > 0) {
+    const { data: partnerProfiles } = await supabase
+      .from("profiles")
+      .select("id, first_name, last_name")
+      .in("id", uniquePartnerIds);
+    for (const p of partnerProfiles ?? []) {
+      partners[p.id] = { first_name: p.first_name, last_name: p.last_name };
+    }
+  }
+
+  return {
+    profile,
+    registrations: registrations ?? [],
+    vipSubs: vipSubs ?? [],
+    matchResults: matchResults ?? [],
+    matchmakingProfile,
+    partners,
+  };
+}
+
+// ─── Delete venue ───────────────────────────────────────────
+
+export async function deleteVenue(id: number) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("venues").delete().eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/venues");
+  redirect("/admin/venues");
+}
+
+// ─── Quick update event field ───────────────────────────────
+
+export async function quickUpdateEvent(id: number, updates: Record<string, any>) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("events").update(updates).eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/events");
+  revalidatePath(`/admin/events/${id}`);
+  return { success: true };
+}
+
+// ─── Quick update venue field ───────────────────────────────
+
+export async function quickUpdateVenue(id: number, updates: Record<string, any>) {
+  const { supabase } = await requireAdmin();
+  const { error } = await supabase.from("venues").update(updates).eq("id", id);
+  if (error) return { error: error.message };
+  revalidatePath("/admin/venues");
+  revalidatePath(`/admin/venues/${id}`);
+  return { success: true };
+}
+
+// ─── Event registration counts ──────────────────────────────
+
+export async function getEventRegistrationCounts(eventIds: number[]) {
+  if (eventIds.length === 0) return {};
+  const { supabase } = await requireAdmin();
+
+  const { data } = await supabase
+    .from("event_registrations")
+    .select("event_id, user_id, profiles(gender)")
+    .in("event_id", eventIds)
+    .in("status", ["confirmed", "attended"]);
+
+  const counts: Record<number, { males: number; females: number; total: number }> = {};
+  for (const reg of data ?? []) {
+    if (!counts[reg.event_id]) counts[reg.event_id] = { males: 0, females: 0, total: 0 };
+    counts[reg.event_id].total++;
+    if ((reg.profiles as any)?.gender === "male") counts[reg.event_id].males++;
+    if ((reg.profiles as any)?.gender === "female") counts[reg.event_id].females++;
+  }
+  return counts;
 }
 
 // ─── VIP Settings ───────────────────────────────────────────

@@ -3,14 +3,14 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { EventFilters } from "@/components/events/event-filters";
 import { EventCard } from "@/components/events/event-card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   return {
     title: t("meta.events_title"),
     description: t("meta.events_description"),
@@ -30,7 +30,8 @@ interface PageProps {
 const EVENTS_PER_PAGE = 12;
 
 async function EventsList({ searchParams }: { searchParams: Awaited<PageProps['searchParams']> }) {
-  const { t, locale } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const headerStore = await headers();
   const country = headerStore.get("x-country") || "gb";
   const supabase = await createClient();
@@ -226,7 +227,7 @@ async function EventsList({ searchParams }: { searchParams: Awaited<PageProps['s
 }
 
 export default async function EventsPage({ searchParams }: PageProps) {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const headerStore = await headers();
   const country = headerStore.get("x-country") || "gb";
   const supabase = await createClient();

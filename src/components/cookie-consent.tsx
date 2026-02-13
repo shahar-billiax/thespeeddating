@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 export function CookieConsent() {
-  const { t } = useTranslation();
+  const t = useTranslations();
   const [show, setShow] = useState(false);
 
   useEffect(() => {

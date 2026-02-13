@@ -1,4 +1,4 @@
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 import { CmsContent } from "./cms-content";
 
 interface CmsPageLayoutProps {
@@ -12,7 +12,7 @@ export async function CmsPageLayout({
   contentHtml,
   fallbackTitle,
 }: CmsPageLayoutProps) {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   return (
     <div>
       {/* Hero */}

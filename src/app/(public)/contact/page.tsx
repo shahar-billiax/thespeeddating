@@ -1,5 +1,6 @@
 import { Metadata } from "next";
-import { getTranslations } from "@/lib/i18n/server";
+import { headers } from "next/headers";
+import { getTranslations } from "next-intl/server";
 import { getPage } from "@/lib/pages";
 import { ContactForm } from "@/components/contact-form";
 import {
@@ -12,7 +13,7 @@ import { CmsContent } from "@/components/cms/cms-content";
 import { Mail, Phone, Clock, MessageSquare } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const page = await getPage("contact");
   return {
     title: page?.meta_title || t("contact.title"),
@@ -40,7 +41,9 @@ const FALLBACK_CONTACT = {
 };
 
 export default async function ContactPage() {
-  const { t, country } = await getTranslations();
+  const t = await getTranslations();
+  const headerStore = await headers();
+  const country = headerStore.get("x-country") || "gb";
   const page = await getPage("contact");
 
   const cmsContact = page?.content_json as {

@@ -30,10 +30,14 @@ import { useRouter } from "next/navigation";
 
 export function TestimoniesPanel({
   stories,
+  pageKey,
+  language,
   pageId,
 }: {
   stories: any[];
-  pageId: number;
+  pageKey: string;
+  language: string;
+  pageId: number | null;
 }) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<number | null>(null);
@@ -52,17 +56,24 @@ export function TestimoniesPanel({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Testimonies</CardTitle>
-          <Button asChild size="sm">
-            <Link href={`/admin/pages/${pageId}/stories/new`}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Testimony
-            </Link>
-          </Button>
+          <CardTitle>Testimonies ({language === "he" ? "Hebrew" : "English"})</CardTitle>
+          {pageId && (
+            <Button asChild size="sm">
+              <Link href={`/admin/pages/${pageKey}/stories/new?lang=${language}`}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Testimony
+              </Link>
+            </Button>
+          )}
         </div>
         <p className="text-sm text-muted-foreground">
           Manage testimonies displayed on this page.
         </p>
+        {!pageId && (
+          <p className="text-sm text-amber-600">
+            Save this language version first before adding testimonies.
+          </p>
+        )}
       </CardHeader>
       <CardContent>
         {stories.length === 0 ? (
@@ -131,7 +142,7 @@ export function TestimoniesPanel({
                       <div className="flex gap-1">
                         <Button asChild variant="ghost" size="sm">
                           <Link
-                            href={`/admin/pages/${pageId}/stories/${story.id}/edit`}
+                            href={`/admin/pages/${pageKey}/stories/${story.id}/edit`}
                           >
                             <Pencil className="h-4 w-4" />
                           </Link>

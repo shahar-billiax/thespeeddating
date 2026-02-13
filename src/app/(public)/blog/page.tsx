@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -22,35 +22,24 @@ function getExcerpt(html: string, maxLength: number = 150): string {
 }
 
 export default async function BlogPage({ searchParams }: PageProps) {
-  const { t, locale, country } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
   const supabase = await createClient();
 
   const params = await searchParams;
   const currentPage = parseInt(params.page || "1", 10);
   const offset = (currentPage - 1) * POSTS_PER_PAGE;
 
-  const { data: countryData } = await supabase
-    .from("countries")
-    .select("id")
-    .eq("code", country)
-    .single();
+  const { data, count } = await supabase
+    .from("blog_posts")
+    .select("*", { count: "exact" })
+    .eq("language_code", locale)
+    .eq("is_published", true)
+    .order("published_at", { ascending: false })
+    .range(offset, offset + POSTS_PER_PAGE - 1);
 
-  let posts: any[] = [];
-  let totalCount = 0;
-
-  if (countryData) {
-    const { data, count } = await supabase
-      .from("blog_posts")
-      .select("*", { count: "exact" })
-      .eq("country_id", countryData.id)
-      .eq("language_code", locale)
-      .eq("is_published", true)
-      .order("published_at", { ascending: false })
-      .range(offset, offset + POSTS_PER_PAGE - 1);
-
-    posts = data || [];
-    totalCount = count || 0;
-  }
+  const posts = data || [];
+  const totalCount = count || 0;
 
   const totalPages = Math.ceil(totalCount / POSTS_PER_PAGE);
 
@@ -80,8 +69,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
                 <div className="p-6 flex-1 flex flex-col">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
                     <Calendar className="h-4 w-4" />
-                    <time dateTime={post.published_at}>
-                      {new Date(post.published_at).toLocaleDateString(
+                    <time dateTime={post.published_at ?? undefined}>
+                      {new Date(post.published_at!).toLocaleDateString(
                         locale === "en" ? "en-GB" : "he-IL",
                         {
                           year: "numeric",

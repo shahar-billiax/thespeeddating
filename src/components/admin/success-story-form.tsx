@@ -33,16 +33,19 @@ import {
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+const LANGUAGES = [
+  { code: "en", label: "English" },
+  { code: "he", label: "Hebrew (עברית)" },
+];
+
 export function SuccessStoryForm({
   story,
-  countries,
   returnTo,
-  defaultCountryId,
+  defaultLanguage,
 }: {
   story?: any;
-  countries: { id: number; name: string; code: string }[];
   returnTo?: string;
-  defaultCountryId?: number;
+  defaultLanguage?: string;
 }) {
   const router = useRouter();
   const [isFeatured, setIsFeatured] = useState(story?.is_featured ?? false);
@@ -140,25 +143,19 @@ export function SuccessStoryForm({
               </Select>
             </div>
             <div>
-              <Label>Country</Label>
+              <Label>Language</Label>
               <Select
-                name="country_id"
-                defaultValue={
-                  story?.country_id
-                    ? String(story.country_id)
-                    : defaultCountryId
-                      ? String(defaultCountryId)
-                      : ""
-                }
+                name="language_code"
+                defaultValue={story?.language_code ?? defaultLanguage ?? "en"}
                 required
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select country" />
+                  <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
-                  {countries.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>
-                      {c.name}
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

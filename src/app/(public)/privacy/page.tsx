@@ -1,8 +1,8 @@
 import { Metadata } from "next";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations } from "next-intl/server";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   return {
     title: t("privacy.title"),
     description: "Privacy Policy for TheSpeedDating - GDPR compliant",
@@ -10,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivacyPage() {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
 
   return (
     <div className="container mx-auto px-4 py-12">

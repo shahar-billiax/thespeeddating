@@ -1,6 +1,8 @@
 "use client";
 
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useCountry } from "@/lib/country-context";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -102,7 +104,9 @@ const FLAG_CLASSES =
   "h-[14px] w-[19px] shrink-0 rounded-[2px] shadow-[0_0_0_1px_rgba(0,0,0,0.1)]";
 
 export function RegionLanguageSelector() {
-  const { country, locale, t } = useTranslation();
+  const t = useTranslations();
+  const locale = useLocale();
+  const country = useCountry();
 
   const currentRegion = REGIONS.find((r) => r.code === country) ?? REGIONS[0];
   const CurrentFlag = currentRegion.Flag;

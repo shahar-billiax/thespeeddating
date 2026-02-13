@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useTranslation } from "@/hooks/use-translation";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
+import { useCountry } from "@/lib/country-context";
 import {
   RegionLanguageSelector,
   REGIONS,
@@ -23,7 +25,9 @@ import { Menu, Crown, ChevronDown, User, Heart, Settings, LogOut, Shield, Check 
 import { useState } from "react";
 
 export function PublicHeader({ user }: { user: { email: string; role?: string } | null }) {
-  const { t, locale, country } = useTranslation();
+  const t = useTranslations();
+  const locale = useLocale();
+  const country = useCountry();
   const router = useRouter();
   const [open, setOpen] = useState(false);
 

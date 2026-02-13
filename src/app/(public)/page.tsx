@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { getTranslations } from "@/lib/i18n/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { getPage } from "@/lib/pages";
 import { getPageFallbackHtml } from "@/lib/i18n/page-fallbacks";
@@ -10,7 +11,7 @@ import { CmsContent } from "@/components/cms/cms-content";
 import { UserPlus, Calendar, Heart, Crown, Users, Sparkles, ArrowRight } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getTranslations();
+  const t = await getTranslations();
   const page = await getPage("home");
   return {
     title: page?.meta_title || t("meta.home_title"),
@@ -19,7 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const { t, locale, country: countryCode } = await getTranslations();
+  const t = await getTranslations();
+  const locale = await getLocale();
+  const headerStore = await headers();
+  const countryCode = headerStore.get("x-country") || "gb";
   const supabase = await createClient();
   const page = await getPage("home");
 
