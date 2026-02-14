@@ -1,0 +1,105 @@
+/* Modern crop editor styles — overrides react-image-crop defaults */
+
+/* ── Selection border ── */
+/* Remove marching-ants animation, replace with clean solid border */
+.crop-modern .ReactCrop__crop-selection {
+  animation: none !important;
+  background-image: none !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+}
+
+.crop-modern .ReactCrop__crop-selection:focus {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: -1px;
+}
+
+/* ── Corner handles — L-shaped brackets ── */
+.crop-modern .ReactCrop__drag-handle {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.crop-modern .ReactCrop__drag-handle:focus {
+  background: transparent !important;
+}
+
+.crop-modern .ReactCrop__drag-handle.ord-nw {
+  border-top: 3px solid #fff !important;
+  border-left: 3px solid #fff !important;
+}
+
+.crop-modern .ReactCrop__drag-handle.ord-ne {
+  border-top: 3px solid #fff !important;
+  border-right: 3px solid #fff !important;
+}
+
+.crop-modern .ReactCrop__drag-handle.ord-se {
+  border-bottom: 3px solid #fff !important;
+  border-right: 3px solid #fff !important;
+}
+
+.crop-modern .ReactCrop__drag-handle.ord-sw {
+  border-bottom: 3px solid #fff !important;
+  border-left: 3px solid #fff !important;
+}
+
+/* ── Edge handles — centered pill bars ── */
+.crop-modern .ReactCrop__drag-handle.ord-n,
+.crop-modern .ReactCrop__drag-handle.ord-s {
+  width: 36px !important;
+  height: 3px !important;
+  background: #fff !important;
+  border-radius: 2px !important;
+}
+
+.crop-modern .ReactCrop__drag-handle.ord-e,
+.crop-modern .ReactCrop__drag-handle.ord-w {
+  width: 3px !important;
+  height: 36px !important;
+  background: #fff !important;
+  border-radius: 2px !important;
+}
+
+/* ── Rule of thirds — subtle grid ── */
+.crop-modern .ReactCrop__rule-of-thirds-vt::before,
+.crop-modern .ReactCrop__rule-of-thirds-vt::after,
+.crop-modern .ReactCrop__rule-of-thirds-hz::before,
+.crop-modern .ReactCrop__rule-of-thirds-hz::after {
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+/* ── Touch devices — bigger handles ── */
+@media (pointer: coarse) {
+  .crop-modern .ReactCrop__drag-handle.ord-nw,
+  .crop-modern .ReactCrop__drag-handle.ord-ne,
+  .crop-modern .ReactCrop__drag-handle.ord-se,
+  .crop-modern .ReactCrop__drag-handle.ord-sw {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  /* Show edge handles on touch too */
+  .crop-modern .ReactCrop .ord-n,
+  .crop-modern .ReactCrop .ord-e,
+  .crop-modern .ReactCrop .ord-s,
+  .crop-modern .ReactCrop .ord-w {
+    display: block !important;
+  }
+
+  .crop-modern .ReactCrop__drag-handle.ord-n,
+  .crop-modern .ReactCrop__drag-handle.ord-s {
+    width: 44px !important;
+    height: 4px !important;
+  }
+
+  .crop-modern .ReactCrop__drag-handle.ord-e,
+  .crop-modern .ReactCrop__drag-handle.ord-w {
+    width: 4px !important;
+    height: 44px !important;
+  }
+}

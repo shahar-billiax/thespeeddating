@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { X } from "lucide-react";
 
 interface EventFiltersProps {
   cities: Array<{ id: number | string; name: string }>;
@@ -53,10 +54,10 @@ export function EventFilters({ cities }: EventFiltersProps) {
   const hasFilters = searchParams.has("city") || searchParams.has("type") || searchParams.has("from") || searchParams.has("to");
 
   return (
-    <div className="flex flex-wrap gap-4 items-center mb-6">
-      <div className="flex-1 min-w-[200px]">
+    <div className="flex flex-wrap items-center gap-3">
+      <div className="flex-1 min-w-[180px] max-w-[280px]">
         <Select value={currentCity} onValueChange={(value) => updateFilter("city", value)}>
-          <SelectTrigger>
+          <SelectTrigger className="h-10 bg-white shadow-sm border-border/60 hover:border-primary/30 hover:shadow transition-all rounded-lg text-sm font-medium">
             <SelectValue placeholder={t("events.filter_city")} />
           </SelectTrigger>
           <SelectContent>
@@ -70,9 +71,9 @@ export function EventFilters({ cities }: EventFiltersProps) {
         </Select>
       </div>
 
-      <div className="flex-1 min-w-[200px]">
+      <div className="flex-1 min-w-[180px] max-w-[280px]">
         <Select value={currentType} onValueChange={(value) => updateFilter("type", value)}>
-          <SelectTrigger>
+          <SelectTrigger className="h-10 bg-white shadow-sm border-border/60 hover:border-primary/30 hover:shadow transition-all rounded-lg text-sm font-medium">
             <SelectValue placeholder={t("events.filter_type")} />
           </SelectTrigger>
           <SelectContent>
@@ -87,7 +88,8 @@ export function EventFilters({ cities }: EventFiltersProps) {
       </div>
 
       {hasFilters && (
-        <Button variant="outline" onClick={clearFilters}>
+        <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors">
+          <X className="h-3.5 w-3.5 me-1" />
           {t("events.clear_filters")}
         </Button>
       )}

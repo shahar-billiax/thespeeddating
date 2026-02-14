@@ -13,7 +13,7 @@ export default async function ScorePage({
 
   if ("error" in data) {
     return (
-      <div className="container max-w-2xl mx-auto py-8 px-4">
+      <div className="section-container max-w-2xl py-16 sm:py-20">
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground">{data.error}</p>
@@ -27,7 +27,7 @@ export default async function ScorePage({
   }
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4">
+    <div className="section-container max-w-2xl py-16 sm:py-20">
       <h1 className="text-3xl font-bold mb-2">Submit Your Choices</h1>
       <p className="text-muted-foreground mb-6">
         For each person, choose Date, Friend, or No. You must submit choices for

@@ -81,15 +81,15 @@ export function TestimoniesPanel({
             No testimonies yet. Add your first one!
           </p>
         ) : (
-          <div className="border rounded-lg">
+          <div className="border rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40px]">#</TableHead>
+                  <TableHead className="w-[40px] hidden sm:table-cell">#</TableHead>
                   <TableHead>Couple / Name</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Year</TableHead>
+                  <TableHead className="hidden md:table-cell">Type</TableHead>
+                  <TableHead className="hidden sm:table-cell">Location</TableHead>
+                  <TableHead className="hidden sm:table-cell">Year</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="w-[100px]">Actions</TableHead>
                 </TableRow>
@@ -97,7 +97,7 @@ export function TestimoniesPanel({
               <TableBody>
                 {stories.map((story: any) => (
                   <TableRow key={story.id}>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">
                       {story.sort_order}
                     </TableCell>
                     <TableCell>
@@ -114,7 +114,7 @@ export function TestimoniesPanel({
                         {story.quote.length > 80 ? "..." : ""}
                       </p>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden md:table-cell">
                       <Badge
                         variant={
                           story.story_type === "wedding"
@@ -125,10 +125,10 @@ export function TestimoniesPanel({
                         {story.story_type}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm hidden sm:table-cell">
                       {story.location || "\u2014"}
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm hidden sm:table-cell">
                       {story.year || "\u2014"}
                     </TableCell>
                     <TableCell>

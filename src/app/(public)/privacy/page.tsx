@@ -13,10 +13,18 @@ export default async function PrivacyPage() {
   const t = await getTranslations();
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">{t("privacy.title")}</h1>
+    <div>
+      {/* Hero */}
+      <section className="page-hero">
+        <div className="section-container">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{t("privacy.title")}</h1>
+          </div>
+        </div>
+      </section>
 
+      <section className="py-16 sm:py-20">
+      <div className="section-container max-w-4xl">
         <div className="prose prose-lg max-w-none dark:prose-invert">
           <p className="text-muted-foreground mb-8">
             <strong>Last updated:</strong> February 2026
@@ -267,6 +275,7 @@ export default async function PrivacyPage() {
           </section>
         </div>
       </div>
+      </section>
     </div>
   );
 }

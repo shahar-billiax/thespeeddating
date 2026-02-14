@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { quickUpdateVenue, deleteVenue } from "@/lib/admin/actions";
 import { AdminSearchInput } from "./admin-data-table";
+import { CoverImageUpload } from "./cover-image-upload";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -324,6 +325,19 @@ export function VenueDetailClient({
         {/* Details tab - inline editable */}
         <TabsContent value="details" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="md:col-span-2">
+              <CardHeader><CardTitle className="text-base">Cover Image</CardTitle></CardHeader>
+              <CardContent>
+                <div className="max-w-md">
+                  <CoverImageUpload
+                    currentImage={venue.cover_image}
+                    onSave={(storagePath) => quickUpdateVenue(venueId, { cover_image: storagePath })}
+                    label="Venue photo shown on event cards"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader><CardTitle className="text-base">Location</CardTitle></CardHeader>
               <CardContent className="space-y-4">

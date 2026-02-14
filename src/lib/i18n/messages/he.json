@@ -169,13 +169,21 @@
     "view_map": "צפה במפה",
     "about_event": "על האירוע",
     "dress_code": "קוד לבוש",
-    "back_to_events": "→ חזרה לאירועים",
+    "back_to_events": "חזרה לאירועים",
     "cancelled": "בוטל",
     "not_found": "אירוע לא נמצא",
     "book_now": "קניית כרטיס",
     "join_waitlist": "הצטרפו לרשימת המתנה",
     "ages": "גילאים {min}-{max}",
-    "country_not_found": "מדינה לא נמצאה"
+    "country_not_found": "מדינה לא נמצאה",
+    "hero_subtitle": "מצאו את אירוע הספיד דייט הבא שלכם",
+    "view_event": "צפה באירוע",
+    "per_person": "לאדם",
+    "booked": "הוזמנו",
+    "tickets_available": "כרטיסים זמינים",
+    "sold_out": "אזל",
+    "male_spots": "מקומות גברים נותרו",
+    "female_spots": "מקומות נשים נותרו"
   },
   "home": {
     "hero_subtitle": "ערבי ספיד דייט לאקדמאים ואנשי קריירה בלבד",

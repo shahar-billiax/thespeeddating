@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import {
   Calendar, Heart, Crown, ExternalLink, User, Mail, Phone,
-  MapPin, Briefcase, GraduationCap, Save, Pencil, X,
+  MapPin, Briefcase, GraduationCap, Save, Pencil, X, ChevronDown,
 } from "lucide-react";
 import { updateMember } from "@/lib/admin/actions";
 import { AdminSearchInput } from "./admin-data-table";
@@ -86,6 +86,120 @@ function ReadOnlyField({ label, value, icon: Icon }: {
       </p>
       <p className="text-sm mt-0.5">{value || "—"}</p>
     </div>
+  );
+}
+
+// ─── Event registration row with expandable details ────────
+
+function EventRegRow({ reg }: { reg: any }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <>
+      <TableRow
+        className="cursor-pointer lg:cursor-default"
+        onClick={() => setExpanded((prev) => !prev)}
+      >
+        <TableCell>
+          <div className="flex items-center gap-1">
+            <ChevronDown
+              className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform lg:hidden ${
+                expanded ? "rotate-180" : ""
+              }`}
+            />
+            <Link
+              href={`/admin/events/${reg.events?.id}`}
+              className="font-medium text-primary hover:underline inline-flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {reg.events?.event_date}
+              {reg.events?.start_time && (
+                <span className="text-muted-foreground text-xs ml-1">{reg.events.start_time}</span>
+              )}
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          </div>
+        </TableCell>
+        <TableCell className="text-sm hidden md:table-cell">{reg.events?.cities?.name ?? "—"}</TableCell>
+        <TableCell className="hidden md:table-cell text-sm">
+          {reg.events?.venues?.name ? (
+            <Link
+              href={`/admin/venues/${reg.events.venues.id}`}
+              className="text-primary hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {reg.events.venues.name}
+            </Link>
+          ) : "—"}
+        </TableCell>
+        <TableCell className="hidden md:table-cell">
+          <Badge variant="outline" className="text-xs">
+            {reg.events?.event_type?.replace(/_/g, " ") ?? "—"}
+          </Badge>
+        </TableCell>
+        <TableCell>
+          <Badge
+            variant={
+              reg.status === "confirmed" ? "default"
+              : reg.status === "waitlisted" ? "secondary"
+              : reg.status === "cancelled" ? "destructive"
+              : "outline"
+            }
+          >
+            {reg.status}
+          </Badge>
+        </TableCell>
+        <TableCell className="hidden sm:table-cell">
+          <Badge variant={reg.payment_status === "paid" ? "default" : "secondary"}>
+            {reg.payment_status}
+          </Badge>
+        </TableCell>
+        <TableCell className="hidden lg:table-cell text-sm">
+          {reg.amount ? `${reg.amount} ${reg.currency ?? ""}` : "—"}
+        </TableCell>
+        <TableCell>
+          {reg.attended === true ? (
+            <Badge variant="default" className="bg-green-600">Attended</Badge>
+          ) : reg.attended === false ? (
+            <Badge variant="destructive">No show</Badge>
+          ) : (
+            <span className="text-muted-foreground text-sm">—</span>
+          )}
+        </TableCell>
+      </TableRow>
+      {expanded && (
+        <TableRow className="lg:hidden bg-muted/30">
+          <TableCell colSpan={8} className="py-2 px-4">
+            <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
+              <div className="md:hidden">
+                <span className="text-muted-foreground">City: </span>
+                <span>{reg.events?.cities?.name ?? "—"}</span>
+              </div>
+              <div className="md:hidden">
+                <span className="text-muted-foreground">Venue: </span>
+                <span>{reg.events?.venues?.name ?? "—"}</span>
+              </div>
+              <div className="md:hidden">
+                <span className="text-muted-foreground">Type: </span>
+                <Badge variant="outline" className="text-xs">
+                  {reg.events?.event_type?.replace(/_/g, " ") ?? "—"}
+                </Badge>
+              </div>
+              <div className="sm:hidden">
+                <span className="text-muted-foreground">Payment: </span>
+                <Badge variant={reg.payment_status === "paid" ? "default" : "secondary"} className="text-xs">
+                  {reg.payment_status}
+                </Badge>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Amount: </span>
+                <span>{reg.amount ? `${reg.amount} ${reg.currency ?? ""}` : "—"}</span>
+              </div>
+            </div>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
 }
 
@@ -215,7 +329,7 @@ export function MemberDetailClient({
       </div>
 
       {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <StatCard label="Events" value={registrations.length} icon={Calendar} />
         <StatCard label="Attended" value={attendedEvents.length} icon={Calendar} color="text-green-600" />
         <StatCard label="Upcoming" value={upcomingRegs.length} icon={Calendar} color="text-blue-600" />
@@ -258,7 +372,7 @@ export function MemberDetailClient({
               <Card>
                 <CardHeader><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
                     <ReadOnlyField label="First Name" value={profile.first_name} />
                     <ReadOnlyField label="Last Name" value={profile.last_name} />
                     <ReadOnlyField label="Email" value={profile.email} icon={Mail} />
@@ -282,7 +396,7 @@ export function MemberDetailClient({
               <Card>
                 <CardHeader><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4" /> Location & Role</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
                     <ReadOnlyField label="Country" value={countryName} />
                     <ReadOnlyField label="City" value={cityName} />
                     <ReadOnlyField label="Role" value={profile.role} />
@@ -319,7 +433,7 @@ export function MemberDetailClient({
           ) : (
             /* ─── EDIT MODE ─────────────────────────── */
             <form ref={formRef} action={handleSave} className="space-y-6 max-w-3xl">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-semibold">Editing Profile</h2>
                   <Badge variant="outline" className="border-amber-400 text-amber-600 bg-amber-50">
@@ -342,7 +456,7 @@ export function MemberDetailClient({
               <Card className="border-amber-200 bg-amber-50/30">
                 <CardHeader><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label>First Name</Label>
                       <Input name="first_name" defaultValue={profile.first_name} />
@@ -352,7 +466,7 @@ export function MemberDetailClient({
                       <Input name="last_name" defaultValue={profile.last_name} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <Label>Email</Label>
                       <Input value={profile.email} disabled className="bg-muted" />
@@ -367,7 +481,7 @@ export function MemberDetailClient({
                       {age && <p className="text-xs text-muted-foreground mt-1">Age: {age}</p>}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> Occupation</Label>
                       <Input name="occupation" defaultValue={profile.occupation ?? ""} />
@@ -377,7 +491,7 @@ export function MemberDetailClient({
                       <Input name="education" defaultValue={profile.education ?? ""} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label>Relationship Status</Label>
                       <Input name="relationship_status" defaultValue={profile.relationship_status ?? ""} />
@@ -397,7 +511,7 @@ export function MemberDetailClient({
               <Card className="border-amber-200 bg-amber-50/30">
                 <CardHeader><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4" /> Location & Role</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label>Country</Label>
                       <Select name="country_id" value={countryId} onValueChange={setCountryId}>
@@ -517,73 +631,18 @@ export function MemberDetailClient({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Date</TableHead>
-                    <TableHead>City</TableHead>
-                    <TableHead className="hidden sm:table-cell">Venue</TableHead>
-                    <TableHead className="hidden sm:table-cell">Type</TableHead>
+                    <TableHead className="hidden md:table-cell">City</TableHead>
+                    <TableHead className="hidden md:table-cell">Venue</TableHead>
+                    <TableHead className="hidden md:table-cell">Type</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Payment</TableHead>
-                    <TableHead className="hidden md:table-cell">Amount</TableHead>
+                    <TableHead className="hidden sm:table-cell">Payment</TableHead>
+                    <TableHead className="hidden lg:table-cell">Amount</TableHead>
                     <TableHead>Attended</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredRegistrations.map((reg: any) => (
-                    <TableRow key={reg.id} className="hover:bg-muted/50 transition-colors">
-                      <TableCell>
-                        <Link
-                          href={`/admin/events/${reg.events?.id}`}
-                          className="font-medium text-primary hover:underline inline-flex items-center gap-1"
-                        >
-                          {reg.events?.event_date}
-                          {reg.events?.start_time && (
-                            <span className="text-muted-foreground text-xs ml-1">{reg.events.start_time}</span>
-                          )}
-                          <ExternalLink className="h-3 w-3" />
-                        </Link>
-                      </TableCell>
-                      <TableCell className="text-sm">{reg.events?.cities?.name ?? "—"}</TableCell>
-                      <TableCell className="hidden sm:table-cell text-sm">
-                        {reg.events?.venues?.name ? (
-                          <Link href={`/admin/venues/${reg.events.venues.id}`} className="text-primary hover:underline">
-                            {reg.events.venues.name}
-                          </Link>
-                        ) : "—"}
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge variant="outline" className="text-xs">
-                          {reg.events?.event_type?.replace(/_/g, " ") ?? "—"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            reg.status === "confirmed" ? "default"
-                            : reg.status === "waitlisted" ? "secondary"
-                            : reg.status === "cancelled" ? "destructive"
-                            : "outline"
-                          }
-                        >
-                          {reg.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={reg.payment_status === "paid" ? "default" : "secondary"}>
-                          {reg.payment_status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-sm">
-                        {reg.amount ? `${reg.amount} ${reg.currency ?? ""}` : "—"}
-                      </TableCell>
-                      <TableCell>
-                        {reg.attended === true ? (
-                          <Badge variant="default" className="bg-green-600">Attended</Badge>
-                        ) : reg.attended === false ? (
-                          <Badge variant="destructive">No show</Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">—</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
+                    <EventRegRow key={reg.id} reg={reg} />
                   ))}
                 </TableBody>
               </Table>
@@ -605,10 +664,10 @@ export function MemberDetailClient({
                 <TableHeader>
                   <TableRow>
                     <TableHead>Event Date</TableHead>
-                    <TableHead>City</TableHead>
+                    <TableHead className="hidden md:table-cell">City</TableHead>
                     <TableHead>Match With</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead className="hidden md:table-cell">Computed</TableHead>
+                    <TableHead className="hidden md:table-cell">Type</TableHead>
+                    <TableHead className="hidden lg:table-cell">Computed</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -627,7 +686,7 @@ export function MemberDetailClient({
                             <ExternalLink className="h-3 w-3" />
                           </Link>
                         </TableCell>
-                        <TableCell className="text-sm">{match.events?.cities?.name ?? "—"}</TableCell>
+                        <TableCell className="text-sm hidden md:table-cell">{match.events?.cities?.name ?? "—"}</TableCell>
                         <TableCell>
                           {partner ? (
                             <Link
@@ -641,12 +700,12 @@ export function MemberDetailClient({
                             <span className="text-muted-foreground">Unknown</span>
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell">
                           <Badge variant={match.result_type === "mutual" ? "default" : "secondary"}>
                             {match.result_type}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
+                        <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
                           {new Date(match.computed_at).toLocaleDateString()}
                         </TableCell>
                       </TableRow>
@@ -680,7 +739,7 @@ export function MemberDetailClient({
                         {sub.status}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Price</p>
                         <p className="font-medium">{sub.price_per_month} {sub.currency}/month</p>
@@ -766,7 +825,7 @@ export function MemberDetailClient({
       <Card>
         <CardHeader><CardTitle className="text-base">Activity Summary</CardTitle></CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Member Since</p>
               <p className="font-medium">{new Date(profile.created_at).toLocaleDateString()}</p>

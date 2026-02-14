@@ -11,17 +11,28 @@ export default async function MatchesPage() {
   const events = await getMyEvents();
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">{t("matches.title")}</h1>
+    <div>
+      <section className="page-hero">
+        <div className="section-container">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{t("matches.title")}</h1>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 sm:py-20">
+        <div className="section-container max-w-2xl">
 
       {events.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="pt-8 pb-8 text-center">
+            <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+              <Heart className="h-7 w-7 text-primary" />
+            </div>
+            <p className="text-muted-foreground mb-6">
               {t("matches.no_events_text")}
             </p>
-            <Button asChild className="mt-4">
+            <Button asChild className="h-11 shadow-sm">
               <Link href="/events">{t("matches.browse_events")}</Link>
             </Button>
           </CardContent>
@@ -29,7 +40,7 @@ export default async function MatchesPage() {
       ) : (
         <div className="space-y-3">
           {events.map((event) => (
-            <Card key={event.eventId}>
+            <Card key={event.eventId} className="border-0 shadow-sm">
               <CardContent className="pt-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -71,6 +82,8 @@ export default async function MatchesPage() {
           ))}
         </div>
       )}
+        </div>
+      </section>
     </div>
   );
 }

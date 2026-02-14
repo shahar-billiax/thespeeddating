@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -13,6 +13,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { ChevronDown, ExternalLink } from "lucide-react";
 
 type MemberRow = {
   id: string;
@@ -75,8 +76,102 @@ function compareFn(a: MemberRow, b: MemberRow, key: SortKey, dir: SortDir): numb
   return dir === "desc" ? -cmp : cmp;
 }
 
+function MemberRowItem({ member: m }: { member: MemberRow }) {
+  const [expanded, setExpanded] = useState(false);
+  const age = getAge(m.date_of_birth);
+
+  return (
+    <>
+      <TableRow
+        className="cursor-pointer lg:cursor-default"
+        onClick={() => setExpanded((prev) => !prev)}
+      >
+        <TableCell>
+          <div className="flex items-center gap-1">
+            <ChevronDown
+              className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform lg:hidden ${
+                expanded ? "rotate-180" : ""
+              }`}
+            />
+            <Link
+              href={`/admin/members/${m.id}`}
+              className="text-primary hover:underline font-medium inline-flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {m.first_name} {m.last_name}
+              <ExternalLink className="h-3 w-3 shrink-0" />
+            </Link>
+          </div>
+        </TableCell>
+        <TableCell className="text-sm hidden lg:table-cell max-w-[150px] truncate">{m.email}</TableCell>
+        <TableCell className="hidden md:table-cell">
+          <Badge
+            variant="outline"
+            className={m.gender === "male" ? "border-blue-300 text-blue-600" : "border-pink-300 text-pink-600"}
+          >
+            {m.gender}
+          </Badge>
+        </TableCell>
+        <TableCell className="hidden lg:table-cell">{age ?? "—"}</TableCell>
+        <TableCell className="hidden lg:table-cell">{m.cities?.name ?? "—"}</TableCell>
+        <TableCell>
+          <Badge variant={m.role === "admin" ? "default" : m.role === "host" || m.role === "host_plus" ? "outline" : "secondary"}>
+            {m.role}
+          </Badge>
+        </TableCell>
+        <TableCell className="hidden md:table-cell">
+          <Badge variant={m.is_active ? "default" : "destructive"} className="text-xs">
+            {m.is_active ? "Active" : "Inactive"}
+          </Badge>
+        </TableCell>
+        <TableCell className="text-sm text-muted-foreground hidden xl:table-cell">
+          {new Date(m.created_at).toLocaleDateString()}
+        </TableCell>
+      </TableRow>
+      {expanded && (
+        <TableRow className="lg:hidden bg-muted/30">
+          <TableCell colSpan={8} className="py-2 px-4">
+            <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
+              <div>
+                <span className="text-muted-foreground">Email: </span>
+                <span className="break-all">{m.email}</span>
+              </div>
+              <div className="md:hidden">
+                <span className="text-muted-foreground">Gender: </span>
+                <Badge
+                  variant="outline"
+                  className={`text-xs ${m.gender === "male" ? "border-blue-300 text-blue-600" : "border-pink-300 text-pink-600"}`}
+                >
+                  {m.gender}
+                </Badge>
+              </div>
+              <div className="md:hidden">
+                <span className="text-muted-foreground">Status: </span>
+                <Badge variant={m.is_active ? "default" : "destructive"} className="text-xs">
+                  {m.is_active ? "Active" : "Inactive"}
+                </Badge>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Age: </span>
+                <span>{age ?? "—"}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">City: </span>
+                <span>{m.cities?.name ?? "—"}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Joined: </span>
+                <span>{new Date(m.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  );
+}
+
 export function MembersTable({ members }: { members: MemberRow[] }) {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>("joined");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
@@ -162,57 +257,22 @@ export function MembersTable({ members }: { members: MemberRow[] }) {
           <TableHeader>
             <TableRow>
               <SortableHeader label="Name" sortKey="name" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Email" sortKey="email" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden sm:table-cell" />
-              <SortableHeader label="Gender" sortKey="gender" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden sm:table-cell" />
-              <SortableHeader label="Age" sortKey="age" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
-              <SortableHeader label="City" sortKey="city" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+              <SortableHeader label="Email" sortKey="email" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+              <SortableHeader label="Gender" sortKey="gender" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+              <SortableHeader label="Age" sortKey="age" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+              <SortableHeader label="City" sortKey="city" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
               <SortableHeader label="Role" sortKey="role" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Status" sortKey="status" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden sm:table-cell" />
-              <SortableHeader label="Joined" sortKey="joined" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+              <SortableHeader label="Status" sortKey="status" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+              <SortableHeader label="Joined" sortKey="joined" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {sorted.length === 0 ? (
               <EmptyTableRow colSpan={8} search={search} entityName="members" />
             ) : (
-              sorted.map((m) => {
-                const age = getAge(m.date_of_birth);
-                return (
-                  <TableRow
-                    key={m.id}
-                    className="cursor-pointer hover:bg-muted/50 transition-colors"
-                    onClick={() => router.push(`/admin/members/${m.id}`)}
-                  >
-                    <TableCell>
-                      <span className="font-medium">{m.first_name} {m.last_name}</span>
-                    </TableCell>
-                    <TableCell className="text-sm hidden sm:table-cell">{m.email}</TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <Badge
-                        variant="outline"
-                        className={m.gender === "male" ? "border-blue-300 text-blue-600" : "border-pink-300 text-pink-600"}
-                      >
-                        {m.gender}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell">{age ?? "—"}</TableCell>
-                    <TableCell className="hidden md:table-cell">{m.cities?.name ?? "—"}</TableCell>
-                    <TableCell>
-                      <Badge variant={m.role === "admin" ? "default" : m.role === "host" || m.role === "host_plus" ? "outline" : "secondary"}>
-                        {m.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell">
-                      <Badge variant={m.is_active ? "default" : "destructive"} className="text-xs">
-                        {m.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground hidden md:table-cell">
-                      {new Date(m.created_at).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+              sorted.map((m) => (
+                <MemberRowItem key={m.id} member={m} />
+              ))
             )}
           </TableBody>
         </Table>

@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Users } from "lucide-react";
+import { MapPin, Users, Clock, ArrowRight } from "lucide-react";
 
 interface EventCardProps {
   event: {
@@ -9,6 +10,7 @@ interface EventCardProps {
     event_date: string;
     start_time: string | null;
     event_type: string | null;
+    image_url?: string | null;
     city_name: string;
     venue_name: string;
     age_min: number | null;
@@ -38,22 +40,21 @@ interface EventCardProps {
     spots_remaining: string;
     men: string;
     women: string;
+    view_event?: string;
   };
 }
 
 export function EventCard({ event, locale, translations }: EventCardProps) {
   // Format date
   const eventDate = new Date(event.event_date + 'T' + event.start_time);
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
   const timeFormatter = new Intl.DateTimeFormat(locale, {
     hour: '2-digit',
     minute: '2-digit',
   });
+
+  const dayFormatter = new Intl.DateTimeFormat(locale, { day: 'numeric' });
+  const monthFormatter = new Intl.DateTimeFormat(locale, { month: 'short' });
+  const weekdayFormatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
 
   // Format currency
   const currencyFormatter = new Intl.NumberFormat(locale, {
@@ -86,45 +87,87 @@ export function EventCard({ event, locale, translations }: EventCardProps) {
       return `${translations.men}: ${currencyFormatter.format(event.price_male)} / ${translations.women}: ${currencyFormatter.format(event.price_female)}`;
     }
     if (!event.price) return translations.free;
-    return `${translations.price_from} ${currencyFormatter.format(event.price)}`;
+    return currencyFormatter.format(event.price);
   };
 
   return (
     <Link href={`/events/${event.id}`}>
-      <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
-        <CardHeader>
-          <div className="flex justify-between items-start mb-2">
-            <Badge variant="secondary">{translations.type}</Badge>
-            {spotsRemaining !== null && (
-              <Badge variant={spotsRemaining > 10 ? "default" : "destructive"}>
+      <Card className="group flex h-full flex-col border-0 p-0 gap-0 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.1),0_1px_4px_rgba(0,0,0,0.04)] ring-1 ring-border/50 hover:ring-primary/20 transition-all duration-300 cursor-pointer overflow-hidden hover:-translate-y-1">
+        {/* Image area */}
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted/40">
+          {event.image_url ? (
+            <Image
+              src={event.image_url}
+              alt={`${event.venue_name} - ${event.city_name}`}
+              fill
+              className="object-cover"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              unoptimized
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.06] via-muted/60 to-accent/30 flex items-center justify-center">
+              <MapPin className="h-10 w-10 text-primary/20" />
+            </div>
+          )}
+          {/* Overlay gradient for readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+          {/* Badges overlaid on image */}
+          <div className="absolute top-3 left-3 rtl:left-auto rtl:right-3 flex flex-wrap items-center gap-1.5">
+            <Badge className="text-xs font-semibold tracking-wide bg-white/90 text-primary border-0 backdrop-blur-sm shadow-sm">
+              {translations.type}
+            </Badge>
+            {spotsRemaining !== null && spotsRemaining <= 10 && (
+              <Badge variant="destructive" className="text-xs shadow-sm">
                 {spotsRemaining} {translations.spots_remaining}
               </Badge>
             )}
           </div>
-          <CardTitle className="text-xl">
-            {dateFormatter.format(eventDate)}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="h-4 w-4" />
-            <span>{timeFormatter.format(eventDate)}</span>
+
+          {/* Date pill overlaid on image bottom */}
+          <div className="absolute bottom-3 left-3 rtl:left-auto rtl:right-3">
+            <div className="inline-flex items-center gap-1.5 rounded-lg bg-white/95 backdrop-blur-sm shadow-sm px-3 py-1.5 text-sm font-bold text-foreground">
+              <span className="uppercase">{weekdayFormatter.format(eventDate)}</span>
+              <span className="text-muted-foreground/40">,</span>
+              <span>{dayFormatter.format(eventDate)} {monthFormatter.format(eventDate)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Content area */}
+        <div className="flex flex-1 flex-col p-4 pt-3.5 gap-3">
+          {/* Venue & location */}
+          <div>
+            <h3 className="font-semibold text-foreground text-[15px] leading-snug line-clamp-1">
+              {event.venue_name}
+            </h3>
+            <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1.5">
+              <MapPin className="h-3 w-3 shrink-0" />
+              {event.city_name}
+            </p>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4" />
-            <span>{event.city_name} - {event.venue_name}</span>
+          {/* Details row */}
+          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Clock className="h-3 w-3 shrink-0 text-primary/60" />
+              <span className="tabular-nums">{timeFormatter.format(eventDate)}</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <Users className="h-3 w-3 shrink-0 text-primary/60" />
+              <span>{getAgeRange()}</span>
+            </span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Users className="h-4 w-4" />
-            <span>{getAgeRange()}</span>
+          {/* Price & CTA */}
+          <div className="mt-auto pt-3 border-t border-border/30 flex items-center justify-between gap-2">
+            <p className="text-base font-bold text-foreground tracking-tight">{getPrice()}</p>
+            <span className="text-xs font-semibold text-primary flex items-center gap-1 group-hover:gap-1.5 transition-all">
+              {translations.view_event || "View Event"}
+              <ArrowRight className="h-3 w-3 rtl:rotate-180" />
+            </span>
           </div>
-
-          <div className="pt-2 border-t">
-            <p className="font-semibold text-lg">{getPrice()}</p>
-          </div>
-        </CardContent>
+        </div>
       </Card>
     </Link>
   );

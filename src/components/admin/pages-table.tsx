@@ -148,16 +148,16 @@ export function PagesTable({ pages }: { pages: GroupedPage[] }) {
         />
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <SortableHeader label="Page Key" sortKey="page_key" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+              <SortableHeader label="Page Key" sortKey="page_key" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
               <SortableHeader label="Title" sortKey="title" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Type" sortKey="page_type" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Languages" sortKey="languages" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+              <SortableHeader label="Type" sortKey="page_type" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+              <SortableHeader label="Languages" sortKey="languages" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
               <SortableHeader label="Status" sortKey="is_published" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Updated" sortKey="updated_at" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+              <SortableHeader label="Updated" sortKey="updated_at" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
               <TableHead className="w-[80px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -176,11 +176,11 @@ export function PagesTable({ pages }: { pages: GroupedPage[] }) {
             ) : (
               sorted.map((entry) => (
                 <TableRow key={entry.page_key}>
-                  <TableCell className="font-mono text-sm">
+                  <TableCell className="font-mono text-sm hidden lg:table-cell">
                     {entry.page_key}
                   </TableCell>
                   <TableCell className="font-medium">{entry.title}</TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">
                     <Badge
                       variant={
                         entry.page_type === "testimony" ? "outline" : "secondary"
@@ -189,7 +189,7 @@ export function PagesTable({ pages }: { pages: GroupedPage[] }) {
                       {getTypeLabel(entry.page_type)}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden xl:table-cell">
                     <div className="flex gap-1">
                       <Badge
                         variant={
@@ -224,7 +224,7 @@ export function PagesTable({ pages }: { pages: GroupedPage[] }) {
                       {entry.is_published ? "Published" : "Draft"}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
+                  <TableCell className="text-sm text-muted-foreground hidden lg:table-cell">
                     {new Date(entry.updated_at).toLocaleDateString()}
                   </TableCell>
                   <TableCell>

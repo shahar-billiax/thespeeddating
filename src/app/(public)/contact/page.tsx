@@ -64,13 +64,13 @@ export default async function ContactPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-20">
-        <div className="container mx-auto px-4">
+      <section className="page-hero">
+        <div className="section-container">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
+            <h1 className="mb-3 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               {page?.title || t("contact.title")}
             </h1>
-            <p className="text-lg text-muted-foreground md:text-xl">
+            <p className="text-base text-muted-foreground sm:text-lg max-w-xl mx-auto">
               {t("contact.subtitle")}
             </p>
           </div>
@@ -79,7 +79,7 @@ export default async function ContactPage() {
 
       {/* CMS Content */}
       {page?.content_html && (
-        <section className="container mx-auto px-4 py-8">
+        <section className="section-container py-8">
           <div className="mx-auto max-w-4xl">
             <CmsContent html={page.content_html} />
           </div>
@@ -87,16 +87,16 @@ export default async function ContactPage() {
       )}
 
       {/* Main Content */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
+      <section className="section-container py-12 md:py-16">
         <div className="mx-auto max-w-6xl">
-          <div className="grid gap-10 lg:grid-cols-5">
+          <div className="grid gap-8 lg:grid-cols-5">
             {/* Contact Info Column */}
-            <div className="space-y-6 lg:col-span-2">
+            <div className="space-y-5 lg:col-span-2">
               {/* Opening Hours Card */}
-              <Card>
+              <Card className="border-0 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <CardTitle className="flex items-center gap-3 text-base">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/8">
                       <Clock className="h-5 w-5 text-primary" />
                     </div>
                     {t("contact.opening_hours")}
@@ -129,10 +129,10 @@ export default async function ContactPage() {
               </Card>
 
               {/* Contact Details Card */}
-              <Card>
+              <Card className="border-0 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <CardTitle className="flex items-center gap-3 text-base">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/8">
                       <MessageSquare className="h-5 w-5 text-primary" />
                     </div>
                     {t("contact.contact_details")}
@@ -141,7 +141,7 @@ export default async function ContactPage() {
                 <CardContent>
                   <div className="space-y-5">
                     <div className="flex items-start gap-4">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8">
                         <Mail className="h-5 w-5 text-primary" />
                       </div>
                       <div>
@@ -155,7 +155,7 @@ export default async function ContactPage() {
                       </div>
                     </div>
                     <div className="flex items-start gap-4">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/8">
                         <Phone className="h-5 w-5 text-primary" />
                       </div>
                       <div>
@@ -178,9 +178,9 @@ export default async function ContactPage() {
 
             {/* Contact Form Column */}
             <div className="lg:col-span-3">
-              <Card>
+              <Card className="border-0 shadow-sm">
                 <CardHeader>
-                  <CardTitle className="text-2xl">{t("contact.send_message")}</CardTitle>
+                  <CardTitle className="text-xl">{t("contact.send_message")}</CardTitle>
                   <p className="text-sm text-muted-foreground">
                     {t("contact.send_message_text")}
                   </p>

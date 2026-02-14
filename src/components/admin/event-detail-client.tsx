@@ -14,10 +14,11 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Check, X, Pencil, Save, Download, ExternalLink,
+  Check, X, Pencil, Save, Download, ExternalLink, ChevronDown,
 } from "lucide-react";
 import { quickUpdateEvent, updateParticipant, exportParticipantsCsv } from "@/lib/admin/actions";
 import { AdminSearchInput } from "./admin-data-table";
+import { CoverImageUpload } from "./cover-image-upload";
 
 // ─── Inline editable field ──────────────────────────────────
 
@@ -132,6 +133,7 @@ function ParticipantRow({
   participant: any;
 }) {
   const [isPending, startTransition] = useTransition();
+  const [expanded, setExpanded] = useState(false);
   const profile = participant.profiles;
   const age = profile?.date_of_birth
     ? Math.floor(
@@ -146,51 +148,97 @@ function ParticipantRow({
     });
   }
 
+  // Count visible columns: always 3 (Name, Status, Attended) + conditionally Phone/Age (md) + Payment (lg)
+  const visibleColCount = 3 + 2 + 1; // max columns for colSpan
+
   return (
-    <TableRow className="hover:bg-muted/50 transition-colors">
-      <TableCell className="font-medium">
-        <Link
-          href={`/admin/members/${profile?.id}`}
-          className="text-primary hover:underline inline-flex items-center gap-1"
-        >
-          {profile?.first_name} {profile?.last_name}
-          <ExternalLink className="h-3 w-3" />
-        </Link>
-      </TableCell>
-      <TableCell className="text-sm">{profile?.email}</TableCell>
-      <TableCell className="text-sm">{profile?.phone ?? "—"}</TableCell>
-      <TableCell>{age ?? "—"}</TableCell>
-      <TableCell>
-        <Badge
-          variant={
-            participant.status === "confirmed" ? "default"
-            : participant.status === "waitlisted" ? "secondary"
-            : "outline"
-          }
-        >
-          {participant.status}
-        </Badge>
-      </TableCell>
-      <TableCell>
-        <Badge variant={participant.payment_status === "paid" ? "default" : "secondary"}>
-          {participant.payment_status}
-        </Badge>
-      </TableCell>
-      <TableCell>
-        <Button
-          variant="ghost"
-          size="sm"
-          disabled={isPending}
-          onClick={toggleAttended}
-        >
-          {participant.attended ? (
-            <Check className="h-4 w-4 text-green-600" />
-          ) : (
-            <X className="h-4 w-4 text-muted-foreground" />
-          )}
-        </Button>
-      </TableCell>
-    </TableRow>
+    <>
+      <TableRow
+        className="cursor-pointer lg:cursor-default"
+        onClick={() => setExpanded((prev) => !prev)}
+      >
+        <TableCell className="py-1.5 max-w-0">
+          <div className="flex items-center gap-1">
+            <ChevronDown
+              className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform lg:hidden ${
+                expanded ? "rotate-180" : ""
+              }`}
+            />
+            <div className="min-w-0">
+              <Link
+                href={`/admin/members/${profile?.id}`}
+                className="text-primary hover:underline font-medium inline-flex items-center gap-1"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {profile?.first_name} {profile?.last_name}
+                <ExternalLink className="h-3 w-3 shrink-0" />
+              </Link>
+              <div className="text-xs text-muted-foreground truncate">
+                {profile?.email}
+              </div>
+            </div>
+          </div>
+        </TableCell>
+        <TableCell className="py-1.5 text-muted-foreground hidden md:table-cell">{profile?.phone ?? "—"}</TableCell>
+        <TableCell className="py-1.5 text-center hidden md:table-cell">{age ?? "—"}</TableCell>
+        <TableCell className="py-1.5">
+          <Badge
+            variant={
+              participant.status === "confirmed" ? "default"
+              : participant.status === "waitlisted" ? "secondary"
+              : "outline"
+            }
+          >
+            {participant.status}
+          </Badge>
+        </TableCell>
+        <TableCell className="py-1.5 hidden lg:table-cell">
+          <Badge variant={participant.payment_status === "paid" ? "default" : "secondary"}>
+            {participant.payment_status}
+          </Badge>
+        </TableCell>
+        <TableCell className="py-1.5 text-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            disabled={isPending}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAttended();
+            }}
+          >
+            {participant.attended ? (
+              <Check className="h-4 w-4 text-green-600" />
+            ) : (
+              <X className="h-4 w-4 text-muted-foreground" />
+            )}
+          </Button>
+        </TableCell>
+      </TableRow>
+      {expanded && (
+        <TableRow className="lg:hidden bg-muted/30">
+          <TableCell colSpan={visibleColCount} className="py-2 px-4">
+            <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm">
+              <div className="md:hidden">
+                <span className="text-muted-foreground">Phone: </span>
+                <span>{profile?.phone ?? "—"}</span>
+              </div>
+              <div className="md:hidden">
+                <span className="text-muted-foreground">Age: </span>
+                <span>{age ?? "—"}</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground">Payment: </span>
+                <Badge variant={participant.payment_status === "paid" ? "default" : "secondary"} className="text-xs">
+                  {participant.payment_status}
+                </Badge>
+              </div>
+            </div>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   );
 }
 
@@ -341,7 +389,7 @@ export function EventDetailClient({
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <div>
               <h3 className="font-semibold mb-3 text-blue-600">
                 Male ({filteredMales.length}
@@ -350,17 +398,16 @@ export function EventDetailClient({
               {filteredMales.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4">No male participants</p>
               ) : (
-                <div className="border rounded-lg overflow-x-auto">
+                <div className="border rounded-lg">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Age</TableHead>
+                        <TableHead className="w-full">Name</TableHead>
+                        <TableHead className="hidden md:table-cell">Phone</TableHead>
+                        <TableHead className="text-center hidden md:table-cell">Age</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Payment</TableHead>
-                        <TableHead>Attended</TableHead>
+                        <TableHead className="hidden lg:table-cell">Payment</TableHead>
+                        <TableHead className="text-center">Attended</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -380,17 +427,16 @@ export function EventDetailClient({
               {filteredFemales.length === 0 ? (
                 <p className="text-sm text-muted-foreground py-4">No female participants</p>
               ) : (
-                <div className="border rounded-lg overflow-x-auto">
+                <div className="border rounded-lg">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Age</TableHead>
+                        <TableHead className="w-full">Name</TableHead>
+                        <TableHead className="hidden md:table-cell">Phone</TableHead>
+                        <TableHead className="text-center hidden md:table-cell">Age</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Payment</TableHead>
-                        <TableHead>Attended</TableHead>
+                        <TableHead className="hidden lg:table-cell">Payment</TableHead>
+                        <TableHead className="text-center">Attended</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -408,6 +454,19 @@ export function EventDetailClient({
         {/* Details tab - inline editable */}
         <TabsContent value="details" className="mt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="md:col-span-2">
+              <CardHeader><CardTitle className="text-base">Cover Image</CardTitle></CardHeader>
+              <CardContent>
+                <div className="max-w-md">
+                  <CoverImageUpload
+                    currentImage={event.cover_image}
+                    onSave={(storagePath) => quickUpdateEvent(eventId, { cover_image: storagePath })}
+                    label="Event image (overrides venue image on event cards)"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader><CardTitle className="text-base">Event Info</CardTitle></CardHeader>
               <CardContent className="space-y-4">

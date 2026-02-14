@@ -19,20 +19,20 @@ export default async function AdminPromotionsPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Promotion Codes</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-2xl md:text-3xl font-bold">Promotion Codes</h1>
         <PromotionDialog countries={countries} />
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Code</TableHead>
-              <TableHead>Type</TableHead>
+              <TableHead className="hidden sm:table-cell">Type</TableHead>
               <TableHead>Value</TableHead>
-              <TableHead>Valid</TableHead>
-              <TableHead>Uses</TableHead>
+              <TableHead className="hidden sm:table-cell">Valid</TableHead>
+              <TableHead className="hidden md:table-cell">Uses</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -47,14 +47,14 @@ export default async function AdminPromotionsPage({
               promotions.map((promo: any) => (
                 <TableRow key={promo.id}>
                   <TableCell className="font-mono font-medium">{promo.code}</TableCell>
-                  <TableCell>{promo.is_percentage ? "Percentage" : "Fixed"}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{promo.is_percentage ? "Percentage" : "Fixed"}</TableCell>
                   <TableCell>
                     {promo.is_percentage ? `${promo.value}%` : promo.value}
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="text-sm hidden sm:table-cell">
                     {promo.valid_from ?? "—"} → {promo.valid_until ?? "—"}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">
                     {promo.times_used}{promo.max_uses ? `/${promo.max_uses}` : ""}
                   </TableCell>
                   <TableCell>

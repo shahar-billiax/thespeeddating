@@ -6,8 +6,8 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Calendar, Clock, MapPin, Users, Ticket, ExternalLink } from "lucide-react";
+
+import { ArrowLeft, Calendar, Clock, MapPin, Users, Ticket, ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 
 interface PageProps {
@@ -117,6 +117,7 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   // Format date and time
   const eventDate = new Date(event.event_date + 'T' + event.start_time);
+  const endDate = event.end_time ? new Date(event.event_date + 'T' + event.end_time) : null;
   const dateFormatter = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
     year: 'numeric',
@@ -139,7 +140,7 @@ export default async function EventDetailPage({ params }: PageProps) {
   const getAgeRange = () => {
     if (event.enable_gendered_age) {
       return (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           <p>{t("events.men")}: {event.age_min_male}-{event.age_max_male}</p>
           <p>{t("events.women")}: {event.age_min_female}-{event.age_max_female}</p>
         </div>
@@ -148,36 +149,56 @@ export default async function EventDetailPage({ params }: PageProps) {
     return <p>{event.age_min}-{event.age_max}</p>;
   };
 
-  // Format price
-  const getPriceDisplay = () => {
-    if (event.enable_gendered_price && event.price_male && event.price_female) {
-      return (
-        <div className="space-y-1">
-          <p>{t("events.men")}: {currencyFormatter.format(event.price_male)}</p>
-          <p>{t("events.women")}: {currencyFormatter.format(event.price_female)}</p>
-        </div>
-      );
+  // Inline age range text for hero badges
+  const getAgeRangeText = () => {
+    if (event.enable_gendered_age) {
+      return `${t("events.men")}: ${event.age_min_male}-${event.age_max_male} / ${t("events.women")}: ${event.age_min_female}-${event.age_max_female}`;
     }
-    return <p>{event.price ? currencyFormatter.format(event.price) : t("events.free")}</p>;
+    return `${event.age_min}-${event.age_max}`;
   };
 
-  // Format spots remaining
-  const getSpotsRemaining = () => {
-    if (event.limit_male && event.limit_female) {
-      const maleRemaining = event.limit_male - maleCount;
-      const femaleRemaining = event.limit_female - femaleCount;
+  // Calculate availability
+  const totalLimit = (event.limit_male && event.limit_female) ? event.limit_male + event.limit_female : null;
+  const spotsRemaining = totalLimit ? totalLimit - totalCount : null;
+  const bookedPercent = totalLimit ? Math.min(100, Math.round((totalCount / totalLimit) * 100)) : 0;
+
+  // CTA button component (shared between sidebar and mobile bar)
+  const CTAButton = ({ className = "" }: { className?: string }) => {
+    if (event.is_cancelled) {
       return (
-        <div className="space-y-1">
-          <p>{t("events.men")}: {maleRemaining} / {event.limit_male}</p>
-          <p>{t("events.women")}: {femaleRemaining} / {event.limit_female}</p>
-        </div>
+        <Button disabled size="lg" className={`w-full h-12 text-base font-semibold ${className}`}>
+          {t("events.cancelled")}
+        </Button>
       );
     }
-    return <p>{t("events.unlimited")}</p>;
+    if (eventFull) {
+      return user ? (
+        <Button size="lg" variant="secondary" className={`w-full h-12 text-base font-semibold ${className}`} disabled>
+          {t("events.join_waitlist")}
+        </Button>
+      ) : (
+        <Button asChild size="lg" variant="secondary" className={`w-full h-12 text-base font-semibold ${className}`}>
+          <Link href={`/login?redirect=/events/${id}`}>
+            {t("events.join_waitlist")}
+          </Link>
+        </Button>
+      );
+    }
+    return user ? (
+      <Button size="lg" className={`w-full h-12 shadow-md text-base font-semibold hover:shadow-lg hover:scale-[1.01] transition-all ${className}`} disabled>
+        {t("events.book_now")} — {t("vip.coming_soon")}
+      </Button>
+    ) : (
+      <Button asChild size="lg" className={`w-full h-12 shadow-md text-base font-semibold hover:shadow-lg hover:scale-[1.01] transition-all ${className}`}>
+        <Link href={`/login?redirect=/events/${id}`}>
+          {t("events.book_now")}
+        </Link>
+      </Button>
+    );
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -208,203 +229,291 @@ export default async function EventDetailPage({ params }: PageProps) {
           }),
         }}
       />
-      <Link href="/events" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4">
-        {t("events.back_to_events")}
-      </Link>
 
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-4">
-          <Badge variant="secondary" className="text-base">
-            {t(`events.type.${event.event_type}`)}
-          </Badge>
-          {event.is_cancelled && (
-            <Badge variant="destructive">{t("events.cancelled")}</Badge>
-          )}
-        </div>
-        <h1 className="text-4xl font-bold mb-2">
-          {dateFormatter.format(eventDate)}
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          {event.cities?.name}
-        </p>
-      </div>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden border-b border-border/40">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/[0.05] via-secondary/40 to-accent/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,oklch(0.48_0.16_12_/_0.08),transparent_60%)]" />
 
-      {/* Event Info Cards */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              {t("events.date_time")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <span>{dateFormatter.format(eventDate)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span>
-                {timeFormatter.format(eventDate)}
-                {event.end_time && ` - ${timeFormatter.format(new Date(event.event_date + 'T' + event.end_time))}`}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="section-container relative max-w-6xl py-10 sm:py-14">
+          {/* Back link */}
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary mb-6 transition-colors font-medium"
+          >
+            <ArrowLeft className="h-3.5 w-3.5 rtl:rotate-180" />
+            {t("events.back_to_events")}
+          </Link>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              {t("events.age_range")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {getAgeRange()}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Ticket className="h-5 w-5" />
-              {t("events.pricing")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">{t("events.standard_price")}</p>
-              {getPriceDisplay()}
-            </div>
-            {event.vip_price && (
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">{t("events.vip_price")}</p>
-                <p>{currencyFormatter.format(event.vip_price)}</p>
-              </div>
+          {/* Badges */}
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <Badge className="bg-primary/[0.08] text-primary border-0 text-sm font-semibold tracking-wide">
+              {t(`events.type.${event.event_type}`)}
+            </Badge>
+            {event.is_cancelled && (
+              <Badge variant="destructive">{t("events.cancelled")}</Badge>
             )}
-            {event.special_offer && event.special_offer_value && (
-              <Badge variant="default">{event.special_offer}</Badge>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              {t("events.spots_remaining")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {getSpotsRemaining()}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Venue Information */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5" />
-            {t("events.venue")}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="font-semibold text-lg mb-1">{event.venues?.name}</h3>
-            <p className="text-muted-foreground">{event.venues?.address}</p>
           </div>
 
-          {event.venues?.description && (
-            <>
-              <Separator />
-              <p>{event.venues.description}</p>
-            </>
-          )}
+          {/* Title */}
+          <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl lg:text-4xl mb-2">
+            {dateFormatter.format(eventDate)}
+          </h1>
 
-          {event.venues?.transport_info && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="font-semibold mb-2">{t("events.transport")}</h4>
-                <p className="text-sm text-muted-foreground">{event.venues.transport_info}</p>
+          {/* City subtitle */}
+          <p className="text-lg text-muted-foreground mb-6 font-medium">
+            {event.cities?.name}
+          </p>
+
+          {/* Quick info pills */}
+          <div className="flex flex-wrap gap-2.5">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white shadow-sm ring-1 ring-border/40 px-4 py-2 text-sm text-foreground font-medium">
+              <Users className="h-4 w-4 text-primary" />
+              <span>{t("events.age_range")}: {getAgeRangeText()}</span>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-white shadow-sm ring-1 ring-border/40 px-4 py-2 text-sm text-foreground font-medium">
+              <Clock className="h-4 w-4 text-primary" />
+              <span>{timeFormatter.format(eventDate)}{endDate && ` - ${timeFormatter.format(endDate)}`}</span>
+            </div>
+            {spotsRemaining !== null && !eventFull && (
+              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 shadow-sm ring-1 ring-emerald-200/60 px-4 py-2 text-sm text-emerald-700 font-medium">
+                <Ticket className="h-4 w-4" />
+                <span>{spotsRemaining} {t("events.spots_remaining")}</span>
               </div>
-            </>
-          )}
+            )}
+          </div>
+        </div>
+      </section>
 
-          {event.venues?.map_url && (
-            <>
-              <Separator />
-              <a
-                href={event.venues.map_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-primary hover:underline"
-              >
-                {t("events.view_map")}
-                <ExternalLink className="h-4 w-4" />
-              </a>
-            </>
-          )}
-        </CardContent>
-      </Card>
+      {/* Two-column content area */}
+      <section className="py-10 sm:py-14 bg-gradient-to-b from-muted/20 to-background">
+        <div className="section-container max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+            {/* Left content column */}
+            <div className="lg:col-span-7 space-y-8">
+              {/* About This Event */}
+              <Card className="border-0 shadow-sm ring-1 ring-border/30">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-xl font-bold tracking-tight">{t("events.about_event")}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {event.description ? (
+                    <p className="text-muted-foreground whitespace-pre-wrap text-[15px] leading-[1.8]">
+                      {event.description}
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground italic">
+                      {t(`events.type.${event.event_type}`)} {t("events.venue").toLowerCase()} {event.cities?.name}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
 
-      {/* Description */}
-      {event.description && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>{t("events.about_event")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="whitespace-pre-wrap">{event.description}</p>
-          </CardContent>
-        </Card>
-      )}
+              {/* Venue Information */}
+              {event.venues && (
+                <Card className="border-0 shadow-sm bg-gradient-to-br from-card to-muted/20 ring-1 ring-border/30">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="flex items-center gap-2.5 text-xl font-bold tracking-tight">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/[0.07]">
+                        <MapPin className="h-4 w-4 text-primary" />
+                      </div>
+                      {t("events.venue")}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h3 className="font-semibold text-lg mb-1">{event.venues.name}</h3>
+                      <p className="text-muted-foreground">{event.venues.address}</p>
+                    </div>
 
-      {/* Dress Code */}
-      {(event.dress_code || event.venues?.dress_code) && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>{t("events.dress_code")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{event.dress_code || event.venues?.dress_code}</p>
-          </CardContent>
-        </Card>
-      )}
+                    {event.venues.description && (
+                      <>
+                        <div className="border-t border-border/30" />
+                        <p className="text-muted-foreground leading-relaxed">
+                          {event.venues.description}
+                        </p>
+                      </>
+                    )}
 
-      {/* CTA */}
-      <div className="flex justify-center">
-        {event.is_cancelled ? (
-          <Button disabled size="lg">
-            {t("events.cancelled")}
-          </Button>
-        ) : eventFull ? (
-          user ? (
-            <Button size="lg" variant="secondary" disabled>
-              {t("events.join_waitlist")}
-            </Button>
-          ) : (
-            <Button asChild size="lg" variant="secondary">
-              <Link href={`/login?redirect=/events/${id}`}>
-                {t("events.join_waitlist")}
-              </Link>
-            </Button>
-          )
-        ) : user ? (
-          <Button size="lg" disabled>
-            {t("events.book_now")} — {t("vip.coming_soon")}
-          </Button>
-        ) : (
-          <Button asChild size="lg">
-            <Link href={`/login?redirect=/events/${id}`}>
-              {t("events.book_now")}
-            </Link>
-          </Button>
-        )}
+                    {event.venues.transport_info && (
+                      <>
+                        <div className="border-t border-border/30" />
+                        <div>
+                          <h4 className="font-semibold text-sm mb-1.5">{t("events.transport")}</h4>
+                          <p className="text-sm text-muted-foreground">{event.venues.transport_info}</p>
+                        </div>
+                      </>
+                    )}
+
+                    {event.venues.map_url && (
+                      <>
+                        <div className="border-t border-border/30" />
+                        <a
+                          href={event.venues.map_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          {t("events.view_map")}
+                        </a>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Dress Code */}
+              {(event.dress_code || event.venues?.dress_code) && (
+                <Card className="border-0 shadow-sm overflow-hidden bg-muted/20 ring-1 ring-border/20">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg font-semibold">{t("events.dress_code")}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-[15px]">{event.dress_code || event.venues?.dress_code}</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Right booking sidebar */}
+            <div className="lg:col-span-5">
+              <div className="lg:sticky lg:top-24">
+                <Card className="border-0 shadow-[0_4px_20px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)] ring-1 ring-border/40 overflow-hidden p-0 gap-0">
+                  {/* Price header */}
+                  <div className="p-6 pb-5 bg-gradient-to-b from-primary/[0.04] via-primary/[0.02] to-transparent">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="text-4xl font-extrabold text-foreground tracking-tight">
+                        {event.price ? currencyFormatter.format(event.price) : t("events.free")}
+                      </span>
+                      {event.price ? (
+                        <span className="text-sm text-muted-foreground font-medium">{t("events.per_person")}</span>
+                      ) : null}
+                    </div>
+                    {event.enable_gendered_price && event.price_male && event.price_female && (
+                      <div className="text-sm text-muted-foreground space-y-0.5 mt-1">
+                        <p>{t("events.men")}: {currencyFormatter.format(event.price_male)}</p>
+                        <p>{t("events.women")}: {currencyFormatter.format(event.price_female)}</p>
+                      </div>
+                    )}
+                    {event.vip_price && (
+                      <p className="text-sm text-amber-600 font-medium mt-1">
+                        VIP: {currencyFormatter.format(event.vip_price)}
+                      </p>
+                    )}
+                    {event.special_offer && event.special_offer_value && (
+                      <Badge variant="default" className="mt-2">{event.special_offer}</Badge>
+                    )}
+                  </div>
+
+                  {/* Key details list */}
+                  <div className="px-6 py-5 space-y-4 border-t border-border/20">
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.06]">
+                        <Calendar className="h-4 w-4 text-primary" />
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">{dateFormatter.format(eventDate)}</p>
+                    </div>
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.06]">
+                        <Clock className="h-4 w-4 text-primary" />
+                      </div>
+                      <p className="text-sm font-semibold text-foreground">
+                        {timeFormatter.format(eventDate)}
+                        {endDate && ` - ${timeFormatter.format(endDate)}`}
+                      </p>
+                    </div>
+                    {event.venues && (
+                      <div className="flex items-start gap-3.5">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.06] mt-0.5">
+                          <MapPin className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="text-sm">
+                          <p className="font-semibold text-foreground">{event.venues.name}</p>
+                          <p className="text-muted-foreground mt-0.5">{event.venues.address}</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3.5">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/[0.06]">
+                        <Users className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="text-sm font-semibold text-foreground">
+                        {getAgeRange()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Availability section */}
+                  <div className="px-6 py-5 space-y-3 border-t border-border/20 bg-muted/15">
+                    {totalLimit ? (
+                      <>
+                        {!eventFull ? (
+                          <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 font-semibold">
+                            {t("events.tickets_available")}
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive" className="font-semibold">{t("events.sold_out")}</Badge>
+                        )}
+
+                        {/* Progress bar */}
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-xs text-muted-foreground font-medium">
+                            <span>{bookedPercent}% {t("events.booked")}</span>
+                          </div>
+                          <div className="h-2.5 rounded-full bg-border/40 overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-500"
+                              style={{ width: `${bookedPercent}%` }}
+                            />
+                          </div>
+                          <div className="flex gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-primary/40" />
+                              {(event.limit_male ?? 0) - maleCount} {t("events.male_spots")}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                              <span className="h-2 w-2 rounded-full bg-primary/60" />
+                              {(event.limit_female ?? 0) - femaleCount} {t("events.female_spots")}
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{t("events.unlimited")}</p>
+                    )}
+                  </div>
+
+                  {/* CTA Button */}
+                  <div className="p-6">
+                    <CTAButton />
+                  </div>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mobile sticky CTA bar */}
+      <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-border/30 bg-background/95 backdrop-blur-xl p-4 shadow-[0_-2px_16px_rgba(0,0,0,0.06)]">
+        <div className="section-container flex items-center justify-between gap-4">
+          <div>
+            <span className="text-xl font-bold tracking-tight">
+              {event.price ? currencyFormatter.format(event.price) : t("events.free")}
+            </span>
+            {event.price ? (
+              <span className="text-xs text-muted-foreground ms-1.5 font-medium">{t("events.per_person")}</span>
+            ) : null}
+          </div>
+          <div className="flex-1 max-w-[220px]">
+            <CTAButton />
+          </div>
+        </div>
       </div>
+
+      {/* Bottom spacer for mobile sticky CTA */}
+      <div className="h-20 lg:hidden" />
     </div>
   );
 }

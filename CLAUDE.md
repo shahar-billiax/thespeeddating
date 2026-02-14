@@ -65,10 +65,11 @@ The app serves **2 countries** (UK + Israel) from a single codebase:
    - Refresh Supabase session
    - Protect `/admin` routes (requires `role=admin` in profiles table)
 
-3. **i18n implementation** (`src/lib/i18n/`):
-   - `getCountryContext(headers)` → extract country/locale from middleware headers
-   - `t(key, locale)` → translation function (server-side)
-   - Context provider for client-side translations
+3. **i18n implementation** (`next-intl` + Supabase):
+   - `next-intl` configured via `src/i18n/request.ts`
+   - Base translations in `src/lib/i18n/messages/{en,he}.json`
+   - Supabase `translations` table provides admin-editable DB overrides
+   - Merge order: JSON-en → JSON-locale → DB-en → DB-locale (last wins)
    - Hebrew (RTL) support for Israel
 
 ### App Structure
@@ -90,7 +91,7 @@ src/
 │   └── ui/              # shadcn/ui components
 ├── lib/
 │   ├── supabase/        # Supabase clients (server, client, admin)
-│   ├── i18n/            # Translation utilities
+│   ├── i18n/            # Base translation JSON files + page fallbacks
 │   ├── auth/            # Auth helpers
 │   ├── matches/         # Match calculation logic
 │   ├── matchmaking/     # Matchmaking system
@@ -146,31 +147,35 @@ Key design patterns:
 
 ### Country Context
 
-Always retrieve country context in Server Components:
+Retrieve country from middleware headers in Server Components:
 ```typescript
-import { getCountryContext } from "@/lib/i18n/server";
+import { headers } from "next/headers";
 
-export default async function Page() {
-  const { country, locale } = await getCountryContext(headers());
-  // Use country/locale for queries and content
-}
+const headerStore = await headers();
+const country = headerStore.get("x-country") || "gb";
 ```
 
-### Translations
+### Translations (`next-intl`)
+
+Uses `next-intl` with Supabase DB overrides. Base translations live in JSON files (`src/lib/i18n/messages/`), admins can override any key via the `/admin/translations` page (stored in Supabase `translations` table).
 
 Server-side:
 ```typescript
-import { t } from "@/lib/i18n/server";
-const title = t("events.title", locale);
+import { getTranslations, getLocale } from "next-intl/server";
+
+const t = await getTranslations();
+const locale = await getLocale();
+const title = t("events.title");
 ```
 
-Client-side (use context provider):
+Client-side:
 ```typescript
 "use client";
-import { useI18n } from "@/lib/i18n/context";
+import { useTranslations, useLocale } from "next-intl";
 
 export function Component() {
-  const { t } = useI18n();
+  const t = useTranslations();
+  const locale = useLocale();
   return <h1>{t("events.title")}</h1>;
 }
 ```

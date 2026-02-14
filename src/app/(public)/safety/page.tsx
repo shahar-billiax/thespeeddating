@@ -15,23 +15,29 @@ export default async function SafetyPage() {
   const t = await getTranslations();
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
-            <Shield className="w-8 h-8 text-primary" />
+    <div>
+      {/* Hero */}
+      <section className="page-hero">
+        <div className="section-container">
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Shield className="h-7 w-7 text-primary" />
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold">{t("safety.title")}</h1>
+            <p className="text-lg text-muted-foreground">
+              Your safety and wellbeing are our top priorities. Please read these guidelines carefully.
+            </p>
           </div>
-          <h1 className="text-4xl font-bold mb-4">{t("safety.title")}</h1>
-          <p className="text-xl text-muted-foreground">
-            Your safety and wellbeing are our top priorities. Please read these guidelines carefully.
-          </p>
         </div>
+      </section>
 
+      <section className="py-16 sm:py-20">
+        <div className="section-container max-w-4xl">
         <div className="space-y-6">
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <Eye className="w-6 h-6 text-primary" />
+                <Eye className="w-5 h-5 text-primary" />
                 Before the Event
               </CardTitle>
             </CardHeader>
@@ -55,10 +61,10 @@ export default async function SafetyPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <Shield className="w-6 h-6 text-primary" />
+                <Shield className="w-5 h-5 text-primary" />
                 During the Event
               </CardTitle>
             </CardHeader>
@@ -88,10 +94,10 @@ export default async function SafetyPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <AlertCircle className="w-6 h-6 text-primary" />
+                <AlertCircle className="w-5 h-5 text-primary" />
                 After the Event
               </CardTitle>
             </CardHeader>
@@ -124,10 +130,10 @@ export default async function SafetyPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <Lock className="w-6 h-6 text-primary" />
+                <Lock className="w-5 h-5 text-primary" />
                 Online Safety
               </CardTitle>
             </CardHeader>
@@ -156,7 +162,7 @@ export default async function SafetyPage() {
           </Card>
         </div>
 
-        <div className="mt-12 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-lg p-6">
+        <Card className="border-0 shadow-sm bg-amber-50 dark:bg-amber-950/20 mt-10 p-6">
           <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-500" />
             If You Feel Unsafe
@@ -175,7 +181,7 @@ export default async function SafetyPage() {
               . For emergencies, always call 999 (UK) or local emergency services.
             </p>
           </div>
-        </div>
+        </Card>
 
         <div className="mt-8 text-center text-sm text-muted-foreground">
           <p>
@@ -183,7 +189,8 @@ export default async function SafetyPage() {
             conduct of participants but we work hard to create safe, respectful environments.
           </p>
         </div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -10,7 +10,7 @@ export default async function AdminPagesPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Pages</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Pages</h1>
         <Button asChild>
           <Link href="/admin/pages/new">
             <Plus className="h-4 w-4 mr-2" />

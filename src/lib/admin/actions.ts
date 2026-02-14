@@ -1018,6 +1018,15 @@ export async function saveGallery(formData: FormData) {
   return { success: true };
 }
 
+export async function deleteGallery(id: number) {
+  const { supabase } = await requireAdmin();
+  // gallery_images cascade on delete via FK constraint
+  const { error } = await supabase.from("galleries").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/galleries");
+  redirect("/admin/galleries");
+}
+
 // ─── Shared lookups ──────────────────────────────────────────
 export async function getCountries() {
   const { supabase } = await requireAdmin();

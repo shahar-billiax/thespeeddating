@@ -76,9 +76,19 @@ export default async function MyEventsPage() {
   const past = events.filter((event) => event.event_date < today);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">{t("my_events.title")}</h1>
-      <MyEventsList upcoming={upcoming} past={past} />
+    <div>
+      <section className="page-hero">
+        <div className="section-container">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{t("my_events.title")}</h1>
+          </div>
+        </div>
+      </section>
+      <section className="py-16 sm:py-20">
+        <div className="section-container max-w-4xl">
+          <MyEventsList upcoming={upcoming} past={past} />
+        </div>
+      </section>
     </div>
   );
 }

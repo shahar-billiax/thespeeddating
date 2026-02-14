@@ -205,70 +205,74 @@ export default async function FAQsPage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary via-primary/90 to-accent py-16 sm:py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center text-white space-y-4 max-w-3xl mx-auto">
-            <HelpCircle className="h-12 w-12 mx-auto text-white/80" />
+      <section className="page-hero">
+        <div className="section-container">
+          <div className="text-center space-y-4 max-w-3xl mx-auto">
+            <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
+              <HelpCircle className="h-7 w-7 text-primary" />
+            </div>
             <h1 className="text-4xl sm:text-5xl font-bold">
               {page?.title || t("faqs.title")}
             </h1>
-            <p className="text-lg text-white/80">
+            <p className="text-lg text-muted-foreground">
               {t("faqs.hero_subtitle")}
             </p>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto space-y-12">
-          {categories.map((category, catIndex) => (
-            <div key={catIndex}>
-              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">
-                  {catIndex + 1}
-                </span>
-                {category.title}
-              </h2>
-              <Accordion type="single" collapsible className="space-y-3">
-                {category.questions.map((faq, index) => (
-                  <AccordionItem
-                    key={index}
-                    value={`cat${catIndex}-${index}`}
-                    className="border rounded-lg px-6 bg-card hover:shadow-sm transition-shadow"
-                  >
-                    <AccordionTrigger className="text-left hover:no-underline py-4">
-                      <span className="font-semibold">{faq.question}</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="text-muted-foreground pb-4">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            </div>
-          ))}
+      <section className="py-16 sm:py-20">
+        <div className="section-container">
+          <div className="max-w-3xl mx-auto space-y-12">
+            {categories.map((category, catIndex) => (
+              <div key={catIndex}>
+                <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-bold">
+                    {catIndex + 1}
+                  </span>
+                  {category.title}
+                </h2>
+                <Accordion type="single" collapsible className="space-y-3">
+                  {category.questions.map((faq, index) => (
+                    <AccordionItem
+                      key={index}
+                      value={`cat${catIndex}-${index}`}
+                      className="border-0 shadow-sm rounded-lg px-6 bg-card"
+                    >
+                      <AccordionTrigger className="text-left hover:no-underline py-4">
+                        <span className="font-semibold">{faq.question}</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-muted-foreground pb-4">
+                        {faq.answer}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            ))}
 
-          {/* CTA Section */}
-          <div className="text-center bg-primary/5 rounded-lg p-8">
-            <h2 className="text-2xl font-bold mb-4">{t("faqs.still_questions")}</h2>
-            <p className="text-muted-foreground mb-6">
-              {t("faqs.still_questions_text")}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild>
-                <Link href="/contact">
-                  {t("nav.contact")}
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/what-is-speed-dating">
-                  {t("nav.what_is_speed_dating")}
-                </Link>
-              </Button>
+            {/* CTA Section */}
+            <div className="text-center border-0 shadow-sm bg-card rounded-2xl p-8 sm:p-10">
+              <h2 className="text-2xl font-bold mb-4">{t("faqs.still_questions")}</h2>
+              <p className="text-muted-foreground mb-6">
+                {t("faqs.still_questions_text")}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild>
+                  <Link href="/contact">
+                    {t("nav.contact")}
+                  </Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/what-is-speed-dating">
+                    {t("nav.what_is_speed_dating")}
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

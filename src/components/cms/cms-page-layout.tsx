@@ -16,8 +16,8 @@ export async function CmsPageLayout({
   return (
     <div>
       {/* Hero */}
-      <section className="bg-gradient-to-b from-primary/5 to-background py-16 md:py-20">
-        <div className="container mx-auto px-4">
+      <section className="page-hero">
+        <div className="section-container">
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
               {title || fallbackTitle}
@@ -27,15 +27,17 @@ export async function CmsPageLayout({
       </section>
 
       {/* Content */}
-      <section className="container mx-auto px-4 py-12 md:py-16">
-        <div className="mx-auto max-w-4xl">
-          {contentHtml ? (
-            <CmsContent html={contentHtml} />
-          ) : (
-            <p className="text-muted-foreground text-center">
-              {t("common.content_coming_soon")}
-            </p>
-          )}
+      <section className="py-16 sm:py-20">
+        <div className="section-container">
+          <div className="mx-auto max-w-4xl">
+            {contentHtml ? (
+              <CmsContent html={contentHtml} />
+            ) : (
+              <p className="text-muted-foreground text-center">
+                {t("common.content_coming_soon")}
+              </p>
+            )}
+          </div>
         </div>
       </section>
     </div>

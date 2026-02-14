@@ -41,24 +41,25 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-border/50">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:z-[60] focus:bg-background focus:p-3 focus:text-foreground focus:border focus:rounded"
       >
         {t("nav.skip_to_content")}
       </a>
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center h-full gap-8">
-          <Link href="/" className="text-xl font-bold text-primary whitespace-nowrap">
+      <div className="section-container flex h-16 items-center justify-between">
+        <div className="flex items-center h-full gap-10">
+          <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-tight text-foreground whitespace-nowrap">
+            <Heart className="h-5 w-5 text-primary fill-primary/20" />
             {t("nav.brand")}
           </Link>
-          <nav className="hidden lg:flex h-full items-center gap-0.5">
+          <nav className="hidden lg:flex h-full items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="relative flex items-center h-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors px-3 after:absolute after:bottom-0 after:inset-x-1.5 after:h-0.5 after:rounded-full after:bg-primary after:origin-center after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200"
+                className="relative flex items-center h-full text-[13px] font-medium text-muted-foreground hover:text-foreground transition-colors px-3 after:absolute after:bottom-0 after:inset-x-2 after:h-0.5 after:rounded-full after:bg-primary after:origin-center after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-200"
               >
                 {link.label}
               </Link>
@@ -66,11 +67,11 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
-            className="hidden lg:inline-flex border-yellow-500/50 text-yellow-600 hover:bg-yellow-500/10 hover:text-yellow-700 gap-1.5"
+            className="hidden lg:inline-flex text-amber-600 hover:text-amber-700 hover:bg-amber-50 gap-1.5 text-[13px]"
             asChild
           >
             <Link href="/vip">
@@ -80,20 +81,22 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
           </Button>
           <RegionLanguageSelector />
           {user ? (
-            <div className="hidden lg:flex items-center gap-2">
+            <div className="hidden lg:flex items-center gap-1.5">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="gap-1.5 focus-visible:ring-0 focus-visible:border-transparent data-[state=open]:bg-accent"
+                    className="gap-1.5 text-[13px] focus-visible:ring-0 focus-visible:border-transparent data-[state=open]:bg-accent"
                   >
-                    <User className="h-4 w-4" />
+                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                      <User className="h-3.5 w-3.5 text-primary" />
+                    </div>
                     {t("nav.my_account")}
                     <ChevronDown className="h-3 w-3 opacity-50" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuContent align="end" className="w-52">
                   {user.role === "admin" && (
                     <>
                       <DropdownMenuItem
@@ -139,10 +142,10 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
             </div>
           ) : (
             <div className="hidden lg:flex items-center gap-2">
-              <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" className="text-[13px]" asChild>
                 <Link href="/login">{t("nav.login")}</Link>
               </Button>
-              <Button size="sm" asChild>
+              <Button size="sm" className="text-[13px] shadow-sm" asChild>
                 <Link href="/register">{t("nav.register")}</Link>
               </Button>
             </div>
@@ -161,8 +164,9 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                 <Link
                   href="/"
                   onClick={() => setOpen(false)}
-                  className="text-xl font-bold text-primary"
+                  className="flex items-center gap-2 text-lg font-bold text-foreground"
                 >
+                  <Heart className="h-5 w-5 text-primary fill-primary/20" />
                   {t("nav.brand")}
                 </Link>
               </div>
@@ -170,7 +174,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
               {/* Scrollable nav */}
               <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
                 {/* Main links */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   {navLinks.map((link) => (
                     <Link
                       key={link.href}
@@ -184,14 +188,14 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                 </div>
 
                 {/* More pages */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
                     {t("nav.more")}
                   </p>
                   <Link
                     href="/vip"
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-yellow-500/10 text-yellow-600 transition-colors"
+                    className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-amber-50 text-amber-600 transition-colors"
                   >
                     <Crown className="h-4 w-4" />
                     {t("nav.vip")}
@@ -220,7 +224,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                 </div>
 
                 {/* Region & Language */}
-                <div className="space-y-1">
+                <div className="space-y-0.5">
                   <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
                     {t("switcher.region")}
                   </p>
@@ -263,7 +267,7 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
 
                 {/* Account section — visible when logged in */}
                 {user && (
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-3 mb-2">
                       {t("nav.my_account")}
                     </p>

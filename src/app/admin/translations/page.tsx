@@ -19,6 +19,7 @@ export default async function AdminTranslationsPage({
       <h1 className="text-3xl font-bold">Translations</h1>
       <TranslationsManager
         pairs={pairs}
+        total={total}
         search={params.search}
         namespace={params.namespace}
       />

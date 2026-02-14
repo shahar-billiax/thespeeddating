@@ -14,7 +14,7 @@ export default async function ResultsPage({
 
   if ("error" in data) {
     return (
-      <div className="container max-w-2xl mx-auto py-8 px-4">
+      <div className="section-container max-w-2xl py-16 sm:py-20">
         <Card>
           <CardContent className="pt-6 text-center">
             <p className="text-muted-foreground">{data.error}</p>
@@ -38,7 +38,7 @@ export default async function ResultsPage({
   const vipData = await getVipBonusData(Number(eventId));
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4">
+    <div className="section-container max-w-2xl py-16 sm:py-20">
       <h1 className="text-3xl font-bold mb-2">Match Results</h1>
       <p className="text-muted-foreground mb-6">
         {(data.event as any)?.date} - {(data.event as any)?.city}
@@ -80,7 +80,7 @@ export default async function ResultsPage({
       )}
 
       {dateMatches.length === 0 && friendMatches.length === 0 && (
-        <Card>
+        <Card className="border-0 shadow-sm">
           <CardContent className="pt-6 text-center text-muted-foreground">
             No mutual matches for this event. Keep attending events!
           </CardContent>
@@ -88,7 +88,7 @@ export default async function ResultsPage({
       )}
 
       {vipData && vipData.length > 0 && (
-        <Card className="mt-6 border-amber-300">
+        <Card className="mt-6 border-0 shadow-sm ring-1 ring-amber-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-amber-700">
               <Crown className="h-5 w-5" />

@@ -24,7 +24,7 @@ export default async function AdminMatchmakingPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Matchmaking</h1>
+      <h1 className="text-2xl md:text-3xl font-bold">Matchmaking</h1>
 
       {/* Packages Section */}
       <MatchmakingPackagesPanel packages={packages} countries={countries} />
@@ -32,16 +32,16 @@ export default async function AdminMatchmakingPage({
       {/* Profiles Section */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Applications</h2>
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Gender</TableHead>
-                <TableHead>Package</TableHead>
+                <TableHead className="hidden sm:table-cell">Email</TableHead>
+                <TableHead className="hidden sm:table-cell">Gender</TableHead>
+                <TableHead className="hidden md:table-cell">Package</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Submitted</TableHead>
+                <TableHead className="hidden md:table-cell">Submitted</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -58,9 +58,9 @@ export default async function AdminMatchmakingPage({
                     <TableCell className="font-medium">
                       {p.profiles?.first_name} {p.profiles?.last_name}
                     </TableCell>
-                    <TableCell className="text-sm">{p.profiles?.email}</TableCell>
-                    <TableCell>{p.profiles?.gender}</TableCell>
-                    <TableCell>{p.package_type ?? "\u2014"}</TableCell>
+                    <TableCell className="text-sm hidden sm:table-cell">{p.profiles?.email}</TableCell>
+                    <TableCell className="hidden sm:table-cell">{p.profiles?.gender}</TableCell>
+                    <TableCell className="hidden md:table-cell">{p.package_type ?? "\u2014"}</TableCell>
                     <TableCell>
                       <Badge
                         variant={
@@ -74,7 +74,7 @@ export default async function AdminMatchmakingPage({
                         {p.status.replace("_", " ")}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="text-sm hidden md:table-cell">
                       {new Date(p.created_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell>

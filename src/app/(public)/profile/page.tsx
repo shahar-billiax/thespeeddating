@@ -44,22 +44,33 @@ export default async function ProfilePage() {
   const isAdmin = profile.role === "admin";
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {isAdmin && (
-        <div className="mb-6">
-          <Button asChild variant="outline">
-            <Link href="/admin">
-              <Shield className="me-2 h-4 w-4" />
-              {t("profile.go_to_admin")}
-            </Link>
-          </Button>
+    <div>
+      <section className="page-hero">
+        <div className="section-container">
+          <div className="mx-auto max-w-3xl text-center">
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">{t("profile.title")}</h1>
+          </div>
         </div>
-      )}
-      <ProfileForm
-        profile={profile}
-        countries={countries || []}
-        cities={cities || []}
-      />
+      </section>
+      <section className="py-16 sm:py-20">
+        <div className="section-container max-w-3xl">
+          {isAdmin && (
+            <div className="mb-8">
+              <Button asChild variant="outline">
+                <Link href="/admin">
+                  <Shield className="me-2 h-4 w-4" />
+                  {t("profile.go_to_admin")}
+                </Link>
+              </Button>
+            </div>
+          )}
+          <ProfileForm
+            profile={profile}
+            countries={countries || []}
+            cities={cities || []}
+          />
+        </div>
+      </section>
     </div>
   );
 }

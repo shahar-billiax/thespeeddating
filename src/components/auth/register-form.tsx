@@ -44,9 +44,13 @@ export function RegisterForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-center text-2xl">{t("auth.register_title")}</CardTitle>
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-center text-2xl font-bold">{t("auth.register_title")}</CardTitle>
+        <div className="flex items-center justify-center gap-2 pt-2">
+          <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 1 ? "bg-primary" : "bg-muted"}`} />
+          <div className={`h-1.5 w-8 rounded-full transition-colors ${step >= 2 ? "bg-primary" : "bg-muted"}`} />
+        </div>
         <p className="text-center text-sm text-muted-foreground">{t("auth.step_of", { step: String(step), total: "2" })}</p>
       </CardHeader>
       <CardContent>
@@ -56,25 +60,25 @@ export function RegisterForm() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">{t("profile.first_name")}</Label>
-                  <Input id="firstName" name="firstName" autoComplete="given-name" required />
+                  <Input id="firstName" name="firstName" autoComplete="given-name" required className="h-11" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">{t("profile.last_name")}</Label>
-                  <Input id="lastName" name="lastName" autoComplete="family-name" required />
+                  <Input id="lastName" name="lastName" autoComplete="family-name" required className="h-11" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t("auth.email")}</Label>
-                <Input id="email" name="email" type="email" autoComplete="email" required />
+                <Input id="email" name="email" type="email" autoComplete="email" required className="h-11" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">{t("auth.password")}</Label>
-                <Input id="password" name="password" type="password" autoComplete="new-password" minLength={6} required />
+                <Input id="password" name="password" type="password" autoComplete="new-password" minLength={6} required className="h-11" />
               </div>
               {stepError && (
                 <p className="text-sm text-destructive">{stepError}</p>
               )}
-              <Button type="button" className="w-full" onClick={handleNext}>
+              <Button type="button" className="w-full h-11 shadow-sm" onClick={handleNext}>
                 {t("common.next")}
               </Button>
             </>
@@ -84,18 +88,18 @@ export function RegisterForm() {
             <>
               <div className="space-y-2">
                 <Label htmlFor="dateOfBirth">{t("profile.date_of_birth")}</Label>
-                <Input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" required />
+                <Input id="dateOfBirth" name="dateOfBirth" type="date" autoComplete="bday" required className="h-11" />
               </div>
               <div className="space-y-2">
                 <Label>{t("profile.gender")}</Label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
-                    <input type="radio" name="gender" value="male" required />
-                    {t("profile.male")}
+                <div className="flex gap-4 pt-1">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="gender" value="male" required className="accent-primary" />
+                    <span className="text-sm">{t("profile.male")}</span>
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input type="radio" name="gender" value="female" required />
-                    {t("profile.female")}
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" name="gender" value="female" required className="accent-primary" />
+                    <span className="text-sm">{t("profile.female")}</span>
                   </label>
                 </div>
               </div>
@@ -135,10 +139,10 @@ export function RegisterForm() {
                 <p className="text-sm text-destructive">{state.error}</p>
               )}
               <div className="flex gap-3">
-                <Button type="button" variant="outline" className="flex-1" onClick={() => setStep(1)}>
+                <Button type="button" variant="outline" className="flex-1 h-11" onClick={() => setStep(1)}>
                   {t("common.back")}
                 </Button>
-                <Button type="submit" className="flex-1" disabled={pending || !consentTerms}>
+                <Button type="submit" className="flex-1 h-11 shadow-sm" disabled={pending || !consentTerms}>
                   {pending ? t("auth.creating_account") : t("nav.register")}
                 </Button>
               </div>
@@ -146,10 +150,10 @@ export function RegisterForm() {
           )}
         </form>
       </CardContent>
-      <CardFooter className="justify-center text-sm">
+      <CardFooter className="justify-center text-sm pt-2">
         <p className="text-muted-foreground">
           {t("auth.have_account")}{" "}
-          <Link href="/login" className="text-primary hover:underline">
+          <Link href="/login" className="text-primary font-medium hover:underline">
             {t("nav.login")}
           </Link>
         </p>

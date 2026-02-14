@@ -16,12 +16,25 @@ import { Plus } from "lucide-react";
 
 const CATEGORIES = ["events", "venues", "homepage", "success_stories"];
 
+interface GalleryDialogProps {
+  countries: { id: number; name: string; code: string }[];
+  gallery?: {
+    id: number;
+    name: string;
+    category: string;
+    country_id: number;
+    is_active: boolean;
+  };
+  trigger?: React.ReactNode;
+}
+
 export function GalleryDialog({
   countries,
-}: {
-  countries: { id: number; name: string; code: string }[];
-}) {
+  gallery,
+  trigger,
+}: GalleryDialogProps) {
   const [open, setOpen] = useState(false);
+  const isEdit = !!gallery;
 
   async function handleSubmit(_prev: any, formData: FormData) {
     const result = await saveGallery(formData);
@@ -34,21 +47,26 @@ export function GalleryDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button><Plus className="h-4 w-4 mr-2" />New Gallery</Button>
+        {trigger ?? (
+          <Button><Plus className="h-4 w-4 mr-2" />New Gallery</Button>
+        )}
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Create Gallery</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{isEdit ? "Edit Gallery" : "Create Gallery"}</DialogTitle>
+        </DialogHeader>
         <form action={formAction} className="space-y-4">
+          {gallery && <input type="hidden" name="id" value={gallery.id} />}
           {state?.error && (
             <p className="text-sm text-destructive">{state.error}</p>
           )}
           <div>
             <Label>Name</Label>
-            <Input name="name" required />
+            <Input name="name" required defaultValue={gallery?.name ?? ""} />
           </div>
           <div>
             <Label>Category</Label>
-            <Select name="category" required>
+            <Select name="category" required defaultValue={gallery?.category ?? ""}>
               <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>
                 {CATEGORIES.map((c) => (
@@ -61,7 +79,11 @@ export function GalleryDialog({
           </div>
           <div>
             <Label>Country</Label>
-            <Select name="country_id" required>
+            <Select
+              name="country_id"
+              required
+              defaultValue={gallery ? String(gallery.country_id) : ""}
+            >
               <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>
                 {countries.map((c) => (
@@ -71,11 +93,17 @@ export function GalleryDialog({
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <Switch id="gallery_active" name="is_active" defaultChecked />
+            <Switch
+              id="gallery_active"
+              name="is_active"
+              defaultChecked={gallery?.is_active ?? true}
+            />
             <Label htmlFor="gallery_active">Active</Label>
           </div>
           <Button type="submit" disabled={isPending} className="w-full">
-            {isPending ? "Creating..." : "Create Gallery"}
+            {isPending
+              ? isEdit ? "Saving..." : "Creating..."
+              : isEdit ? "Save Changes" : "Create Gallery"}
           </Button>
         </form>
       </DialogContent>

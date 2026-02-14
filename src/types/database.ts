@@ -306,6 +306,7 @@ export type Database = {
           age_min_male: number | null
           city_id: number
           country_id: number
+          cover_image: string | null
           created_at: string
           currency: string | null
           description: string | null
@@ -341,6 +342,7 @@ export type Database = {
           age_min_male?: number | null
           city_id: number
           country_id: number
+          cover_image?: string | null
           created_at?: string
           currency?: string | null
           description?: string | null
@@ -376,6 +378,7 @@ export type Database = {
           age_min_male?: number | null
           city_id?: number
           country_id?: number
+          cover_image?: string | null
           created_at?: string
           currency?: string | null
           description?: string | null
@@ -1132,6 +1135,7 @@ export type Database = {
           contact_person_name: string | null
           contact_person_phone: string | null
           country_id: number
+          cover_image: string | null
           created_at: string
           description: string | null
           dress_code: string | null
@@ -1155,6 +1159,7 @@ export type Database = {
           contact_person_name?: string | null
           contact_person_phone?: string | null
           country_id: number
+          cover_image?: string | null
           created_at?: string
           description?: string | null
           dress_code?: string | null
@@ -1178,6 +1183,7 @@ export type Database = {
           contact_person_name?: string | null
           contact_person_phone?: string | null
           country_id?: number
+          cover_image?: string | null
           created_at?: string
           description?: string | null
           dress_code?: string | null

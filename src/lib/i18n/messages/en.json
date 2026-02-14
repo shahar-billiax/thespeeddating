@@ -169,13 +169,21 @@
     "view_map": "View on Map",
     "about_event": "About This Event",
     "dress_code": "Dress Code",
-    "back_to_events": "← Back to Events",
+    "back_to_events": "Back to Events",
     "cancelled": "Cancelled",
     "not_found": "Event Not Found",
     "book_now": "Book Now",
     "join_waitlist": "Join Waitlist",
     "ages": "Ages {min}-{max}",
-    "country_not_found": "Country not found"
+    "country_not_found": "Country not found",
+    "hero_subtitle": "Find your next speed dating event",
+    "view_event": "View Event",
+    "per_person": "per person",
+    "booked": "booked",
+    "tickets_available": "Tickets Available",
+    "sold_out": "Sold Out",
+    "male_spots": "male spots left",
+    "female_spots": "female spots left"
   },
   "home": {
     "hero_subtitle": "Jewish Speed Dating in the UK & Israel since 2003",

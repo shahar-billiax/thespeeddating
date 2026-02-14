@@ -14,9 +14,15 @@
     "test:watch": "vitest",
     "db:reset": "supabase db reset",
     "db:gen-types": "supabase gen types typescript --local > src/types/database.ts",
-    "seed:admin": "npx tsx scripts/seed-admin.ts"
+    "seed:admin": "npx tsx scripts/seed-admin.ts",
+    "seed:test-users": "npx tsx scripts/seed-test-users.ts",
+    "seed:test-activity": "npx tsx scripts/seed-test-activity.ts",
+    "cleanup:test-users": "npx tsx scripts/cleanup-test-users.ts"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
     "@tiptap/extension-color": "^3.19.0",
@@ -46,6 +52,7 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-image-crop": "^11.0.10",
     "server-only": "^0.0.1",
     "sonner": "^2.0.7",
     "stripe": "^20.3.1",

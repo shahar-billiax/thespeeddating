@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
+import { ResizableImage } from "./editor-resizable-image";
 import Link from "@tiptap/extension-link";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
@@ -21,7 +21,7 @@ import {
   getActiveAccentColor,
   isInAccentableBlock,
 } from "./editor-accent-extension";
-import { useState, useCallback } from "react";
+import { useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -49,6 +49,7 @@ import {
   Heading4,
   Link2,
   Image as ImageIcon,
+  ImagePlus,
   Undo,
   Redo,
   Quote,
@@ -83,6 +84,8 @@ import { EditorColorPicker } from "./editor-color-picker";
 interface PageEditorProps {
   content: string;
   onChange: (html: string) => void;
+  onOpenMediaGallery?: () => void;
+  onImageImported?: () => void;
 }
 
 type BlockType = "paragraph" | "h1" | "h2" | "h3" | "h4" | "codeBlock";
@@ -409,7 +412,12 @@ function FormatIndicator({ editor }: { editor: ReturnType<typeof useEditor> }) {
 /*  Main editor                                                        */
 /* ------------------------------------------------------------------ */
 
-export function PageEditor({ content, onChange }: PageEditorProps) {
+export interface PageEditorRef {
+  insertImage: (url: string, alt: string) => void;
+}
+
+export const PageEditor = forwardRef<PageEditorRef, PageEditorProps>(
+  function PageEditor({ content, onChange, onOpenMediaGallery, onImageImported }, ref) {
   const [linkDialogOpen, setLinkDialogOpen] = useState(false);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [linkInitialUrl, setLinkInitialUrl] = useState("");
@@ -423,11 +431,7 @@ export function PageEditor({ content, onChange }: PageEditorProps) {
         link: false,
         underline: false,
       }),
-      Image.configure({
-        HTMLAttributes: {
-          class: "max-w-full h-auto rounded-lg",
-        },
-      }),
+      ResizableImage,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
@@ -458,11 +462,44 @@ export function PageEditor({ content, onChange }: PageEditorProps) {
       attributes: {
         class: "cms-content p-4 min-h-[400px] focus:outline-none",
       },
+      handleDrop: (view, event, _slice, moved) => {
+        if (moved) return false;
+        const url = event.dataTransfer?.getData("text/x-media-url");
+        if (!url) return false;
+        event.preventDefault();
+        const coordinates = view.posAtCoords({
+          left: event.clientX,
+          top: event.clientY,
+        });
+        if (coordinates) {
+          const node = view.state.schema.nodes.image.create({ src: url });
+          const transaction = view.state.tr.insert(coordinates.pos, node);
+          view.dispatch(transaction);
+          return true;
+        }
+        return false;
+      },
+      handleDOMEvents: {
+        dragover: (_view, event) => {
+          // Allow drops from gallery by preventing default for our custom type
+          if (event.dataTransfer?.types.includes("text/x-media-url")) {
+            event.preventDefault();
+            return true;
+          }
+          return false;
+        },
+      },
     },
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML());
     },
   });
+
+  useImperativeHandle(ref, () => ({
+    insertImage(url: string, alt: string) {
+      editor?.chain().focus().setImage({ src: url, alt }).run();
+    },
+  }), [editor]);
 
   const openLinkDialog = useCallback(() => {
     if (!editor) return;
@@ -704,10 +741,18 @@ export function PageEditor({ content, onChange }: PageEditorProps) {
           </ToolbarButton>
           <ToolbarButton
             onClick={() => setImageDialogOpen(true)}
-            tooltip="Insert Image"
+            tooltip="Insert Image (URL)"
           >
             <ImageIcon className="h-4 w-4" />
           </ToolbarButton>
+          {onOpenMediaGallery && (
+            <ToolbarButton
+              onClick={onOpenMediaGallery}
+              tooltip="Media Gallery"
+            >
+              <ImagePlus className="h-4 w-4" />
+            </ToolbarButton>
+          )}
           <TableMenu editor={editor} />
 
           <ToolbarSeparator />
@@ -754,7 +799,8 @@ export function PageEditor({ content, onChange }: PageEditorProps) {
         open={imageDialogOpen}
         onOpenChange={setImageDialogOpen}
         onSubmit={handleImageSubmit}
+        onImported={onImageImported}
       />
     </TooltipProvider>
   );
-}
+});

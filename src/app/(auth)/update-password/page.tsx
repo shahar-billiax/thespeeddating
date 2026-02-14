@@ -18,20 +18,20 @@ export default function UpdatePasswordPage() {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-center text-2xl">{t("auth.set_new_password")}</CardTitle>
+    <Card className="border-0 shadow-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-center text-2xl font-bold">{t("auth.set_new_password")}</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="password">{t("auth.new_password")}</Label>
-            <Input id="password" name="password" type="password" minLength={6} required />
+            <Input id="password" name="password" type="password" minLength={6} required className="h-11" />
           </div>
           {state?.error && (
             <p className="text-sm text-destructive">{state.error}</p>
           )}
-          <Button type="submit" className="w-full" disabled={pending}>
+          <Button type="submit" className="w-full h-11 shadow-sm" disabled={pending}>
             {pending ? t("auth.updating") : t("auth.update_password")}
           </Button>
         </form>
