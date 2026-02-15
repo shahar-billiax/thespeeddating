@@ -53,7 +53,7 @@ export default async function ProfilePage() {
         </div>
       </section>
       <section className="py-16 sm:py-20">
-        <div className="section-container max-w-3xl">
+        <div className="section-container max-w-5xl">
           {isAdmin && (
             <div className="mb-8">
               <Button asChild variant="outline">

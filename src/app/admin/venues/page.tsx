@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { VenuesTable } from "@/components/admin/venues-table";
 
+
 export default async function AdminVenuesPage() {
   const venues = await getAllVenues();
 

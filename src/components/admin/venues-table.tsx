@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useAdminCountry } from "@/lib/admin-country-context";
 
 type VenueRow = {
   id: number;
@@ -55,10 +56,16 @@ function compareFn(a: VenueRow, b: VenueRow, key: SortKey, dir: SortDir): number
 
 export function VenuesTable({ venues }: { venues: VenueRow[] }) {
   const router = useRouter();
+  const { countryCode } = useAdminCountry();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>("name");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>(countryCode);
+
+  useEffect(() => {
+    setCountryFilter(countryCode);
+  }, [countryCode]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -71,6 +78,10 @@ export function VenuesTable({ venues }: { venues: VenueRow[] }) {
 
   const filtered = useMemo(() => {
     let list = venues;
+
+    if (countryFilter !== "all") {
+      list = list.filter((v) => v.countries?.code === countryFilter);
+    }
 
     if (activeFilter !== "all") {
       list = list.filter((v) =>
@@ -90,7 +101,7 @@ export function VenuesTable({ venues }: { venues: VenueRow[] }) {
     }
 
     return list;
-  }, [venues, search, activeFilter]);
+  }, [venues, search, activeFilter, countryFilter]);
 
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
@@ -99,12 +110,22 @@ export function VenuesTable({ venues }: { venues: VenueRow[] }) {
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
         <AdminSearchInput
           value={search}
           onChange={setSearch}
           placeholder="Search venues..."
         />
+        <Select value={countryFilter} onValueChange={setCountryFilter}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Countries</SelectItem>
+            <SelectItem value="gb">United Kingdom</SelectItem>
+            <SelectItem value="il">Israel</SelectItem>
+          </SelectContent>
+        </Select>
         <Select value={activeFilter} onValueChange={setActiveFilter}>
           <SelectTrigger className="w-[140px]">
             <SelectValue placeholder="Status" />

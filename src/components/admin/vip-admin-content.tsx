@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VipPlansPanel } from "@/components/admin/vip-plans-panel";
 import { VipBenefitsPanel } from "@/components/admin/vip-benefits-panel";
 import { VipSettingsPanel } from "@/components/admin/vip-settings-panel";
+import { useAdminCountry } from "@/lib/admin-country-context";
 
 const LANGUAGES = [
   { code: "en", label: "English" },
@@ -62,7 +63,8 @@ export function VipAdminContent({
   settings: Settings[];
   countries: Country[];
 }) {
-  const defaultCountry = countries[0]?.code ?? "gb";
+  const { countryCode: adminCountryCode } = useAdminCountry();
+  const defaultCountry = countries.find((c) => c.code === adminCountryCode)?.code ?? countries[0]?.code ?? "gb";
   const [lang, setLang] = useState("en");
 
   // Benefits are language-global (same for all countries).

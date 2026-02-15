@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { useAdminCountry } from "@/lib/admin-country-context";
 
 type EventRow = {
   id: number;
@@ -100,10 +101,16 @@ export function EventsTable({
   regCounts: Record<number, { males: number; females: number; total: number }>;
 }) {
   const router = useRouter();
+  const { countryCode } = useAdminCountry();
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey | null>("event_date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>(countryCode);
+
+  useEffect(() => {
+    setCountryFilter(countryCode);
+  }, [countryCode]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -122,6 +129,10 @@ export function EventsTable({
   const filtered = useMemo(() => {
     let list = enriched;
 
+    if (countryFilter !== "all") {
+      list = list.filter((e) => e.countries?.code === countryFilter);
+    }
+
     if (statusFilter !== "all") {
       list = list.filter((e) => getStatus(e) === statusFilter);
     }
@@ -138,7 +149,7 @@ export function EventsTable({
     }
 
     return list;
-  }, [enriched, search, statusFilter]);
+  }, [enriched, search, statusFilter, countryFilter]);
 
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
@@ -147,12 +158,22 @@ export function EventsTable({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
         <AdminSearchInput
           value={search}
           onChange={setSearch}
           placeholder="Search events..."
         />
+        <Select value={countryFilter} onValueChange={setCountryFilter}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Country" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Countries</SelectItem>
+            <SelectItem value="gb">United Kingdom</SelectItem>
+            <SelectItem value="il">Israel</SelectItem>
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[150px]">
             <SelectValue placeholder="Status" />

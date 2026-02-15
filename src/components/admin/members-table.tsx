@@ -1,36 +1,69 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Table, TableBody, TableCell, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  SortableHeader, AdminSearchInput, EmptyTableRow,
+  SortableHeader, EmptyTableRow,
   type SortDir,
 } from "./admin-data-table";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
-import { ChevronDown, ExternalLink } from "lucide-react";
+  Sheet, SheetContent, SheetTrigger,
+} from "@/components/ui/sheet";
+import { ChevronDown, ExternalLink, Filter, LayoutGrid, List, X } from "lucide-react";
+import { useAdminCountry } from "@/lib/admin-country-context";
+import {
+  MembersFilterPanel,
+  countActiveFilters,
+  DEFAULT_FILTERS,
+  type MembersFilterState,
+} from "./members-filter-panel";
+import { MembersCardView } from "./members-card-view";
+
+// ─── Types ──────────────────────────────────────────────────
 
 type MemberRow = {
   id: string;
   first_name: string;
+  middle_name: string | null;
   last_name: string;
   email: string;
   phone: string | null;
+  home_phone: string | null;
+  mobile_phone: string | null;
+  work_phone: string | null;
   gender: string;
   date_of_birth: string;
   role: string;
   is_active: boolean;
   created_at: string;
+  avatar_url: string | null;
+  faith: string | null;
+  relationship_status: string | null;
+  has_children: boolean | null;
+  subscribed_email: boolean;
+  subscribed_phone: boolean;
+  subscribed_sms: boolean;
+  occupation: string | null;
+  education: string | null;
+  sexual_preference: string | null;
+  admin_comments: string | null;
+  city_id: number | null;
   cities: { name: string } | null;
   countries: { name: string; code: string } | null;
 };
 
+type City = { id: number; name: string; country_id: number };
+
 type SortKey = "name" | "email" | "gender" | "age" | "city" | "role" | "joined" | "status";
+
+type ViewMode = "table" | "grid";
+
+// ─── Helpers ────────────────────────────────────────────────
 
 function getAge(dob: string): number | null {
   if (!dob) return null;
@@ -75,6 +108,8 @@ function compareFn(a: MemberRow, b: MemberRow, key: SortKey, dir: SortDir): numb
   }
   return dir === "desc" ? -cmp : cmp;
 }
+
+// ─── Table row ──────────────────────────────────────────────
 
 function MemberRowItem({ member: m }: { member: MemberRow }) {
   const [expanded, setExpanded] = useState(false);
@@ -171,12 +206,225 @@ function MemberRowItem({ member: m }: { member: MemberRow }) {
   );
 }
 
-export function MembersTable({ members }: { members: MemberRow[] }) {
-  const [search, setSearch] = useState("");
+// ─── Active filter chips ────────────────────────────────────
+
+function ActiveFilterChips({
+  filters,
+  onFilterChange,
+  onClearAll,
+}: {
+  filters: MembersFilterState;
+  onFilterChange: <K extends keyof MembersFilterState>(key: K, value: MembersFilterState[K]) => void;
+  onClearAll: () => void;
+}) {
+  const chips: { label: string; clear: () => void }[] = [];
+
+  if (filters.countryFilter !== "all") {
+    chips.push({
+      label: `Country: ${filters.countryFilter.toUpperCase()}`,
+      clear: () => onFilterChange("countryFilter", "all"),
+    });
+  }
+  if (filters.genderFilter !== "all") {
+    chips.push({
+      label: `Gender: ${filters.genderFilter}`,
+      clear: () => onFilterChange("genderFilter", "all"),
+    });
+  }
+  if (filters.roleFilter !== "all") {
+    chips.push({
+      label: `Role: ${filters.roleFilter}`,
+      clear: () => onFilterChange("roleFilter", "all"),
+    });
+  }
+  if (filters.statusFilter !== "all") {
+    chips.push({
+      label: `${filters.statusFilter === "yes" ? "Active" : "Inactive"}`,
+      clear: () => onFilterChange("statusFilter", "all"),
+    });
+  }
+  if (filters.selectedCities.length > 0) {
+    chips.push({
+      label: `Cities: ${filters.selectedCities.join(", ")}`,
+      clear: () => onFilterChange("selectedCities", []),
+    });
+  }
+  if (filters.ageMin !== null || filters.ageMax !== null) {
+    chips.push({
+      label: `Age: ${filters.ageMin ?? 18}–${filters.ageMax ?? 90}`,
+      clear: () => {
+        onFilterChange("ageMin", null);
+        onFilterChange("ageMax", null);
+      },
+    });
+  }
+  if (filters.faithFilter !== "all") {
+    chips.push({
+      label: `Faith: ${filters.faithFilter.replace(/_/g, " ")}`,
+      clear: () => onFilterChange("faithFilter", "all"),
+    });
+  }
+  if (filters.relationshipFilter !== "all") {
+    chips.push({
+      label: `Relationship: ${filters.relationshipFilter}`,
+      clear: () => onFilterChange("relationshipFilter", "all"),
+    });
+  }
+  if (filters.hasChildrenFilter !== "all") {
+    chips.push({
+      label: `Children: ${filters.hasChildrenFilter}`,
+      clear: () => onFilterChange("hasChildrenFilter", "all"),
+    });
+  }
+  if (filters.lookingForFilter !== "all") {
+    chips.push({
+      label: `Looking for: ${filters.lookingForFilter}`,
+      clear: () => onFilterChange("lookingForFilter", "all"),
+    });
+  }
+  if (filters.educationFilter !== "all") {
+    chips.push({
+      label: `Education: ${filters.educationFilter}`,
+      clear: () => onFilterChange("educationFilter", "all"),
+    });
+  }
+  if (filters.occupationSearch) {
+    chips.push({
+      label: `Profession: ${filters.occupationSearch}`,
+      clear: () => onFilterChange("occupationSearch", ""),
+    });
+  }
+  if (filters.subscribedEmail !== "all") {
+    chips.push({
+      label: `Email: ${filters.subscribedEmail}`,
+      clear: () => onFilterChange("subscribedEmail", "all"),
+    });
+  }
+  if (filters.subscribedPhone !== "all") {
+    chips.push({
+      label: `Phone sub: ${filters.subscribedPhone}`,
+      clear: () => onFilterChange("subscribedPhone", "all"),
+    });
+  }
+  if (filters.subscribedSms !== "all") {
+    chips.push({
+      label: `SMS: ${filters.subscribedSms}`,
+      clear: () => onFilterChange("subscribedSms", "all"),
+    });
+  }
+  if (filters.registeredWithinMonths !== null) {
+    chips.push({
+      label: `Registered: last ${filters.registeredWithinMonths}mo`,
+      clear: () => onFilterChange("registeredWithinMonths", null),
+    });
+  }
+  if (filters.eventWithinMonths !== null) {
+    chips.push({
+      label: `Event: last ${filters.eventWithinMonths}mo`,
+      clear: () => onFilterChange("eventWithinMonths", null),
+    });
+  }
+  if (filters.hasComments !== "all") {
+    chips.push({
+      label: `Comments: ${filters.hasComments}`,
+      clear: () => onFilterChange("hasComments", "all"),
+    });
+  }
+
+  if (chips.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-1.5 items-center">
+      {chips.map((chip) => (
+        <Badge
+          key={chip.label}
+          variant="secondary"
+          className="text-xs gap-1 pr-1 cursor-pointer hover:bg-destructive/10 hover:text-destructive transition-colors"
+          onClick={chip.clear}
+        >
+          {chip.label}
+          <X className="h-3 w-3" />
+        </Badge>
+      ))}
+      <button
+        type="button"
+        onClick={onClearAll}
+        className="text-xs text-muted-foreground hover:text-destructive ml-1 transition-colors"
+      >
+        Clear all
+      </button>
+    </div>
+  );
+}
+
+// ─── Main component ─────────────────────────────────────────
+
+export function MembersTable({
+  members,
+  cities,
+  eventActivity,
+}: {
+  members: MemberRow[];
+  cities: City[];
+  eventActivity: Record<string, string>;
+}) {
+  const { countryCode } = useAdminCountry();
+
+  // Sort state
   const [sortKey, setSortKey] = useState<SortKey | null>("joined");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [genderFilter, setGenderFilter] = useState<string>("all");
-  const [roleFilter, setRoleFilter] = useState<string>("all");
+
+  // View state — always init as "table" to avoid hydration mismatch
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
+
+  useEffect(() => {
+    const saved = localStorage.getItem("members-view") as ViewMode | null;
+    if (saved === "table" || saved === "grid") {
+      setViewMode(saved);
+    }
+  }, []);
+
+  // Filter state
+  const [filters, setFilters] = useState<MembersFilterState>({
+    ...DEFAULT_FILTERS,
+    countryFilter: countryCode,
+  });
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, countryFilter: countryCode }));
+  }, [countryCode]);
+
+  useEffect(() => {
+    localStorage.setItem("members-view", viewMode);
+  }, [viewMode]);
+
+  // Clear city selections when country changes
+  useEffect(() => {
+    if (filters.countryFilter === "all") return;
+    const COUNTRY_CODE_TO_ID: Record<string, number> = { gb: 1, il: 2 };
+    const cid = COUNTRY_CODE_TO_ID[filters.countryFilter];
+    if (!cid) return;
+    const validCityNames = new Set(
+      cities.filter((c) => c.country_id === cid).map((c) => c.name)
+    );
+    const cleaned = filters.selectedCities.filter((name) =>
+      validCityNames.has(name)
+    );
+    if (cleaned.length !== filters.selectedCities.length) {
+      setFilters((prev) => ({ ...prev, selectedCities: cleaned }));
+    }
+  }, [filters.countryFilter, filters.selectedCities, cities]);
+
+  const handleFilterChange = useCallback(
+    <K extends keyof MembersFilterState>(key: K, value: MembersFilterState[K]) => {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    },
+    []
+  );
+
+  const handleClearAll = useCallback(() => {
+    setFilters({ ...DEFAULT_FILTERS, countryFilter: countryCode });
+  }, [countryCode]);
 
   function handleSort(key: SortKey) {
     if (sortKey === key) {
@@ -187,96 +435,241 @@ export function MembersTable({ members }: { members: MemberRow[] }) {
     }
   }
 
+  // ─── Filtering ──────────────────────────────────────────
+
   const filtered = useMemo(() => {
     let list = members;
 
-    if (genderFilter !== "all") {
-      list = list.filter((m) => m.gender === genderFilter);
+    if (filters.countryFilter !== "all") {
+      list = list.filter((m) => m.countries?.code === filters.countryFilter);
     }
-
-    if (roleFilter !== "all") {
-      list = list.filter((m) => m.role === roleFilter);
+    if (filters.genderFilter !== "all") {
+      list = list.filter((m) => m.gender === filters.genderFilter);
     }
-
-    if (search.trim()) {
-      const term = search.toLowerCase().trim();
+    if (filters.roleFilter !== "all") {
+      list = list.filter((m) => m.role === filters.roleFilter);
+    }
+    if (filters.statusFilter !== "all") {
       list = list.filter((m) =>
-        `${m.first_name} ${m.last_name}`.toLowerCase().includes(term) ||
-        m.email.toLowerCase().includes(term) ||
-        (m.phone ?? "").includes(term) ||
-        (m.cities?.name ?? "").toLowerCase().includes(term) ||
-        m.role.toLowerCase().includes(term)
+        filters.statusFilter === "yes" ? m.is_active : !m.is_active
+      );
+    }
+    if (filters.selectedCities.length > 0) {
+      list = list.filter(
+        (m) => m.cities?.name && filters.selectedCities.includes(m.cities.name)
+      );
+    }
+    if (filters.ageMin !== null || filters.ageMax !== null) {
+      list = list.filter((m) => {
+        const age = getAge(m.date_of_birth);
+        if (age === null) return false;
+        if (filters.ageMin !== null && age < filters.ageMin) return false;
+        if (filters.ageMax !== null && age > filters.ageMax) return false;
+        return true;
+      });
+    }
+    if (filters.faithFilter !== "all") {
+      list = list.filter((m) => m.faith === filters.faithFilter);
+    }
+    if (filters.relationshipFilter !== "all") {
+      list = list.filter((m) => m.relationship_status === filters.relationshipFilter);
+    }
+    if (filters.hasChildrenFilter !== "all") {
+      list = list.filter((m) =>
+        filters.hasChildrenFilter === "yes"
+          ? m.has_children === true
+          : m.has_children !== true
+      );
+    }
+    if (filters.lookingForFilter !== "all") {
+      list = list.filter((m) => m.sexual_preference === filters.lookingForFilter);
+    }
+    if (filters.educationFilter !== "all") {
+      const term = filters.educationFilter.toLowerCase();
+      list = list.filter((m) =>
+        (m.education ?? "").toLowerCase().includes(term)
+      );
+    }
+    if (filters.occupationSearch) {
+      const term = filters.occupationSearch.toLowerCase();
+      list = list.filter((m) =>
+        (m.occupation ?? "").toLowerCase().includes(term)
+      );
+    }
+    if (filters.subscribedEmail !== "all") {
+      list = list.filter((m) =>
+        filters.subscribedEmail === "yes" ? m.subscribed_email : !m.subscribed_email
+      );
+    }
+    if (filters.subscribedPhone !== "all") {
+      list = list.filter((m) =>
+        filters.subscribedPhone === "yes" ? m.subscribed_phone : !m.subscribed_phone
+      );
+    }
+    if (filters.subscribedSms !== "all") {
+      list = list.filter((m) =>
+        filters.subscribedSms === "yes" ? m.subscribed_sms : !m.subscribed_sms
+      );
+    }
+    if (filters.registeredWithinMonths !== null && filters.registeredWithinMonths > 0) {
+      const cutoff = new Date();
+      cutoff.setMonth(cutoff.getMonth() - filters.registeredWithinMonths);
+      list = list.filter((m) => new Date(m.created_at) >= cutoff);
+    }
+    if (filters.eventWithinMonths !== null && filters.eventWithinMonths > 0) {
+      const cutoff = new Date();
+      cutoff.setMonth(cutoff.getMonth() - filters.eventWithinMonths);
+      list = list.filter((m) => {
+        const lastEvent = eventActivity[m.id];
+        return lastEvent ? new Date(lastEvent) >= cutoff : false;
+      });
+    }
+    if (filters.hasComments !== "all") {
+      list = list.filter((m) =>
+        filters.hasComments === "yes"
+          ? m.admin_comments && m.admin_comments.trim().length > 0
+          : !m.admin_comments || m.admin_comments.trim().length === 0
+      );
+    }
+    if (filters.search.trim()) {
+      const term = filters.search.toLowerCase().trim();
+      list = list.filter(
+        (m) =>
+          `${m.first_name} ${m.last_name}`.toLowerCase().includes(term) ||
+          m.email.toLowerCase().includes(term) ||
+          (m.phone ?? "").includes(term) ||
+          (m.cities?.name ?? "").toLowerCase().includes(term) ||
+          m.role.toLowerCase().includes(term) ||
+          (m.occupation ?? "").toLowerCase().includes(term) ||
+          (m.education ?? "").toLowerCase().includes(term)
       );
     }
 
     return list;
-  }, [members, search, genderFilter, roleFilter]);
+  }, [members, filters, eventActivity]);
 
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
     return [...filtered].sort((a, b) => compareFn(a, b, sortKey, sortDir));
   }, [filtered, sortKey, sortDir]);
 
+  const activeCount = countActiveFilters(filters);
+
+  // ─── Shared filter panel props ──────────────────────────
+
+  const filterPanelProps = {
+    filters,
+    onFilterChange: handleFilterChange,
+    onClearAll: handleClearAll,
+    cities,
+    resultCount: sorted.length,
+    totalCount: members.length,
+  };
+
+  // ─── Render ─────────────────────────────────────────────
+
   return (
-    <>
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center flex-wrap">
-        <AdminSearchInput
-          value={search}
-          onChange={setSearch}
-          placeholder="Search by name, email, phone..."
-        />
-        <Select value={genderFilter} onValueChange={setGenderFilter}>
-          <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Gender" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="male">Male</SelectItem>
-            <SelectItem value="female">Female</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger className="w-[130px]">
-            <SelectValue placeholder="Role" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="member">Member</SelectItem>
-            <SelectItem value="host">Host</SelectItem>
-            <SelectItem value="host_plus">Host Plus</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-          </SelectContent>
-        </Select>
-        <span className="text-sm text-muted-foreground ml-auto">
-          {sorted.length} of {members.length} members
-        </span>
+    <div className="flex gap-4">
+      {/* ── Main content ── */}
+      <div className="flex-1 min-w-0">
+        {/* Top bar */}
+        <div className="flex items-center gap-2 mb-3 flex-wrap">
+          {/* Mobile filter trigger */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="lg:hidden gap-1.5">
+                <Filter className="h-3.5 w-3.5" />
+                Filters
+                {activeCount > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="h-4 min-w-[16px] px-1 text-[10px] rounded-full"
+                  >
+                    {activeCount}
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] p-0">
+              <MembersFilterPanel {...filterPanelProps} />
+            </SheetContent>
+          </Sheet>
+
+          {/* View mode toggle */}
+          <div className="flex items-center border rounded-md">
+            <Button
+              variant={viewMode === "table" ? "default" : "ghost"}
+              size="sm"
+              className="h-8 px-2.5 rounded-r-none"
+              onClick={() => setViewMode("table")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "default" : "ghost"}
+              size="sm"
+              className="h-8 px-2.5 rounded-l-none"
+              onClick={() => setViewMode("grid")}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <span className="text-sm text-muted-foreground ml-auto whitespace-nowrap tabular-nums">
+            <span className="font-semibold text-foreground">{sorted.length}</span>
+            {" "}of {members.length} members
+          </span>
+        </div>
+
+        {/* Active filter chips */}
+        {activeCount > 0 && (
+          <div className="mb-3">
+            <ActiveFilterChips
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClearAll={handleClearAll}
+            />
+          </div>
+        )}
+
+        {/* Data view */}
+        {viewMode === "table" ? (
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <SortableHeader label="Name" sortKey="name" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortableHeader label="Email" sortKey="email" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+                  <SortableHeader label="Gender" sortKey="gender" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+                  <SortableHeader label="Age" sortKey="age" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+                  <SortableHeader label="City" sortKey="city" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+                  <SortableHeader label="Role" sortKey="role" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
+                  <SortableHeader label="Status" sortKey="status" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
+                  <SortableHeader label="Joined" sortKey="joined" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {sorted.length === 0 ? (
+                  <EmptyTableRow colSpan={8} search={filters.search} entityName="members" />
+                ) : (
+                  sorted.map((m) => (
+                    <MemberRowItem key={m.id} member={m} />
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <MembersCardView members={sorted as any} />
+        )}
       </div>
 
-      <div className="border rounded-lg overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <SortableHeader label="Name" sortKey="name" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Email" sortKey="email" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
-              <SortableHeader label="Gender" sortKey="gender" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
-              <SortableHeader label="Age" sortKey="age" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
-              <SortableHeader label="City" sortKey="city" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
-              <SortableHeader label="Role" sortKey="role" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-              <SortableHeader label="Status" sortKey="status" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
-              <SortableHeader label="Joined" sortKey="joined" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sorted.length === 0 ? (
-              <EmptyTableRow colSpan={8} search={search} entityName="members" />
-            ) : (
-              sorted.map((m) => (
-                <MemberRowItem key={m.id} member={m} />
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </>
+      {/* ── Desktop filter sidebar (right side, always visible on lg+) ── */}
+      <aside className="hidden lg:block w-[280px] xl:w-[300px] shrink-0">
+        <div className="sticky top-4 max-h-[calc(100vh-120px)] flex flex-col border rounded-lg overflow-hidden bg-background">
+          <MembersFilterPanel {...filterPanelProps} />
+        </div>
+      </aside>
+    </div>
   );
 }

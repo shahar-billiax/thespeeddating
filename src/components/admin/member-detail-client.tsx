@@ -374,9 +374,13 @@ export function MemberDetailClient({
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
                     <ReadOnlyField label="First Name" value={profile.first_name} />
+                    <ReadOnlyField label="Middle Name" value={profile.middle_name} />
                     <ReadOnlyField label="Last Name" value={profile.last_name} />
                     <ReadOnlyField label="Email" value={profile.email} icon={Mail} />
-                    <ReadOnlyField label="Phone" value={profile.phone} icon={Phone} />
+                    <ReadOnlyField label="Phone (Legacy)" value={profile.phone} icon={Phone} />
+                    <ReadOnlyField label="Home Phone" value={profile.home_phone} icon={Phone} />
+                    <ReadOnlyField label="Mobile Phone" value={profile.mobile_phone} icon={Phone} />
+                    <ReadOnlyField label="Work Phone" value={profile.work_phone} icon={Phone} />
                     <ReadOnlyField label="Date of Birth" value={profile.date_of_birth ? `${profile.date_of_birth} (Age: ${age})` : null} />
                     <ReadOnlyField label="Gender" value={profile.gender} />
                     <ReadOnlyField label="Occupation" value={profile.occupation} icon={Briefcase} />
@@ -456,10 +460,14 @@ export function MemberDetailClient({
               <Card className="border-amber-200 bg-amber-50/30">
                 <CardHeader><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                       <Label>First Name</Label>
                       <Input name="first_name" defaultValue={profile.first_name} />
+                    </div>
+                    <div>
+                      <Label>Middle Name</Label>
+                      <Input name="middle_name" defaultValue={profile.middle_name ?? ""} />
                     </div>
                     <div>
                       <Label>Last Name</Label>
@@ -472,13 +480,27 @@ export function MemberDetailClient({
                       <Input value={profile.email} disabled className="bg-muted" />
                     </div>
                     <div>
-                      <Label>Phone</Label>
-                      <Input name="phone" defaultValue={profile.phone ?? ""} />
-                    </div>
-                    <div>
                       <Label>DOB</Label>
                       <Input value={profile.date_of_birth} disabled className="bg-muted" />
                       {age && <p className="text-xs text-muted-foreground mt-1">Age: {age}</p>}
+                    </div>
+                    <div>
+                      <Label>Phone (Legacy)</Label>
+                      <Input name="phone" defaultValue={profile.phone ?? ""} />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <Label>Home Phone</Label>
+                      <Input name="home_phone" defaultValue={profile.home_phone ?? ""} />
+                    </div>
+                    <div>
+                      <Label>Mobile Phone</Label>
+                      <Input name="mobile_phone" defaultValue={profile.mobile_phone ?? ""} />
+                    </div>
+                    <div>
+                      <Label>Work Phone</Label>
+                      <Input name="work_phone" defaultValue={profile.work_phone ?? ""} />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

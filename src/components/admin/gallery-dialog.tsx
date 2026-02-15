@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import { useAdminCountry } from "@/lib/admin-country-context";
 
 const CATEGORIES = ["events", "venues", "homepage", "success_stories"];
 
@@ -34,6 +35,7 @@ export function GalleryDialog({
   trigger,
 }: GalleryDialogProps) {
   const [open, setOpen] = useState(false);
+  const { countryId: adminCountryId } = useAdminCountry();
   const isEdit = !!gallery;
 
   async function handleSubmit(_prev: any, formData: FormData) {
@@ -82,7 +84,7 @@ export function GalleryDialog({
             <Select
               name="country_id"
               required
-              defaultValue={gallery ? String(gallery.country_id) : ""}
+              defaultValue={gallery ? String(gallery.country_id) : String(adminCountryId)}
             >
               <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>

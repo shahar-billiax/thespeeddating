@@ -11,18 +11,26 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAdminCountry } from "@/lib/admin-country-context";
+import { AlertTriangle } from "lucide-react";
 
 export function VenueForm({
   venue,
   countries,
   cities,
+  defaultCountryId,
 }: {
   venue?: any;
   countries: { id: number; name: string; code: string }[];
   cities: { id: number; name: string; country_id: number }[];
+  defaultCountryId?: number;
 }) {
   const [countryId, setCountryId] = useState(
-    venue?.country_id ? String(venue.country_id) : ""
+    venue?.country_id
+      ? String(venue.country_id)
+      : defaultCountryId
+        ? String(defaultCountryId)
+        : ""
   );
 
   const filteredCities = countryId
@@ -35,9 +43,26 @@ export function VenueForm({
   }
 
   const [state, formAction, isPending] = useActionState(handleSubmit, null);
+  const { countryId: adminCountryId } = useAdminCountry();
+  const entityCountryId = venue?.country_id;
+  const isCrossCountry = venue && entityCountryId && entityCountryId !== adminCountryId;
+  const entityCountryName = isCrossCountry
+    ? countries.find((c) => c.id === entityCountryId)?.name ?? "another country"
+    : "";
+  const adminCountryName = countries.find((c) => c.id === adminCountryId)?.name ?? "";
 
   return (
     <form action={formAction} className="space-y-6 max-w-3xl">
+      {isCrossCountry && (
+        <div className="flex items-start gap-2 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md text-sm">
+          <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>
+            This venue belongs to <strong>{entityCountryName}</strong>, but you are
+            currently managing <strong>{adminCountryName}</strong>. Changes will
+            affect the {entityCountryName} site.
+          </span>
+        </div>
+      )}
       {state?.error && (
         <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">
           {state.error}

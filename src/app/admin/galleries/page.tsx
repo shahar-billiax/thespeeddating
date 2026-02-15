@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getGalleries, getCountries } from "@/lib/admin/actions";
+import { getGalleries, getCountries, getAdminCountryId } from "@/lib/admin/actions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Image, Library } from "lucide-react";
 import { AdminPagination } from "@/components/admin/pagination";
 import { GalleryDialog } from "@/components/admin/gallery-dialog";
 import { GalleryFilters } from "@/components/admin/gallery-filters";
+
 
 export default async function AdminGalleriesPage({
   searchParams,
@@ -16,12 +17,15 @@ export default async function AdminGalleriesPage({
   const params = await searchParams;
   const adminDb = createAdminClient();
 
+  const adminCountryId = await getAdminCountryId();
+  const effectiveCountry = params.country ?? (adminCountryId ? String(adminCountryId) : undefined);
+
   const [{ galleries, total, page, perPage }, countries, mediaCount] =
     await Promise.all([
       getGalleries({
         page: params.page ? Number(params.page) : 1,
         category: params.category,
-        country: params.country,
+        country: effectiveCountry,
       }),
       getCountries(),
       (adminDb as any)

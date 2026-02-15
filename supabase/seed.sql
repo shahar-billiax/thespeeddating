@@ -689,7 +689,7 @@ insert into translations (string_key, language_code, value) values
   ('contact.send_message', 'en', 'Send us a message'),
   ('contact.send_message_text', 'en', 'Or please fill in your details below and send — we will reply shortly!'),
   ('contact.error', 'en', 'Failed to send message. Please try again.'),
-  ('events.back_to_events', 'en', '← Back to Events'),
+  ('events.back_to_events', 'en', 'Back to Events'),
   ('common.page', 'en', 'Page'),
   ('common.of', 'en', 'of'),
   ('common.previous', 'en', 'Previous'),
@@ -730,7 +730,7 @@ insert into translations (string_key, language_code, value) values
   ('contact.send_message', 'he', 'שלחו לנו הודעה'),
   ('contact.send_message_text', 'he', 'או מלאו את הפרטים שלכם למטה ושלחו — נחזור אליכם בקרוב!'),
   ('contact.error', 'he', 'שליחת ההודעה נכשלה. אנא נסו שוב.'),
-  ('events.back_to_events', 'he', '← חזרה לאירועים'),
+  ('events.back_to_events', 'he', 'חזרה לאירועים'),
   ('common.page', 'he', 'עמוד'),
   ('common.of', 'he', 'מתוך'),
   ('common.previous', 'he', 'הקודם'),
@@ -750,7 +750,7 @@ insert into pages (page_key, country_id, language_code, title, content_html, met
 <p>The evening isn''t just about meeting your dream partner; it''s also about meeting new people and making new friends. You never know who knows who!</p>
 <p>Sign up now for the next event. All our events are Jewish.</p>
 <p><strong>Please note:</strong> We accept advance bookings only to ensure the evening''s success.</p>
-<p>** wish to be considered as a virtual host? were hiring!</p>',
+<p>** Wish to be considered as a virtual host? We''re hiring!</p>',
     'Jewish Speed Dating UK & Israel | The Speed Dating',
     'Professional evenings for professional Jewish people. Jewish speed dating events in London, Manchester, Tel Aviv since 2003. Over 120 weddings worldwide.',
     true
@@ -791,14 +791,14 @@ insert into pages (page_key, country_id, language_code, title, content_html, met
 <li>Try and make it entertaining</li>
 </ul>
 <p>You can ask any questions you like, but remember that first impressions count and being original is a plus.</p>
-<p>You can be creative and ask different questions to ''What do you do for work?'' or ''Where do you live?'' We suggest you try more surprsing set of questions, like ''Where would you go for a romantic holiday?'' or ''What do you look at first when meeting someone for the first time?''</p>
+<p>You can be creative and ask different questions to ''What do you do for work?'' or ''Where do you live?'' We suggest you try a more surprising set of questions, like ''Where would you go for a romantic holiday?'' or ''What do you look at first when meeting someone for the first time?''</p>
 <p>Enjoy dating for what it is, dating. It is meeting people and socializing and spending time in the company of stimulating individuals who may or may not play a bigger part in your life down the road. The fact is, most people have something interesting to offer. While you may not be out on the dating scene looking for new friends, you may well find one or two fabulous people along the way.</p>
 
 <h2>Tips for Men</h2>
 <ol>
 <li>Smile, Women are smile addicts. A few well-placed smiles, a happy attitude, some (non-erotic!) jokes here and there and you can win a woman''s heart faster than a handsome tall guy, who is grumpy.</li>
 <li>Stand straight and sit up. It shows that you are strong, well trained and not ill. And it will make you taller.</li>
-<li>Use her name thruout the talks with her. This alone creates a more intimate atmosphere.</li>
+<li>Use her name throughout the talks with her. This alone creates a more intimate atmosphere.</li>
 <li>Even if you feel mentally close to the other person, keep your hands to yourself, its only a first mini date!</li>
 <li>Use deodorants. Under normal circumstances most women hate sweat odor. Hate it. Its not even about using perfumes. Perfumes can be used additionally. The main idea is non-smelling, which is more important than good-smelling.</li>
 <li>The reason of talking to a woman is to establish a relaxed atmosphere and to be friendly. Thus don''t get involved into highly arguable subjects such as ''Why death penalties for minors should be allowed'' or ''Why Greenpeace is doing more harm than good''</li>
@@ -990,7 +990,7 @@ insert into pages (page_key, country_id, language_code, title, content_html, met
     'en',
     'Franchise & Jobs',
     '<h2>Jobs</h2>
-<h3>April 2020 - were hiring!</h3>
+<h3>April 2020 - We''re hiring!</h3>
 <p>If you know your way with apps and consider yourself Tech, also sociable and can host under pressure - Please contact us</p>
 <p>We hire people from time to time to join our team.</p>
 <p>Please check back with us for an update or simply email us with your resume. We would be looking for the following:</p>
@@ -1070,7 +1070,7 @@ insert into pages (page_key, country_id, language_code, title, content_html, met
 <p>Information and content contained herein should not be distributed or copied in whole or in part in any written format without the written permission of thespeeddating.us / thespeeddating.co.uk / thespeeddating.co.il / thespeedating.com / thejewishspeedating.co.uk.</p>
 
 <h2>VIP Membership</h2>
-<p>You may cancel your registration or subscription to the Service at any time during the term of such registration or subscription or any renewal period by accessing the "Personal Settings" page under the and clicking on "Delete Account" button, and providing the information requested. Alternatively, you may cancel your registration or subscription by sending a notice of cancellation to: cancel@zivoogim.com, such notice being effective upon our receipt. In each case, your subscription will terminate at the end of the subscription term for which you have paid, and you will not receive any refund for any unused days of such subscription term.</p>
+<p>You may cancel your registration or subscription to the Service at any time during the term of such registration or subscription or any renewal period by accessing the "Personal Settings" page under the and clicking on "Delete Account" button, and providing the information requested. Alternatively, you may cancel your registration or subscription by sending a notice of cancellation to: Cancel@TheSpeedDating.co.uk, such notice being effective upon our receipt. In each case, your subscription will terminate at the end of the subscription term for which you have paid, and you will not receive any refund for any unused days of such subscription term.</p>
 
 <h2>Privacy Policy</h2>
 <p>thespeeddating.us / thespeeddating.co.uk / thespeeddating.co.il / thespeedating.com / thejewishspeedating.co.uk value our customer''s privacy and sees it as a matter of an utmost importance. Your personal details and any information we have from your registration will be used to: Add your details as a customer of thespeeddating.co.uk / thespeeddating.co.il / thespeedating.com / thejewishspeedating.co.uk e mail list and/or register you to one or more of our events. This information will be used to let you know whether you have got any matches resulting from the event you have participated in and only when you yourself have been expressing your interest in meeting the other person again and obtaining his or her details.</p>

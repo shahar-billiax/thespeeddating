@@ -217,6 +217,53 @@ export type Database = {
           },
         ]
       }
+      event_match_questions: {
+        Row: {
+          created_at: string
+          event_id: number | null
+          id: number
+          is_active: boolean
+          is_required: boolean
+          options: Json | null
+          question_text: string
+          question_type: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id?: number | null
+          id?: number
+          is_active?: boolean
+          is_required?: boolean
+          options?: Json | null
+          question_text: string
+          question_type: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: number | null
+          id?: number
+          is_active?: boolean
+          is_required?: boolean
+          options?: Json | null
+          question_text?: string
+          question_type?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_match_questions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_registrations: {
         Row: {
           admin_notes: string | null
@@ -322,6 +369,8 @@ export type Database = {
           limit_female: number | null
           limit_male: number | null
           match_results_released: boolean
+          match_submission_deadline: string | null
+          match_submission_locked: boolean
           match_submission_open: boolean
           price: number | null
           price_female: number | null
@@ -358,6 +407,8 @@ export type Database = {
           limit_female?: number | null
           limit_male?: number | null
           match_results_released?: boolean
+          match_submission_deadline?: string | null
+          match_submission_locked?: boolean
           match_submission_open?: boolean
           price?: number | null
           price_female?: number | null
@@ -394,6 +445,8 @@ export type Database = {
           limit_female?: number | null
           limit_male?: number | null
           match_results_released?: boolean
+          match_submission_deadline?: string | null
+          match_submission_locked?: boolean
           match_submission_open?: boolean
           price?: number | null
           price_female?: number | null
@@ -554,12 +607,52 @@ export type Database = {
           },
         ]
       }
+      match_score_answers: {
+        Row: {
+          answer: string | null
+          created_at: string
+          id: number
+          match_score_id: number
+          question_id: number
+        }
+        Insert: {
+          answer?: string | null
+          created_at?: string
+          id?: number
+          match_score_id: number
+          question_id: number
+        }
+        Update: {
+          answer?: string | null
+          created_at?: string
+          id?: number
+          match_score_id?: number
+          question_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_score_answers_match_score_id_fkey"
+            columns: ["match_score_id"]
+            isOneToOne: false
+            referencedRelation: "match_scores"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_score_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "event_match_questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_scores: {
         Row: {
           choice: string
           event_id: number
           id: number
           is_active: boolean
+          is_draft: boolean
           scored_id: string
           scorer_id: string
           share_email: boolean
@@ -568,12 +661,15 @@ export type Database = {
           share_phone: boolean
           share_whatsapp: boolean
           submitted_at: string
+          submitted_by_user_at: string | null
+          updated_at: string
         }
         Insert: {
           choice: string
           event_id: number
           id?: number
           is_active?: boolean
+          is_draft?: boolean
           scored_id: string
           scorer_id: string
           share_email?: boolean
@@ -582,12 +678,15 @@ export type Database = {
           share_phone?: boolean
           share_whatsapp?: boolean
           submitted_at?: string
+          submitted_by_user_at?: string | null
+          updated_at?: string
         }
         Update: {
           choice?: string
           event_id?: number
           id?: number
           is_active?: boolean
+          is_draft?: boolean
           scored_id?: string
           scorer_id?: string
           share_email?: boolean
@@ -596,6 +695,8 @@ export type Database = {
           share_phone?: boolean
           share_whatsapp?: boolean
           submitted_at?: string
+          submitted_by_user_at?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -703,6 +804,39 @@ export type Database = {
           },
         ]
       }
+      media_files: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          file_size: number | null
+          filename: string
+          id: number
+          mime_type: string | null
+          storage_path: string
+          updated_at: string
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          file_size?: number | null
+          filename: string
+          id?: number
+          mime_type?: string | null
+          storage_path: string
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          file_size?: number | null
+          filename?: string
+          id?: number
+          mime_type?: string | null
+          storage_path?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pages: {
         Row: {
           content_html: string
@@ -776,11 +910,14 @@ export type Database = {
           gender: string
           has_children: boolean | null
           height_cm: number | null
+          home_phone: string | null
           id: string
           instagram: string | null
           interests: string | null
           is_active: boolean
           last_name: string
+          middle_name: string | null
+          mobile_phone: string | null
           occupation: string | null
           phone: string | null
           privacy_preferences: Json | null
@@ -792,6 +929,7 @@ export type Database = {
           subscribed_sms: boolean
           updated_at: string
           whatsapp: string | null
+          work_phone: string | null
         }
         Insert: {
           admin_comments?: string | null
@@ -809,11 +947,14 @@ export type Database = {
           gender: string
           has_children?: boolean | null
           height_cm?: number | null
+          home_phone?: string | null
           id: string
           instagram?: string | null
           interests?: string | null
           is_active?: boolean
           last_name: string
+          middle_name?: string | null
+          mobile_phone?: string | null
           occupation?: string | null
           phone?: string | null
           privacy_preferences?: Json | null
@@ -825,6 +966,7 @@ export type Database = {
           subscribed_sms?: boolean
           updated_at?: string
           whatsapp?: string | null
+          work_phone?: string | null
         }
         Update: {
           admin_comments?: string | null
@@ -842,11 +984,14 @@ export type Database = {
           gender?: string
           has_children?: boolean | null
           height_cm?: number | null
+          home_phone?: string | null
           id?: string
           instagram?: string | null
           interests?: string | null
           is_active?: boolean
           last_name?: string
+          middle_name?: string | null
+          mobile_phone?: string | null
           occupation?: string | null
           phone?: string | null
           privacy_preferences?: Json | null
@@ -858,6 +1003,7 @@ export type Database = {
           subscribed_sms?: boolean
           updated_at?: string
           whatsapp?: string | null
+          work_phone?: string | null
         }
         Relationships: [
           {

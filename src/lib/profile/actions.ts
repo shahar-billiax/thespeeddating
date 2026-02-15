@@ -6,6 +6,7 @@ import { z } from "zod";
 
 const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
+  middle_name: z.string().optional(),
   last_name: z.string().min(1, "Last name is required"),
   bio: z.string().optional(),
   occupation: z.string().optional(),
@@ -26,6 +27,9 @@ const profileSchema = z.object({
   country_id: z.coerce.number().positive().optional().nullable(),
   city_id: z.coerce.number().positive().optional().nullable(),
   phone: z.string().optional(),
+  home_phone: z.string().optional(),
+  mobile_phone: z.string().optional(),
+  work_phone: z.string().optional(),
   whatsapp: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
@@ -53,6 +57,7 @@ export async function updateProfile(formData: FormData) {
 
   const rawData = {
     first_name: formData.get("first_name"),
+    middle_name: formData.get("middle_name") || null,
     last_name: formData.get("last_name"),
     bio: formData.get("bio") || null,
     occupation: formData.get("occupation") || null,
@@ -64,6 +69,9 @@ export async function updateProfile(formData: FormData) {
     country_id: formData.get("country_id") ? Number(formData.get("country_id")) : null,
     city_id: formData.get("city_id") ? Number(formData.get("city_id")) : null,
     phone: formData.get("phone") || null,
+    home_phone: formData.get("home_phone") || null,
+    mobile_phone: formData.get("mobile_phone") || null,
+    work_phone: formData.get("work_phone") || null,
     whatsapp: formData.get("whatsapp") || null,
     instagram: formData.get("instagram") || null,
     facebook: formData.get("facebook") || null,

@@ -9,13 +9,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
+import { AdminCountrySelector } from "@/components/admin/admin-country-selector";
 
-export function AdminTopbar({ user }: { user: { email: string } }) {
+interface Country {
+  id: number;
+  name: string;
+  code: string;
+  currency: string;
+}
+
+export function AdminTopbar({
+  user,
+  countries,
+}: {
+  user: { email: string };
+  countries: Country[];
+}) {
   const initials = user.email.slice(0, 2).toUpperCase();
 
   return (
     <header className="h-14 border-b bg-background flex items-center justify-between px-4 md:px-6">
-      <div className="md:hidden w-10" />
+      <div className="flex items-center gap-3">
+        <div className="md:hidden w-10" />
+        <AdminCountrySelector countries={countries} />
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="gap-2">

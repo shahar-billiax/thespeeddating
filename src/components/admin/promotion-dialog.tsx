@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import { useAdminCountry } from "@/lib/admin-country-context";
 
 export function PromotionDialog({
   countries,
@@ -20,6 +21,7 @@ export function PromotionDialog({
   countries: { id: number; name: string; code: string }[];
 }) {
   const [open, setOpen] = useState(false);
+  const { countryId: adminCountryId } = useAdminCountry();
 
   async function handleSubmit(_prev: any, formData: FormData) {
     const result = await savePromotion(formData);
@@ -51,7 +53,7 @@ export function PromotionDialog({
           </div>
           <div>
             <Label>Country</Label>
-            <Select name="country_id" required>
+            <Select name="country_id" required defaultValue={String(adminCountryId)}>
               <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>
                 {countries.map((c) => (

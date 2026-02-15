@@ -3,7 +3,18 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+
+// ─── Admin country helper ───────────────────────────────────
+export async function getAdminCountryId(): Promise<number | null> {
+  const cookieStore = await cookies();
+  const val = cookieStore.get("admin_country")?.value;
+  if (!val) return null;
+  const [idStr] = val.split(":");
+  const id = Number(idStr);
+  return isNaN(id) ? null : id;
+}
 
 // ─── Auth helper ─────────────────────────────────────────────
 async function requireAdmin() {
@@ -24,7 +35,7 @@ async function requireAdmin() {
 }
 
 // ─── Dashboard stats ─────────────────────────────────────────
-export async function getDashboardStats() {
+export async function getDashboardStats(countryId?: number | null) {
   const { supabase } = await requireAdmin();
 
   const now = new Date().toISOString();
@@ -35,27 +46,34 @@ export async function getDashboardStats() {
     Date.now() - 7 * 24 * 60 * 60 * 1000
   ).toISOString();
 
+  let membersQuery = supabase
+    .from("profiles")
+    .select("id, created_at", { count: "exact", head: false })
+    .eq("is_active", true);
+  if (countryId) membersQuery = membersQuery.eq("country_id", countryId);
+
+  let eventsQuery = supabase
+    .from("events")
+    .select("id", { count: "exact", head: true })
+    .eq("is_published", true)
+    .eq("is_cancelled", false)
+    .gte("event_date", now.split("T")[0]);
+  if (countryId) eventsQuery = eventsQuery.eq("country_id", countryId);
+
+  let regsQuery = supabase
+    .from("event_registrations")
+    .select("id, events!inner(country_id)", { count: "exact", head: true })
+    .gte("registered_at", sevenDaysAgo);
+  if (countryId) regsQuery = regsQuery.eq("events.country_id", countryId);
+
+  let vipQuery = supabase
+    .from("vip_subscriptions")
+    .select("id, vip_plans!inner(country_id)", { count: "exact", head: true })
+    .eq("status", "active");
+  if (countryId) vipQuery = vipQuery.eq("vip_plans.country_id", countryId);
+
   const [members, upcomingEvents, recentRegistrations, activeVips] =
-    await Promise.all([
-      supabase
-        .from("profiles")
-        .select("id, created_at", { count: "exact", head: false })
-        .eq("is_active", true),
-      supabase
-        .from("events")
-        .select("id", { count: "exact", head: true })
-        .eq("is_published", true)
-        .eq("is_cancelled", false)
-        .gte("event_date", now.split("T")[0]),
-      supabase
-        .from("event_registrations")
-        .select("id", { count: "exact", head: true })
-        .gte("registered_at", sevenDaysAgo),
-      supabase
-        .from("vip_subscriptions")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "active"),
-    ]);
+    await Promise.all([membersQuery, eventsQuery, regsQuery, vipQuery]);
 
   // Count new members in last 30 days
   const newMembers = members.data?.filter(
@@ -72,11 +90,11 @@ export async function getDashboardStats() {
   };
 }
 
-export async function getUpcomingEventsWithGender() {
+export async function getUpcomingEventsWithGender(countryId?: number | null) {
   const { supabase } = await requireAdmin();
   const now = new Date().toISOString().split("T")[0];
 
-  const { data: events } = await supabase
+  let query = supabase
     .from("events")
     .select(
       `id, event_date, start_time, event_type, limit_male, limit_female,
@@ -87,6 +105,10 @@ export async function getUpcomingEventsWithGender() {
     .gte("event_date", now)
     .order("event_date", { ascending: true })
     .limit(10);
+
+  if (countryId) query = query.eq("country_id", countryId);
+
+  const { data: events } = await query;
 
   if (!events) return [];
 
@@ -567,7 +589,8 @@ export async function updateMember(id: string, formData: FormData) {
 
   const updates: Record<string, any> = {};
   const fields = [
-    "first_name", "last_name", "phone", "bio", "occupation", "education",
+    "first_name", "middle_name", "last_name", "phone", "home_phone", "mobile_phone", "work_phone",
+    "bio", "occupation", "education",
     "relationship_status", "faith", "admin_comments", "role",
   ];
   for (const f of fields) {
@@ -681,13 +704,16 @@ export async function deleteBlogPost(id: number) {
 }
 
 // ─── Promotions CRUD ─────────────────────────────────────────
-export async function getPromotions(params: { page?: number }) {
+export async function getPromotions(params: {
+  page?: number;
+  country?: string;
+}) {
   const { supabase } = await requireAdmin();
   const page = params.page ?? 1;
   const perPage = 20;
   const offset = (page - 1) * perPage;
 
-  const { data, count, error } = await supabase
+  let query = supabase
     .from("promotion_codes")
     .select(`*, countries(name, code), events(event_date, cities(name))`, {
       count: "exact",
@@ -695,6 +721,9 @@ export async function getPromotions(params: { page?: number }) {
     .order("created_at", { ascending: false })
     .range(offset, offset + perPage - 1);
 
+  if (params.country) query = query.eq("country_id", Number(params.country));
+
+  const { data, count, error } = await query;
   if (error) throw new Error(error.message);
   return { promotions: data ?? [], total: count ?? 0, page, perPage };
 }
@@ -857,6 +886,7 @@ export async function deleteTranslation(id: number) {
 export async function getMatchmakingProfiles(params: {
   page?: number;
   status?: string;
+  country?: string;
 }) {
   const { supabase } = await requireAdmin();
   const page = params.page ?? 1;
@@ -865,13 +895,16 @@ export async function getMatchmakingProfiles(params: {
 
   let query = supabase
     .from("matchmaking_profiles")
-    .select(`*, profiles(first_name, last_name, email, gender)`, {
-      count: "exact",
-    })
+    .select(
+      `*, profiles!inner(first_name, last_name, email, gender, country_id)`,
+      { count: "exact" }
+    )
     .order("created_at", { ascending: false })
     .range(offset, offset + perPage - 1);
 
   if (params.status) query = query.eq("status", params.status);
+  if (params.country)
+    query = query.eq("profiles.country_id", Number(params.country));
 
   const { data, count, error } = await query;
   if (error) throw new Error(error.message);
@@ -1603,13 +1636,40 @@ export async function getAllMembers() {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select(`id, first_name, last_name, email, phone, gender, date_of_birth,
-             role, is_active, created_at,
+    .select(`id, first_name, middle_name, last_name, email, phone, home_phone, mobile_phone, work_phone,
+             gender, date_of_birth,
+             role, is_active, created_at, avatar_url,
+             faith, relationship_status, has_children,
+             subscribed_email, subscribed_phone, subscribed_sms,
+             occupation, education, sexual_preference, admin_comments,
+             city_id,
              cities(name), countries(name, code)`)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
   return data ?? [];
+}
+
+// ─── Member event activity (latest registration per user) ───
+
+export async function getMemberEventActivity() {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("event_registrations")
+    .select("user_id, registered_at")
+    .order("registered_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+
+  // Build map: user_id -> latest registration date
+  const activity: Record<string, string> = {};
+  for (const row of data ?? []) {
+    if (!activity[row.user_id]) {
+      activity[row.user_id] = row.registered_at;
+    }
+  }
+  return activity;
 }
 
 // ─── Enhanced Member detail ─────────────────────────────────
@@ -1770,5 +1830,186 @@ export async function saveVipSettings(formData: FormData) {
   if (error) return { error: error.message };
   revalidatePath("/admin/vip");
   revalidatePath("/vip");
+  return { success: true };
+}
+
+// ─── Match Management ────────────────────────────────────────
+
+export async function getEventMatchStats(eventId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { count: totalParticipants } = await supabase
+    .from("event_registrations")
+    .select("id", { count: "exact", head: true })
+    .eq("event_id", eventId)
+    .eq("attended", true)
+    .in("status", ["confirmed", "attended"]);
+
+  const { data: allScores } = await supabase
+    .from("match_scores")
+    .select("scorer_id, is_draft")
+    .eq("event_id", eventId);
+
+  const submitters = new Set<string>();
+  const drafters = new Set<string>();
+  for (const s of allScores ?? []) {
+    if (s.is_draft) drafters.add(s.scorer_id);
+    else submitters.add(s.scorer_id);
+  }
+
+  const { data: results } = await supabase
+    .from("match_results")
+    .select("result_type")
+    .eq("event_id", eventId);
+
+  return {
+    totalParticipants: totalParticipants ?? 0,
+    submitted: submitters.size,
+    drafts: drafters.size - submitters.size,
+    pending: Math.max(0, (totalParticipants ?? 0) - submitters.size - Math.max(0, drafters.size - submitters.size)),
+    mutualDates: results?.filter(r => r.result_type === "mutual_date").length ?? 0,
+    mutualFriends: results?.filter(r => r.result_type === "mutual_friend").length ?? 0,
+  };
+}
+
+export async function getEventMatchSubmissions(eventId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { data } = await supabase
+    .from("match_scores")
+    .select(`
+      id, scorer_id, scored_id, choice, is_draft, submitted_at,
+      share_email, share_phone, share_whatsapp, share_instagram, share_facebook,
+      scorer:profiles!match_scores_scorer_id_fkey(first_name, last_name),
+      scored:profiles!match_scores_scored_id_fkey(first_name, last_name)
+    `)
+    .eq("event_id", eventId)
+    .order("scorer_id")
+    .order("submitted_at", { ascending: false });
+
+  return data ?? [];
+}
+
+export async function getEventMutualMatches(eventId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { data } = await supabase
+    .from("match_results")
+    .select(`
+      id, result_type, user_a_id, user_b_id, user_a_shares, user_b_shares,
+      user_a:profiles!match_results_user_a_id_fkey(first_name, last_name),
+      user_b:profiles!match_results_user_b_id_fkey(first_name, last_name)
+    `)
+    .eq("event_id", eventId)
+    .neq("result_type", "no_match");
+
+  return data ?? [];
+}
+
+export async function reopenUserSubmission(eventId: number, userId: string) {
+  const adminClient = createAdminClient();
+
+  const { error } = await adminClient
+    .from("match_scores")
+    .update({
+      is_draft: true,
+      submitted_by_user_at: undefined,
+    } as any)
+    .eq("event_id", eventId)
+    .eq("scorer_id", userId);
+
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/events/${eventId}`);
+  return { success: true };
+}
+
+export async function updateMatchDeadline(eventId: number, deadline: string | null) {
+  const { supabase } = await requireAdmin();
+
+  const { error } = await supabase
+    .from("events")
+    .update({ match_submission_deadline: deadline })
+    .eq("id", eventId);
+
+  if (error) return { error: error.message };
+  revalidatePath(`/admin/events/${eventId}`);
+  return { success: true };
+}
+
+// ─── Match Questions Management ──────────────────────────────
+
+export async function getAdminMatchQuestions(eventId?: number) {
+  const { supabase } = await requireAdmin();
+
+  let query = supabase
+    .from("event_match_questions")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (eventId !== undefined) {
+    query = query.or(`event_id.is.null,event_id.eq.${eventId}`);
+  }
+
+  const { data } = await query;
+  return data ?? [];
+}
+
+export async function saveMatchQuestion(questionData: {
+  id?: number;
+  event_id: number | null;
+  question_text: string;
+  question_type: string;
+  options: string[] | null;
+  is_required: boolean;
+  sort_order: number;
+  is_active: boolean;
+}) {
+  const { supabase } = await requireAdmin();
+
+  if (questionData.id) {
+    const { error } = await supabase
+      .from("event_match_questions")
+      .update({
+        question_text: questionData.question_text,
+        question_type: questionData.question_type,
+        options: questionData.options,
+        is_required: questionData.is_required,
+        sort_order: questionData.sort_order,
+        is_active: questionData.is_active,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", questionData.id);
+
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase
+      .from("event_match_questions")
+      .insert({
+        event_id: questionData.event_id,
+        question_text: questionData.question_text,
+        question_type: questionData.question_type,
+        options: questionData.options,
+        is_required: questionData.is_required,
+        sort_order: questionData.sort_order,
+        is_active: questionData.is_active,
+      });
+
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/admin/events");
+  return { success: true };
+}
+
+export async function deleteMatchQuestion(id: number) {
+  const { supabase } = await requireAdmin();
+
+  const { error } = await supabase
+    .from("event_match_questions")
+    .delete()
+    .eq("id", id);
+
+  if (error) return { error: error.message };
+  revalidatePath("/admin/events");
   return { success: true };
 }

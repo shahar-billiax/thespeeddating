@@ -19,6 +19,7 @@ import {
 import { quickUpdateEvent, updateParticipant, exportParticipantsCsv } from "@/lib/admin/actions";
 import { AdminSearchInput } from "./admin-data-table";
 import { CoverImageUpload } from "./cover-image-upload";
+import { MatchesTabContent } from "./matches-tab-content";
 
 // ─── Inline editable field ──────────────────────────────────
 
@@ -372,6 +373,7 @@ export function EventDetailClient({
             Participants ({participants.length})
           </TabsTrigger>
           <TabsTrigger value="details">Event Details</TabsTrigger>
+          <TabsTrigger value="matches">Matches</TabsTrigger>
           <TabsTrigger value="settings">Quick Settings</TabsTrigger>
         </TabsList>
 
@@ -530,6 +532,11 @@ export function EventDetailClient({
           </div>
         </TabsContent>
 
+        {/* Matches tab */}
+        <TabsContent value="matches" className="mt-4">
+          <MatchesTabContent eventId={eventId} />
+        </TabsContent>
+
         {/* Quick Settings tab */}
         <TabsContent value="settings" className="mt-4">
           <Card>
@@ -540,6 +547,19 @@ export function EventDetailClient({
               <ToggleField label="Match Results Released" checked={event.match_results_released} fieldName="match_results_released" eventId={eventId} />
               <ToggleField label="Gendered Pricing" checked={event.enable_gendered_price} fieldName="enable_gendered_price" eventId={eventId} />
               <ToggleField label="Gendered Age Ranges" checked={event.enable_gendered_age} fieldName="enable_gendered_age" eventId={eventId} />
+              <ToggleField label="Lock Match Submissions" checked={event.match_submission_locked} fieldName="match_submission_locked" eventId={eventId} />
+              <div className="space-y-1.5 pt-2 border-t">
+                <Label className="text-sm">Match Submission Deadline</Label>
+                <Input
+                  type="datetime-local"
+                  defaultValue={event.match_submission_deadline?.slice(0, 16) ?? ""}
+                  className="h-8 text-sm max-w-xs"
+                  onBlur={(e) => {
+                    const val = e.target.value ? new Date(e.target.value).toISOString() : null;
+                    quickUpdateEvent(eventId, { match_submission_deadline: val });
+                  }}
+                />
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

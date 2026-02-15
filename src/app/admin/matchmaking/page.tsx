@@ -1,4 +1,4 @@
-import { getMatchmakingProfiles, getMatchmakingPackages, getCountries } from "@/lib/admin/actions";
+import { getMatchmakingProfiles, getMatchmakingPackages, getCountries, getAdminCountryId } from "@/lib/admin/actions";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -7,18 +7,21 @@ import { AdminPagination } from "@/components/admin/pagination";
 import { MatchmakingReview } from "@/components/admin/matchmaking-review";
 import { MatchmakingPackagesPanel } from "@/components/admin/matchmaking-packages-panel";
 
+
 export default async function AdminMatchmakingPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
+  const adminCountryId = await getAdminCountryId();
   const [{ profiles, total, page, perPage }, packages, countries] = await Promise.all([
     getMatchmakingProfiles({
       page: params.page ? Number(params.page) : 1,
       status: params.status,
+      country: adminCountryId ? String(adminCountryId) : undefined,
     }),
-    getMatchmakingPackages(),
+    getMatchmakingPackages(adminCountryId ?? undefined),
     getCountries(),
   ]);
 

@@ -54,38 +54,34 @@ export function EventFilters({ cities }: EventFiltersProps) {
   const hasFilters = searchParams.has("city") || searchParams.has("type") || searchParams.has("from") || searchParams.has("to");
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <div className="flex-1 min-w-[180px] max-w-[280px]">
-        <Select value={currentCity} onValueChange={(value) => updateFilter("city", value)}>
-          <SelectTrigger className="h-10 bg-white shadow-sm border-border/60 hover:border-primary/30 hover:shadow transition-all rounded-lg text-sm font-medium">
-            <SelectValue placeholder={t("events.filter_city")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("events.all_cities")}</SelectItem>
-            {cities.map((city) => (
-              <SelectItem key={String(city.id)} value={String(city.id)}>
-                {city.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <Select value={currentCity} onValueChange={(value) => updateFilter("city", value)}>
+        <SelectTrigger className="h-10 w-auto bg-white shadow-sm border-border/60 hover:border-primary/30 hover:shadow transition-all rounded-lg text-sm font-medium">
+          <SelectValue placeholder={t("events.filter_city")} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t("events.all_cities")}</SelectItem>
+          {cities.map((city) => (
+            <SelectItem key={String(city.id)} value={String(city.id)}>
+              {city.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <div className="flex-1 min-w-[180px] max-w-[280px]">
-        <Select value={currentType} onValueChange={(value) => updateFilter("type", value)}>
-          <SelectTrigger className="h-10 bg-white shadow-sm border-border/60 hover:border-primary/30 hover:shadow transition-all rounded-lg text-sm font-medium">
-            <SelectValue placeholder={t("events.filter_type")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("events.all_types")}</SelectItem>
-            {eventTypes.map((type) => (
-              <SelectItem key={type} value={type}>
-                {t(`events.type.${type}`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Select value={currentType} onValueChange={(value) => updateFilter("type", value)}>
+        <SelectTrigger className="h-10 w-auto bg-white shadow-sm border-border/60 hover:border-primary/30 hover:shadow transition-all rounded-lg text-sm font-medium">
+          <SelectValue placeholder={t("events.filter_type")} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t("events.all_types")}</SelectItem>
+          {eventTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {t(`events.type.${type}`)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {hasFilters && (
         <Button variant="ghost" size="sm" onClick={clearFilters} className="text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors">

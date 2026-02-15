@@ -1,4 +1,4 @@
-import { getPromotions, getCountries } from "@/lib/admin/actions";
+import { getPromotions, getCountries, getAdminCountryId } from "@/lib/admin/actions";
 import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -6,14 +6,19 @@ import {
 import { AdminPagination } from "@/components/admin/pagination";
 import { PromotionDialog } from "@/components/admin/promotion-dialog";
 
+
 export default async function AdminPromotionsPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
+  const adminCountryId = await getAdminCountryId();
   const [{ promotions, total, page, perPage }, countries] = await Promise.all([
-    getPromotions({ page: params.page ? Number(params.page) : 1 }),
+    getPromotions({
+      page: params.page ? Number(params.page) : 1,
+      country: adminCountryId ? String(adminCountryId) : undefined,
+    }),
     getCountries(),
   ]);
 

@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAdminCountry } from "@/lib/admin-country-context";
 
 const CATEGORIES = ["events", "venues", "homepage", "success_stories"];
 
@@ -19,10 +20,11 @@ export function GalleryFilters({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { countryId: adminCountryId } = useAdminCountry();
 
   const current = {
     category: searchParams.get("category") ?? undefined,
-    country: searchParams.get("country") ?? undefined,
+    country: searchParams.get("country") ?? (adminCountryId ? String(adminCountryId) : undefined),
   };
 
   function setFilter(key: string, value: string | undefined) {

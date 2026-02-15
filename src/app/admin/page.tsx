@@ -3,15 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import {
   getDashboardStats,
   getUpcomingEventsWithGender,
+  getAdminCountryId,
 } from "@/lib/admin/actions";
 import { getTranslations } from "next-intl/server";
 import { Users, Calendar, UserPlus, Crown } from "lucide-react";
 import Link from "next/link";
 
+
 export default async function AdminDashboardPage() {
+  const adminCountryId = await getAdminCountryId();
   const [stats, upcomingEvents, t] = await Promise.all([
-    getDashboardStats(),
-    getUpcomingEventsWithGender(),
+    getDashboardStats(adminCountryId),
+    getUpcomingEventsWithGender(adminCountryId),
     getTranslations(),
   ]);
 

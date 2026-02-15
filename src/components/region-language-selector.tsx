@@ -14,61 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Check } from "lucide-react";
-
-/* ------------------------------------------------------------------ */
-/*  SVG flag components — 4:3 aspect ratio (viewBox 60×45)            */
-/* ------------------------------------------------------------------ */
-
-function FlagGB({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 60 45"
-      className={className}
-      role="img"
-      aria-label="UK flag"
-    >
-      <clipPath id="gb-clip">
-        <rect width="60" height="45" rx="3" />
-      </clipPath>
-      <g clipPath="url(#gb-clip)">
-        <rect width="60" height="45" fill="#012169" />
-        <path d="M0,0 L60,45 M60,0 L0,45" stroke="#fff" strokeWidth="9" />
-        <path d="M0,0 L60,45 M60,0 L0,45" stroke="#C8102E" strokeWidth="3" />
-        <path d="M30,0 V45 M0,22.5 H60" stroke="#fff" strokeWidth="15" />
-        <path d="M30,0 V45 M0,22.5 H60" stroke="#C8102E" strokeWidth="9" />
-      </g>
-    </svg>
-  );
-}
-
-function FlagIL({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 60 45"
-      className={className}
-      role="img"
-      aria-label="Israel flag"
-    >
-      <clipPath id="il-clip">
-        <rect width="60" height="45" rx="3" />
-      </clipPath>
-      <g clipPath="url(#il-clip)">
-        <rect width="60" height="45" fill="#fff" />
-        <rect y="5" width="60" height="7" fill="#0038b8" />
-        <rect y="33" width="60" height="7" fill="#0038b8" />
-        <g
-          fill="none"
-          stroke="#0038b8"
-          strokeWidth="1.6"
-          transform="translate(30,22.5)"
-        >
-          <polygon points="0,-10 8.66,5 -8.66,5" />
-          <polygon points="0,10 8.66,-5 -8.66,-5" />
-        </g>
-      </g>
-    </svg>
-  );
-}
+import { FlagGB, FlagIL } from "@/components/ui/flags";
 
 /* ------------------------------------------------------------------ */
 /*  Shared data + helpers (exported for mobile menu reuse)            */

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { EventsTable } from "@/components/admin/events-table";
 
+
 export default async function AdminEventsPage() {
   const events = await getAllEvents();
   const eventIds = events.map((e: any) => e.id);
