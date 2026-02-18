@@ -1,25 +1,29 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Check, X, Pencil, Save, Download, ExternalLink, ChevronDown,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Check, X, Pencil, Save, Download, ExternalLink, ChevronDown, Upload, Loader2, Building, Trash2,
 } from "lucide-react";
-import { quickUpdateEvent, updateParticipant, exportParticipantsCsv } from "@/lib/admin/actions";
+import { quickUpdateEvent, updateParticipant, exportParticipantsCsv, getEventGalleryData, setEntityCoverImage, clearEventCover } from "@/lib/admin/actions";
 import { AdminSearchInput } from "./admin-data-table";
-import { CoverImageUpload } from "./cover-image-upload";
 import { MatchesTabContent } from "./matches-tab-content";
+import { EntityGallery } from "./entity-gallery";
 
 // ─── Inline editable field ──────────────────────────────────
 
@@ -53,7 +57,7 @@ function InlineField({
   if (editing) {
     return (
       <div>
-        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</p>
         <div className="flex items-center gap-2 mt-1">
           <Input
             type={type}
@@ -79,7 +83,7 @@ function InlineField({
 
   return (
     <div className="group">
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</p>
       <div className="flex items-center gap-2 mt-1">
         <p className="text-sm">{value ?? "—"}</p>
         <button
@@ -89,39 +93,6 @@ function InlineField({
           <Pencil className="h-3 w-3 text-muted-foreground hover:text-foreground" />
         </button>
       </div>
-    </div>
-  );
-}
-
-// ─── Toggle field ───────────────────────────────────────────
-
-function ToggleField({
-  label,
-  checked,
-  fieldName,
-  eventId,
-}: {
-  label: string;
-  checked: boolean;
-  fieldName: string;
-  eventId: number;
-}) {
-  const [isPending, startTransition] = useTransition();
-
-  function toggle() {
-    startTransition(async () => {
-      await quickUpdateEvent(eventId, { [fieldName]: !checked });
-    });
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <Switch
-        checked={checked}
-        onCheckedChange={toggle}
-        disabled={isPending}
-      />
-      <Label className="text-sm">{label}</Label>
     </div>
   );
 }
@@ -149,8 +120,7 @@ function ParticipantRow({
     });
   }
 
-  // Count visible columns: always 3 (Name, Status, Attended) + conditionally Phone/Age (md) + Payment (lg)
-  const visibleColCount = 3 + 2 + 1; // max columns for colSpan
+  const visibleColCount = 3 + 2 + 1;
 
   return (
     <>
@@ -255,9 +225,41 @@ export function EventDetailClient({
   eventId: number;
 }) {
   const [participantSearch, setParticipantSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("participants");
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+
+  async function handleCoverUpload(file: File) {
+    setCoverUploading(true);
+    try {
+      const data = await getEventGalleryData(eventId);
+      const formData = new FormData();
+      formData.append("files", file);
+      formData.append("event_id", String(eventId));
+      const res = await fetch(`/api/admin/galleries/${data.galleryId}/images`, {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      if (result.images?.[0]?.id) {
+        await setEntityCoverImage("event", eventId, result.images[0].id);
+      }
+      router.refresh();
+    } catch (err) {
+      console.error("Cover upload failed:", err);
+      setCoverError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setCoverUploading(false);
+    }
+  }
 
   const males = participants.filter((p: any) => p.profiles?.gender === "male");
   const females = participants.filter((p: any) => p.profiles?.gender === "female");
+  const attended = participants.filter((p: any) => p.attended === true);
   const isPast = event.event_date < new Date().toISOString().split("T")[0];
 
   const filteredMales = participantSearch.trim()
@@ -294,9 +296,9 @@ export function EventDetailClient({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">
             {event.event_date} {event.start_time && `at ${event.start_time}`}
@@ -330,11 +332,11 @@ export function EventDetailClient({
       </div>
 
       {/* Quick stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Participants</p>
-            <p className="font-medium text-lg">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+        <Card className="border-l-2 border-l-blue-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Participants</p>
+            <p className="font-bold text-xl mt-0.5">
               <span className="text-blue-600">{males.length}M</span>
               {" / "}
               <span className="text-pink-600">{females.length}F</span>
@@ -342,16 +344,22 @@ export function EventDetailClient({
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Type</p>
-            <p className="font-medium">{event.event_type?.replace(/_/g, " ") ?? "—"}</p>
+        <Card className="border-l-2 border-l-green-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Attended</p>
+            <p className="font-bold text-xl mt-0.5">{attended.length}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Price</p>
-            <p className="font-medium">
+        <Card className="border-l-2 border-l-purple-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Type</p>
+            <p className="font-medium mt-0.5">{event.event_type?.replace(/_/g, " ") ?? "—"}</p>
+          </CardContent>
+        </Card>
+        <Card className="border-l-2 border-l-emerald-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Price</p>
+            <p className="font-medium mt-0.5">
               {event.enable_gendered_price
                 ? `M: ${event.price_male ?? "—"} / F: ${event.price_female ?? "—"}`
                 : event.price ?? "Free"}
@@ -359,22 +367,22 @@ export function EventDetailClient({
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Country</p>
-            <p className="font-medium">{(event.countries as any)?.name ?? "—"}</p>
+        <Card className="border-l-2 border-l-amber-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Country</p>
+            <p className="font-medium mt-0.5">{(event.countries as any)?.name ?? "—"}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="participants">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="participants">
             Participants ({participants.length})
           </TabsTrigger>
           <TabsTrigger value="details">Event Details</TabsTrigger>
+          <TabsTrigger value="images">Images</TabsTrigger>
           <TabsTrigger value="matches">Matches</TabsTrigger>
-          <TabsTrigger value="settings">Quick Settings</TabsTrigger>
         </TabsList>
 
         {/* Participants tab */}
@@ -391,7 +399,7 @@ export function EventDetailClient({
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
             <div>
               <h3 className="font-semibold mb-3 text-blue-600">
                 Male ({filteredMales.length}
@@ -453,83 +461,331 @@ export function EventDetailClient({
           </div>
         </TabsContent>
 
-        {/* Details tab - inline editable */}
+        {/* Details tab - inline editable - TWO COLUMN LAYOUT */}
         <TabsContent value="details" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="md:col-span-2">
-              <CardHeader><CardTitle className="text-base">Cover Image</CardTitle></CardHeader>
-              <CardContent>
-                <div className="max-w-md">
-                  <CoverImageUpload
-                    currentImage={event.cover_image}
-                    onSave={(storagePath) => quickUpdateEvent(eventId, { cover_image: storagePath })}
-                    label="Event image (overrides venue image on event cards)"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            {/* Left column */}
+            <div className="lg:col-span-3 space-y-4">
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Event Info</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  <InlineField label="Description" value={event.description} fieldName="description" eventId={eventId} />
+                  <InlineField label="Dress Code" value={event.dress_code} fieldName="dress_code" eventId={eventId} />
+                  <InlineField label="Special Offer" value={event.special_offer} fieldName="special_offer" eventId={eventId} />
+                  <InlineField label="Special Offer Value" value={event.special_offer_value} fieldName="special_offer_value" eventId={eventId} type="number" />
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader><CardTitle className="text-base">Event Info</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <InlineField label="Description" value={event.description} fieldName="description" eventId={eventId} />
-                <InlineField label="Dress Code" value={event.dress_code} fieldName="dress_code" eventId={eventId} />
-                <InlineField label="Special Offer" value={event.special_offer} fieldName="special_offer" eventId={eventId} />
-                <InlineField label="Special Offer Value" value={event.special_offer_value} fieldName="special_offer_value" eventId={eventId} type="number" />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle className="text-base">Age & Capacity</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                {event.enable_gendered_age ? (
-                  <>
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Pricing</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  {event.enable_gendered_price ? (
                     <div className="grid grid-cols-2 gap-3">
-                      <InlineField label="Min Age (M)" value={event.age_min_male} fieldName="age_min_male" eventId={eventId} type="number" />
-                      <InlineField label="Max Age (M)" value={event.age_max_male} fieldName="age_max_male" eventId={eventId} type="number" />
+                      <InlineField label="Price (M)" value={event.price_male} fieldName="price_male" eventId={eventId} type="number" />
+                      <InlineField label="Price (F)" value={event.price_female} fieldName="price_female" eventId={eventId} type="number" />
                     </div>
+                  ) : (
+                    <InlineField label="Price" value={event.price} fieldName="price" eventId={eventId} type="number" />
+                  )}
+                  {event.enable_gendered_price ? (
                     <div className="grid grid-cols-2 gap-3">
-                      <InlineField label="Min Age (F)" value={event.age_min_female} fieldName="age_min_female" eventId={eventId} type="number" />
-                      <InlineField label="Max Age (F)" value={event.age_max_female} fieldName="age_max_female" eventId={eventId} type="number" />
+                      <InlineField label="VIP (M)" value={event.vip_price_male} fieldName="vip_price_male" eventId={eventId} type="number" />
+                      <InlineField label="VIP (F)" value={event.vip_price_female} fieldName="vip_price_female" eventId={eventId} type="number" />
                     </div>
-                  </>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    <InlineField label="Min Age" value={event.age_min} fieldName="age_min" eventId={eventId} type="number" />
-                    <InlineField label="Max Age" value={event.age_max} fieldName="age_max" eventId={eventId} type="number" />
-                  </div>
-                )}
-                <div className="grid grid-cols-2 gap-3">
-                  <InlineField label="Limit Male" value={event.limit_male} fieldName="limit_male" eventId={eventId} type="number" />
-                  <InlineField label="Limit Female" value={event.limit_female} fieldName="limit_female" eventId={eventId} type="number" />
-                </div>
-              </CardContent>
-            </Card>
+                  ) : (
+                    <InlineField label="VIP Price" value={event.vip_price} fieldName="vip_price" eventId={eventId} type="number" />
+                  )}
 
-            <Card>
-              <CardHeader><CardTitle className="text-base">Pricing</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                {event.enable_gendered_price ? (
-                  <div className="grid grid-cols-2 gap-3">
-                    <InlineField label="Price (M)" value={event.price_male} fieldName="price_male" eventId={eventId} type="number" />
-                    <InlineField label="Price (F)" value={event.price_female} fieldName="price_female" eventId={eventId} type="number" />
-                  </div>
-                ) : (
-                  <InlineField label="Price" value={event.price} fieldName="price" eventId={eventId} type="number" />
-                )}
-                <InlineField label="VIP Price" value={event.vip_price} fieldName="vip_price" eventId={eventId} type="number" />
-              </CardContent>
-            </Card>
+                  {/* Early Bird & Last Minute in Accordion */}
+                  <Accordion
+                    type="multiple"
+                    defaultValue={[
+                      ...(event.early_bird_enabled ? ["early-bird"] : []),
+                      ...(event.last_minute_enabled ? ["last-minute"] : []),
+                    ]}
+                  >
+                    <AccordionItem value="early-bird" className="border-t border-b-0">
+                      <AccordionTrigger className="py-3 hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <span>Early Bird</span>
+                          <Badge variant={event.early_bird_enabled ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
+                            {event.early_bird_enabled ? "On" : "Off"}
+                          </Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2">
+                          {event.early_bird_enabled ? (
+                            <>
+                              {event.enable_gendered_price ? (
+                                <div className="grid grid-cols-2 gap-3">
+                                  <InlineField label="EB Price (M)" value={event.early_bird_price_male} fieldName="early_bird_price_male" eventId={eventId} type="number" />
+                                  <InlineField label="EB Price (F)" value={event.early_bird_price_female} fieldName="early_bird_price_female" eventId={eventId} type="number" />
+                                </div>
+                              ) : (
+                                <InlineField label="Early Bird Price" value={event.early_bird_price} fieldName="early_bird_price" eventId={eventId} type="number" />
+                              )}
+                              <div className="flex items-center gap-2 text-sm">
+                                <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Deadline:</span>
+                                <span className="text-sm">{event.early_bird_deadline ? new Date(event.early_bird_deadline).toLocaleString() : "—"}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Early Bird pricing is disabled</p>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
 
-            <Card>
-              <CardHeader><CardTitle className="text-base">Time</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <InlineField label="Date" value={event.event_date} fieldName="event_date" eventId={eventId} type="date" />
-                <InlineField label="Start Time" value={event.start_time} fieldName="start_time" eventId={eventId} type="time" />
-                <InlineField label="End Time" value={event.end_time} fieldName="end_time" eventId={eventId} type="time" />
-              </CardContent>
-            </Card>
+                    <AccordionItem value="last-minute" className="border-t border-b-0">
+                      <AccordionTrigger className="py-3 hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <span>Last Minute</span>
+                          <Badge variant={event.last_minute_enabled ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
+                            {event.last_minute_enabled ? "On" : "Off"}
+                          </Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-2">
+                          {event.last_minute_enabled ? (
+                            <>
+                              {event.enable_gendered_price ? (
+                                <div className="grid grid-cols-2 gap-3">
+                                  <InlineField label="LM Price (M)" value={event.last_minute_price_male} fieldName="last_minute_price_male" eventId={eventId} type="number" />
+                                  <InlineField label="LM Price (F)" value={event.last_minute_price_female} fieldName="last_minute_price_female" eventId={eventId} type="number" />
+                                </div>
+                              ) : (
+                                <InlineField label="Last Minute Price" value={event.last_minute_price} fieldName="last_minute_price" eventId={eventId} type="number" />
+                              )}
+                              <div className="flex items-center gap-2 text-sm">
+                                <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Mode:</span>
+                                <span className="text-sm">{event.last_minute_mode === "days_before" ? `${event.last_minute_days_before} days before` : "Specific date"}</span>
+                              </div>
+                              {event.last_minute_mode === "date" && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <span className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Activation:</span>
+                                  <span className="text-sm">{event.last_minute_activation ? new Date(event.last_minute_activation).toLocaleString() : "—"}</span>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">Last Minute pricing is disabled</p>
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right column */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Cover Image */}
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Cover Image</CardTitle></CardHeader>
+                <CardContent>
+                  {(() => {
+                    const hasOwnCover = !!event.cover_image;
+                    const venueCover = (event.venues as any)?.cover_image as string | null;
+                    const effectiveCover = event.cover_image ?? venueCover;
+                    const isVenueFallback = !hasOwnCover && !!venueCover;
+
+                    return (
+                      <div>
+                        {effectiveCover ? (
+                          <div className={`group/cover relative rounded-lg overflow-hidden border bg-muted/20 ${isVenueFallback ? "border-blue-200 dark:border-blue-900" : "border-border/40"}`}>
+                            <div className="relative aspect-[16/9] w-full">
+                              <img
+                                src={`${supabaseUrl}/storage/v1/object/public/media/${effectiveCover}`}
+                                alt="Cover"
+                                className="w-full h-full object-cover"
+                              />
+                              {isVenueFallback && (
+                                <div className="absolute top-2 left-2">
+                                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/90 text-white shadow-sm backdrop-blur-sm">
+                                    <Building className="h-3 w-3" />
+                                    From venue
+                                  </span>
+                                </div>
+                              )}
+                              <div className="absolute inset-0 bg-black/0 group-hover/cover:bg-black/30 transition-colors flex items-center justify-center gap-2">
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  className="opacity-0 group-hover/cover:opacity-100 transition-opacity"
+                                  onClick={() => coverInputRef.current?.click()}
+                                  disabled={coverUploading}
+                                >
+                                  {coverUploading ? (
+                                    <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                                  ) : (
+                                    <Upload className="h-4 w-4 mr-1.5" />
+                                  )}
+                                  {coverUploading ? "Uploading..." : isVenueFallback ? "Upload custom cover" : "Change cover"}
+                                </Button>
+                                {hasOwnCover && venueCover && (
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    className="opacity-0 group-hover/cover:opacity-100 transition-opacity"
+                                    onClick={async () => {
+                                      await clearEventCover(eventId);
+                                      router.refresh();
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-1.5" />
+                                    Use venue cover
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => coverInputRef.current?.click()}
+                            disabled={coverUploading}
+                            className="w-full aspect-[16/9] rounded-lg border-2 border-dashed border-border/40 bg-muted/20 hover:border-primary/40 hover:bg-muted/40 transition-colors flex items-center justify-center cursor-pointer"
+                          >
+                            <div className="text-center text-muted-foreground">
+                              {coverUploading ? (
+                                <Loader2 className="h-8 w-8 mx-auto mb-1 animate-spin opacity-60" />
+                              ) : (
+                                <Upload className="h-8 w-8 mx-auto mb-1 opacity-40" />
+                              )}
+                              <span className="text-sm">{coverUploading ? "Uploading..." : "Upload cover image"}</span>
+                            </div>
+                          </button>
+                        )}
+                        <input
+                          ref={coverInputRef}
+                          type="file"
+                          accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            e.target.value = "";
+                            if (file) {
+                              setCoverError(null);
+                              handleCoverUpload(file);
+                            }
+                          }}
+                        />
+                        {coverError && (
+                          <p className="text-xs text-destructive mt-2">{coverError}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {isVenueFallback ? (
+                            <>
+                              Using cover from{" "}
+                              <Link
+                                href={`/admin/venues/${(event.venues as any)?.id}`}
+                                className="text-primary hover:underline"
+                              >
+                                {(event.venues as any)?.name}
+                              </Link>
+                              . Upload an image to override.
+                            </>
+                          ) : hasOwnCover ? (
+                            <>
+                              Custom cover for this event.{" "}
+                              <button
+                                type="button"
+                                className="text-primary hover:underline"
+                                onClick={() => setActiveTab("images")}
+                              >
+                                Manage all images
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              No cover image.{" "}
+                              {(event.venues as any) ? "Assign a cover to the venue, or upload one here." : "Upload a cover image."}
+                            </>
+                          )}
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              {/* Time */}
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Time</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  <InlineField label="Date" value={event.event_date} fieldName="event_date" eventId={eventId} type="date" />
+                  <InlineField label="Start Time" value={event.start_time} fieldName="start_time" eventId={eventId} type="time" />
+                  <InlineField label="End Time" value={event.end_time} fieldName="end_time" eventId={eventId} type="time" />
+                </CardContent>
+              </Card>
+
+              {/* Age & Capacity */}
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Age & Capacity</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  {event.enable_gendered_age ? (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <InlineField label="Min Age (M)" value={event.age_min_male} fieldName="age_min_male" eventId={eventId} type="number" />
+                        <InlineField label="Max Age (M)" value={event.age_max_male} fieldName="age_max_male" eventId={eventId} type="number" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <InlineField label="Min Age (F)" value={event.age_min_female} fieldName="age_min_female" eventId={eventId} type="number" />
+                        <InlineField label="Max Age (F)" value={event.age_max_female} fieldName="age_max_female" eventId={eventId} type="number" />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-3">
+                      <InlineField label="Min Age" value={event.age_min} fieldName="age_min" eventId={eventId} type="number" />
+                      <InlineField label="Max Age" value={event.age_max} fieldName="age_max" eventId={eventId} type="number" />
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-3">
+                    <InlineField label="Limit Male" value={event.limit_male} fieldName="limit_male" eventId={eventId} type="number" />
+                    <InlineField label="Limit Female" value={event.limit_female} fieldName="limit_female" eventId={eventId} type="number" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
+        </TabsContent>
+
+        {/* Images tab */}
+        <TabsContent value="images" className="mt-4 space-y-4">
+          {!event.cover_image && (event.venues as any)?.cover_image && (
+            <div className="flex items-start gap-3 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 p-3">
+              <img
+                src={`${supabaseUrl}/storage/v1/object/public/media/${(event.venues as any).cover_image}`}
+                alt="Venue cover"
+                className="w-20 h-14 rounded object-cover shrink-0"
+              />
+              <div className="min-w-0">
+                <p className="text-sm font-medium flex items-center gap-1.5">
+                  <Building className="h-3.5 w-3.5 text-blue-500" />
+                  Using venue cover
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  This event shows the cover from{" "}
+                  <Link
+                    href={`/admin/venues/${(event.venues as any).id}`}
+                    className="text-primary hover:underline"
+                  >
+                    {(event.venues as any).name}
+                  </Link>
+                  . Upload an image below to override it with a custom event cover.
+                </p>
+              </div>
+            </div>
+          )}
+          <EntityGallery
+            entityType="event"
+            entityId={eventId}
+            currentCoverImage={event.cover_image}
+            getGalleryData={getEventGalleryData}
+          />
         </TabsContent>
 
         {/* Matches tab */}
@@ -537,32 +793,6 @@ export function EventDetailClient({
           <MatchesTabContent eventId={eventId} />
         </TabsContent>
 
-        {/* Quick Settings tab */}
-        <TabsContent value="settings" className="mt-4">
-          <Card>
-            <CardContent className="pt-6 space-y-4">
-              <ToggleField label="Published" checked={event.is_published} fieldName="is_published" eventId={eventId} />
-              <ToggleField label="Cancelled" checked={event.is_cancelled} fieldName="is_cancelled" eventId={eventId} />
-              <ToggleField label="Match Submission Open" checked={event.match_submission_open} fieldName="match_submission_open" eventId={eventId} />
-              <ToggleField label="Match Results Released" checked={event.match_results_released} fieldName="match_results_released" eventId={eventId} />
-              <ToggleField label="Gendered Pricing" checked={event.enable_gendered_price} fieldName="enable_gendered_price" eventId={eventId} />
-              <ToggleField label="Gendered Age Ranges" checked={event.enable_gendered_age} fieldName="enable_gendered_age" eventId={eventId} />
-              <ToggleField label="Lock Match Submissions" checked={event.match_submission_locked} fieldName="match_submission_locked" eventId={eventId} />
-              <div className="space-y-1.5 pt-2 border-t">
-                <Label className="text-sm">Match Submission Deadline</Label>
-                <Input
-                  type="datetime-local"
-                  defaultValue={event.match_submission_deadline?.slice(0, 16) ?? ""}
-                  className="h-8 text-sm max-w-xs"
-                  onBlur={(e) => {
-                    const val = e.target.value ? new Date(e.target.value).toISOString() : null;
-                    quickUpdateEvent(eventId, { match_submission_deadline: val });
-                  }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );

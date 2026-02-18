@@ -21,6 +21,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   Calendar, Heart, Crown, ExternalLink, User, Mail, Phone,
   MapPin, Briefcase, GraduationCap, Save, Pencil, X, ChevronDown,
@@ -52,20 +53,21 @@ function getAge(dob: string): number | null {
 
 // ─── Stat card ──────────────────────────────────────────────
 
-function StatCard({ label, value, icon: Icon, color }: {
+function StatCard({ label, value, icon: Icon, color, borderColor }: {
   label: string;
   value: string | number;
   icon: any;
   color?: string;
+  borderColor?: string;
 }) {
   return (
-    <Card>
-      <CardContent className="pt-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Icon className={`h-4 w-4 ${color ?? "text-muted-foreground"}`} />
-          <p className="text-sm text-muted-foreground">{label}</p>
-        </div>
-        <p className="text-2xl font-bold">{value}</p>
+    <Card className={borderColor ? `border-l-2 ${borderColor}` : ""}>
+      <CardContent className="pt-3 pb-3">
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+          <Icon className={`h-3.5 w-3.5 ${color ?? "text-muted-foreground"}`} />
+          {label}
+        </p>
+        <p className="text-xl font-bold mt-0.5">{value}</p>
       </CardContent>
     </Card>
   );
@@ -80,7 +82,7 @@ function ReadOnlyField({ label, value, icon: Icon }: {
 }) {
   return (
     <div>
-      <p className="text-sm font-medium text-muted-foreground flex items-center gap-1">
+      <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium flex items-center gap-1">
         {Icon && <Icon className="h-3 w-3" />}
         {label}
       </p>
@@ -286,23 +288,36 @@ export function MemberDetailClient({
   const cityName = cities.find((c) => c.id === profile.city_id)?.name;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold">
-            {profile.first_name} {profile.last_name}
-          </h1>
-          <div className="flex items-center gap-2 text-muted-foreground text-sm">
-            <Mail className="h-3.5 w-3.5" />
-            <span>{profile.email}</span>
-            {profile.phone && (
-              <>
-                <span className="mx-1">|</span>
-                <Phone className="h-3.5 w-3.5" />
-                <span>{profile.phone}</span>
-              </>
-            )}
+    <div className="space-y-4">
+      {/* Header with Avatar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-12 w-12">
+            <AvatarFallback className={`text-lg font-semibold ${
+              profile.gender === "male"
+                ? "bg-blue-50 text-blue-600"
+                : profile.gender === "female"
+                  ? "bg-pink-50 text-pink-600"
+                  : "bg-primary/10 text-primary"
+            }`}>
+              {profile.first_name?.[0]}{profile.last_name?.[0]}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <h1 className="text-2xl font-bold">
+              {profile.first_name} {profile.last_name}
+            </h1>
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+              <Mail className="h-3.5 w-3.5" />
+              <span>{profile.email}</span>
+              {profile.phone && (
+                <>
+                  <span className="mx-1">|</span>
+                  <Phone className="h-3.5 w-3.5" />
+                  <span>{profile.phone}</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -328,13 +343,13 @@ export function MemberDetailClient({
         </div>
       </div>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <StatCard label="Events" value={registrations.length} icon={Calendar} />
-        <StatCard label="Attended" value={attendedEvents.length} icon={Calendar} color="text-green-600" />
-        <StatCard label="Upcoming" value={upcomingRegs.length} icon={Calendar} color="text-blue-600" />
-        <StatCard label="Matches" value={matchResults.length} icon={Heart} color="text-pink-600" />
-        <StatCard label="VIP Subs" value={vipSubs.length} icon={Crown} color="text-amber-600" />
+      {/* Stats cards with accent borders */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <StatCard label="Events" value={registrations.length} icon={Calendar} color="text-blue-600" borderColor="border-l-blue-400" />
+        <StatCard label="Attended" value={attendedEvents.length} icon={Calendar} color="text-green-600" borderColor="border-l-green-400" />
+        <StatCard label="Upcoming" value={upcomingRegs.length} icon={Calendar} color="text-indigo-600" borderColor="border-l-indigo-400" />
+        <StatCard label="Matches" value={matchResults.length} icon={Heart} color="text-pink-600" borderColor="border-l-pink-400" />
+        <StatCard label="VIP Subs" value={vipSubs.length} icon={Crown} color="text-amber-600" borderColor="border-l-amber-400" />
       </div>
 
       <Tabs defaultValue="profile">
@@ -359,9 +374,9 @@ export function MemberDetailClient({
           )}
 
           {!isEditing ? (
-            /* ─── VIEW MODE ─────────────────────────── */
-            <div className="space-y-6 max-w-3xl">
-              <div className="flex items-center justify-between">
+            /* ─── VIEW MODE — two-column layout ──────── */
+            <div>
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold">Profile Details</h2>
                 <Button onClick={handleEdit} variant="outline" size="sm">
                   <Pencil className="h-4 w-4 mr-2" />
@@ -369,245 +384,261 @@ export function MemberDetailClient({
                 </Button>
               </div>
 
-              <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
-                    <ReadOnlyField label="First Name" value={profile.first_name} />
-                    <ReadOnlyField label="Middle Name" value={profile.middle_name} />
-                    <ReadOnlyField label="Last Name" value={profile.last_name} />
-                    <ReadOnlyField label="Email" value={profile.email} icon={Mail} />
-                    <ReadOnlyField label="Phone (Legacy)" value={profile.phone} icon={Phone} />
-                    <ReadOnlyField label="Home Phone" value={profile.home_phone} icon={Phone} />
-                    <ReadOnlyField label="Mobile Phone" value={profile.mobile_phone} icon={Phone} />
-                    <ReadOnlyField label="Work Phone" value={profile.work_phone} icon={Phone} />
-                    <ReadOnlyField label="Date of Birth" value={profile.date_of_birth ? `${profile.date_of_birth} (Age: ${age})` : null} />
-                    <ReadOnlyField label="Gender" value={profile.gender} />
-                    <ReadOnlyField label="Occupation" value={profile.occupation} icon={Briefcase} />
-                    <ReadOnlyField label="Education" value={profile.education} icon={GraduationCap} />
-                    <ReadOnlyField label="Relationship Status" value={profile.relationship_status} />
-                    <ReadOnlyField label="Faith" value={profile.faith} />
-                  </div>
-                  {profile.bio && (
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm font-medium text-muted-foreground mb-1">Bio</p>
-                      <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                {/* Left column */}
+                <div className="lg:col-span-3 space-y-4">
+                  <Card>
+                    <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                        <ReadOnlyField label="First Name" value={profile.first_name} />
+                        <ReadOnlyField label="Middle Name" value={profile.middle_name} />
+                        <ReadOnlyField label="Last Name" value={profile.last_name} />
+                        <ReadOnlyField label="Email" value={profile.email} icon={Mail} />
+                        <ReadOnlyField label="Phone (Legacy)" value={profile.phone} icon={Phone} />
+                        <ReadOnlyField label="Home Phone" value={profile.home_phone} icon={Phone} />
+                        <ReadOnlyField label="Mobile Phone" value={profile.mobile_phone} icon={Phone} />
+                        <ReadOnlyField label="Work Phone" value={profile.work_phone} icon={Phone} />
+                        <ReadOnlyField label="Date of Birth" value={profile.date_of_birth ? `${profile.date_of_birth} (Age: ${age})` : null} />
+                        <ReadOnlyField label="Gender" value={profile.gender} />
+                        <ReadOnlyField label="Occupation" value={profile.occupation} icon={Briefcase} />
+                        <ReadOnlyField label="Education" value={profile.education} icon={GraduationCap} />
+                        <ReadOnlyField label="Relationship Status" value={profile.relationship_status} />
+                        <ReadOnlyField label="Faith" value={profile.faith} />
+                      </div>
+                      {profile.bio && (
+                        <div className="mt-4 pt-4 border-t">
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-1">Bio</p>
+                          <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
 
-              <Card>
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4" /> Location & Role</CardTitle></CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-4">
-                    <ReadOnlyField label="Country" value={countryName} />
-                    <ReadOnlyField label="City" value={cityName} />
-                    <ReadOnlyField label="Role" value={profile.role} />
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Status</p>
-                      <Badge variant={profile.is_active ? "default" : "destructive"} className="mt-0.5">
-                        {profile.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  {/* Social Profiles — always shown */}
+                  <Card>
+                    <CardHeader className="pb-3"><CardTitle className="text-base">Social Profiles</CardTitle></CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <ReadOnlyField label="Facebook" value={profile.facebook} />
+                        <ReadOnlyField label="Instagram" value={profile.instagram} />
+                        <ReadOnlyField label="WhatsApp" value={profile.whatsapp} />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {profile.admin_comments && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Admin Comments</CardTitle></CardHeader>
-                  <CardContent>
-                    <p className="text-sm whitespace-pre-wrap">{profile.admin_comments}</p>
-                  </CardContent>
-                </Card>
-              )}
+                {/* Right column */}
+                <div className="lg:col-span-2 space-y-4">
+                  <Card>
+                    <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4" /> Location & Role</CardTitle></CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                        <ReadOnlyField label="Country" value={countryName} />
+                        <ReadOnlyField label="City" value={cityName} />
+                        <ReadOnlyField label="Role" value={profile.role} />
+                        <div>
+                          <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Status</p>
+                          <Badge variant={profile.is_active ? "default" : "destructive"} className="mt-0.5">
+                            {profile.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              {(profile.facebook || profile.instagram || profile.whatsapp) && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Social Profiles</CardTitle></CardHeader>
-                  <CardContent className="space-y-2">
-                    {profile.facebook && <p className="text-sm"><span className="text-muted-foreground">Facebook:</span> {profile.facebook}</p>}
-                    {profile.instagram && <p className="text-sm"><span className="text-muted-foreground">Instagram:</span> {profile.instagram}</p>}
-                    {profile.whatsapp && <p className="text-sm"><span className="text-muted-foreground">WhatsApp:</span> {profile.whatsapp}</p>}
-                  </CardContent>
-                </Card>
-              )}
+                  {/* Activity Summary — moved from page bottom */}
+                  <Card>
+                    <CardHeader className="pb-3"><CardTitle className="text-base">Activity Summary</CardTitle></CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                        <ReadOnlyField label="Member Since" value={new Date(profile.created_at).toLocaleDateString()} />
+                        <ReadOnlyField label="Last Updated" value={new Date(profile.updated_at).toLocaleDateString()} />
+                        <ReadOnlyField label="Email Subscribed" value={profile.subscribed_email ? "Yes" : "No"} />
+                        <ReadOnlyField label="SMS Subscribed" value={profile.subscribed_sms ? "Yes" : "No"} />
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Admin Comments — always shown */}
+                  <Card>
+                    <CardHeader className="pb-3"><CardTitle className="text-base">Admin Comments</CardTitle></CardHeader>
+                    <CardContent>
+                      <p className="text-sm whitespace-pre-wrap">{profile.admin_comments || "—"}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
             </div>
           ) : (
-            /* ─── EDIT MODE ─────────────────────────── */
-            <form ref={formRef} action={handleSave} className="space-y-6 max-w-3xl">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-semibold">Editing Profile</h2>
-                  <Badge variant="outline" className="border-amber-400 text-amber-600 bg-amber-50">
-                    <Pencil className="h-3 w-3 mr-1" />
-                    Edit Mode
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={handleCancelEdit} disabled={isPending}>
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel
-                  </Button>
-                  <Button type="submit" size="sm" disabled={isPending}>
-                    <Save className="h-4 w-4 mr-2" />
-                    {isPending ? "Saving..." : "Save Changes"}
-                  </Button>
+            /* ─── EDIT MODE — sticky bar + two columns ── */
+            <form ref={formRef} action={handleSave}>
+              {/* Sticky action bar */}
+              <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm border-b -mx-4 md:-mx-6 px-4 md:px-6 py-3 mb-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-semibold">Editing Profile</h2>
+                    <Badge variant="outline" className="border-amber-400 text-amber-600 bg-amber-50">
+                      <Pencil className="h-3 w-3 mr-1" />
+                      Edit Mode
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={handleCancelEdit} disabled={isPending}>
+                      <X className="h-4 w-4 mr-2" />
+                      Cancel
+                    </Button>
+                    <Button type="submit" size="sm" disabled={isPending}>
+                      <Save className="h-4 w-4 mr-2" />
+                      {isPending ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </div>
                 </div>
               </div>
 
-              <Card className="border-amber-200 bg-amber-50/30">
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <Label>First Name</Label>
-                      <Input name="first_name" defaultValue={profile.first_name} />
-                    </div>
-                    <div>
-                      <Label>Middle Name</Label>
-                      <Input name="middle_name" defaultValue={profile.middle_name ?? ""} />
-                    </div>
-                    <div>
-                      <Label>Last Name</Label>
-                      <Input name="last_name" defaultValue={profile.last_name} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Email</Label>
-                      <Input value={profile.email} disabled className="bg-muted" />
-                    </div>
-                    <div>
-                      <Label>DOB</Label>
-                      <Input value={profile.date_of_birth} disabled className="bg-muted" />
-                      {age && <p className="text-xs text-muted-foreground mt-1">Age: {age}</p>}
-                    </div>
-                    <div>
-                      <Label>Phone (Legacy)</Label>
-                      <Input name="phone" defaultValue={profile.phone ?? ""} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Home Phone</Label>
-                      <Input name="home_phone" defaultValue={profile.home_phone ?? ""} />
-                    </div>
-                    <div>
-                      <Label>Mobile Phone</Label>
-                      <Input name="mobile_phone" defaultValue={profile.mobile_phone ?? ""} />
-                    </div>
-                    <div>
-                      <Label>Work Phone</Label>
-                      <Input name="work_phone" defaultValue={profile.work_phone ?? ""} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> Occupation</Label>
-                      <Input name="occupation" defaultValue={profile.occupation ?? ""} />
-                    </div>
-                    <div>
-                      <Label className="flex items-center gap-1"><GraduationCap className="h-3 w-3" /> Education</Label>
-                      <Input name="education" defaultValue={profile.education ?? ""} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Relationship Status</Label>
-                      <Input name="relationship_status" defaultValue={profile.relationship_status ?? ""} />
-                    </div>
-                    <div>
-                      <Label>Faith</Label>
-                      <Input name="faith" defaultValue={profile.faith ?? ""} />
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Bio</Label>
-                    <Textarea name="bio" rows={3} defaultValue={profile.bio ?? ""} />
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+                {/* Left column — Personal Info */}
+                <div className="lg:col-span-3 space-y-4">
+                  <Card className="border-amber-200 bg-amber-50/30">
+                    <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><User className="h-4 w-4" /> Personal Info</CardTitle></CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <Label>First Name</Label>
+                          <Input name="first_name" defaultValue={profile.first_name} />
+                        </div>
+                        <div>
+                          <Label>Middle Name</Label>
+                          <Input name="middle_name" defaultValue={profile.middle_name ?? ""} />
+                        </div>
+                        <div>
+                          <Label>Last Name</Label>
+                          <Input name="last_name" defaultValue={profile.last_name} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                          <Label>Email</Label>
+                          <Input value={profile.email} disabled className="bg-muted" />
+                        </div>
+                        <div>
+                          <Label>DOB</Label>
+                          <Input value={profile.date_of_birth} disabled className="bg-muted" />
+                          {age && <p className="text-xs text-muted-foreground mt-1">Age: {age}</p>}
+                        </div>
+                        <div>
+                          <Label>Phone (Legacy)</Label>
+                          <Input name="phone" defaultValue={profile.phone ?? ""} />
+                        </div>
+                      </div>
 
-              <Card className="border-amber-200 bg-amber-50/30">
-                <CardHeader><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4" /> Location & Role</CardTitle></CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Country</Label>
-                      <Select name="country_id" value={countryId} onValueChange={setCountryId}>
-                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          {countries.map((c) => (
-                            <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>City</Label>
-                      <Select name="city_id" defaultValue={profile.city_id ? String(profile.city_id) : ""}>
-                        <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-                        <SelectContent>
-                          {filteredCities.map((c) => (
-                            <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div>
-                    <Label>Role</Label>
-                    <Select name="role" defaultValue={profile.role}>
-                      <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="member">Member</SelectItem>
-                        <SelectItem value="host">Host</SelectItem>
-                        <SelectItem value="host_plus">Host Plus</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Switch id="is_active" name="is_active" defaultChecked={profile.is_active} />
-                    <Label htmlFor="is_active">Active</Label>
-                  </div>
-                </CardContent>
-              </Card>
+                      {/* Phone Numbers — grouped */}
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Phone Numbers</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <Label className="text-xs">Home</Label>
+                            <Input name="home_phone" defaultValue={profile.home_phone ?? ""} className="h-8" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Mobile</Label>
+                            <Input name="mobile_phone" defaultValue={profile.mobile_phone ?? ""} className="h-8" />
+                          </div>
+                          <div>
+                            <Label className="text-xs">Work</Label>
+                            <Input name="work_phone" defaultValue={profile.work_phone ?? ""} className="h-8" />
+                          </div>
+                        </div>
+                      </div>
 
-              <Card className="border-amber-200 bg-amber-50/30">
-                <CardHeader><CardTitle className="text-base">Admin Comments</CardTitle></CardHeader>
-                <CardContent>
-                  <Textarea
-                    name="admin_comments"
-                    rows={4}
-                    defaultValue={profile.admin_comments ?? ""}
-                    placeholder="Internal notes about this member..."
-                  />
-                </CardContent>
-              </Card>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <Label className="flex items-center gap-1"><Briefcase className="h-3 w-3" /> Occupation</Label>
+                          <Input name="occupation" defaultValue={profile.occupation ?? ""} />
+                        </div>
+                        <div>
+                          <Label className="flex items-center gap-1"><GraduationCap className="h-3 w-3" /> Education</Label>
+                          <Input name="education" defaultValue={profile.education ?? ""} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <Label>Relationship Status</Label>
+                          <Input name="relationship_status" defaultValue={profile.relationship_status ?? ""} />
+                        </div>
+                        <div>
+                          <Label>Faith</Label>
+                          <Input name="faith" defaultValue={profile.faith ?? ""} />
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Bio</Label>
+                        <Textarea name="bio" rows={3} defaultValue={profile.bio ?? ""} />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {(profile.facebook || profile.instagram || profile.whatsapp) && (
-                <Card>
-                  <CardHeader><CardTitle className="text-base">Social Profiles</CardTitle></CardHeader>
-                  <CardContent className="space-y-2">
-                    {profile.facebook && <p className="text-sm"><span className="text-muted-foreground">Facebook:</span> {profile.facebook}</p>}
-                    {profile.instagram && <p className="text-sm"><span className="text-muted-foreground">Instagram:</span> {profile.instagram}</p>}
-                    {profile.whatsapp && <p className="text-sm"><span className="text-muted-foreground">WhatsApp:</span> {profile.whatsapp}</p>}
-                  </CardContent>
-                </Card>
-              )}
+                {/* Right column — Location & Role + Admin Comments */}
+                <div className="lg:col-span-2 space-y-4">
+                  <Card className="border-amber-200 bg-amber-50/30">
+                    <CardHeader className="pb-3"><CardTitle className="text-base flex items-center gap-2"><MapPin className="h-4 w-4" /> Location & Role</CardTitle></CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <Label>Country</Label>
+                          <Select name="country_id" value={countryId} onValueChange={setCountryId}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                              {countries.map((c) => (
+                                <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label>City</Label>
+                          <Select name="city_id" defaultValue={profile.city_id ? String(profile.city_id) : ""}>
+                            <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                            <SelectContent>
+                              {filteredCities.map((c) => (
+                                <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Role</Label>
+                        <Select name="role" defaultValue={profile.role}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="member">Member</SelectItem>
+                            <SelectItem value="host">Host</SelectItem>
+                            <SelectItem value="host_plus">Host Plus</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center justify-between bg-muted/50 p-3 rounded-lg">
+                        <Label htmlFor="is_active" className="cursor-pointer">Active</Label>
+                        <Switch id="is_active" name="is_active" defaultChecked={profile.is_active} />
+                      </div>
+                    </CardContent>
+                  </Card>
 
-              <div className="flex items-center gap-3">
-                <Button type="submit" disabled={isPending}>
-                  <Save className="h-4 w-4 mr-2" />
-                  {isPending ? "Saving..." : "Save Changes"}
-                </Button>
-                <Button type="button" variant="outline" onClick={handleCancelEdit} disabled={isPending}>
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
+                  <Card className="border-amber-200 bg-amber-50/30">
+                    <CardHeader className="pb-3"><CardTitle className="text-base">Admin Comments</CardTitle></CardHeader>
+                    <CardContent>
+                      <Textarea
+                        name="admin_comments"
+                        rows={4}
+                        defaultValue={profile.admin_comments ?? ""}
+                        placeholder="Internal notes about this member..."
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </form>
           )}
@@ -842,31 +873,6 @@ export function MemberDetailClient({
           </TabsContent>
         )}
       </Tabs>
-
-      {/* Activity summary at bottom */}
-      <Card>
-        <CardHeader><CardTitle className="text-base">Activity Summary</CardTitle></CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-muted-foreground">Member Since</p>
-              <p className="font-medium">{new Date(profile.created_at).toLocaleDateString()}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Last Updated</p>
-              <p className="font-medium">{new Date(profile.updated_at).toLocaleDateString()}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Email Subscribed</p>
-              <p className="font-medium">{profile.subscribed_email ? "Yes" : "No"}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">SMS Subscribed</p>
-              <p className="font-medium">{profile.subscribed_sms ? "Yes" : "No"}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

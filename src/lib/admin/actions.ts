@@ -194,7 +194,7 @@ export async function getEvent(id: number) {
 
   const { data, error } = await supabase
     .from("events")
-    .select(`*, cities(id, name), countries(id, name, code, currency), venues(id, name)`)
+    .select(`*, cities(id, name), countries(id, name, code, currency), venues(id, name, cover_image)`)
     .eq("id", id)
     .single();
 
@@ -227,6 +227,12 @@ export async function createEvent(formData: FormData) {
     vip_price: formData.get("vip_price")
       ? Number(formData.get("vip_price"))
       : null,
+    vip_price_male: formData.get("vip_price_male")
+      ? Number(formData.get("vip_price_male"))
+      : null,
+    vip_price_female: formData.get("vip_price_female")
+      ? Number(formData.get("vip_price_female"))
+      : null,
     enable_gendered_price: formData.get("enable_gendered_price") === "on",
     age_min: formData.get("age_min") ? Number(formData.get("age_min")) : null,
     age_max: formData.get("age_max") ? Number(formData.get("age_max")) : null,
@@ -255,7 +261,73 @@ export async function createEvent(formData: FormData) {
       : null,
     currency: (formData.get("currency") as string) || null,
     is_published: formData.get("is_published") === "on",
+    // Dynamic pricing
+    early_bird_enabled: formData.get("early_bird_enabled") === "on",
+    early_bird_price: formData.get("early_bird_price")
+      ? Number(formData.get("early_bird_price"))
+      : null,
+    early_bird_price_male: formData.get("early_bird_price_male")
+      ? Number(formData.get("early_bird_price_male"))
+      : null,
+    early_bird_price_female: formData.get("early_bird_price_female")
+      ? Number(formData.get("early_bird_price_female"))
+      : null,
+    early_bird_deadline: (formData.get("early_bird_deadline") as string) || null,
+    last_minute_enabled: formData.get("last_minute_enabled") === "on",
+    last_minute_price: formData.get("last_minute_price")
+      ? Number(formData.get("last_minute_price"))
+      : null,
+    last_minute_price_male: formData.get("last_minute_price_male")
+      ? Number(formData.get("last_minute_price_male"))
+      : null,
+    last_minute_price_female: formData.get("last_minute_price_female")
+      ? Number(formData.get("last_minute_price_female"))
+      : null,
+    last_minute_mode: (formData.get("last_minute_mode") as string) || "date",
+    last_minute_activation:
+      (formData.get("last_minute_activation") as string) || null,
+    last_minute_days_before: formData.get("last_minute_days_before")
+      ? Number(formData.get("last_minute_days_before"))
+      : null,
   };
+
+  // Validate early bird deadline is before event start
+  if (event.early_bird_enabled && event.early_bird_deadline) {
+    const deadline = new Date(event.early_bird_deadline);
+    const eventStart = new Date(
+      `${event.event_date}T${event.start_time || "23:59"}`
+    );
+    if (deadline >= eventStart) {
+      return { error: "Early bird deadline must be before the event start time." };
+    }
+  }
+
+  // Validate early bird ends before last minute starts
+  if (event.early_bird_enabled && event.last_minute_enabled) {
+    const earlyEnd = event.early_bird_deadline
+      ? new Date(event.early_bird_deadline)
+      : null;
+    let lastMinuteStart: Date | null = null;
+    if (event.last_minute_mode === "date" && event.last_minute_activation) {
+      lastMinuteStart = new Date(event.last_minute_activation);
+    } else if (
+      event.last_minute_mode === "days_before" &&
+      event.last_minute_days_before
+    ) {
+      const eventStart = new Date(
+        `${event.event_date}T${event.start_time || "00:00"}`
+      );
+      lastMinuteStart = new Date(
+        eventStart.getTime() -
+          event.last_minute_days_before * 24 * 60 * 60 * 1000
+      );
+    }
+    if (earlyEnd && lastMinuteStart && earlyEnd > lastMinuteStart) {
+      return {
+        error: "Early bird deadline must be before last minute activation.",
+      };
+    }
+  }
 
   const { data, error } = await supabase
     .from("events")
@@ -294,6 +366,12 @@ export async function updateEvent(id: number, formData: FormData) {
     vip_price: formData.get("vip_price")
       ? Number(formData.get("vip_price"))
       : null,
+    vip_price_male: formData.get("vip_price_male")
+      ? Number(formData.get("vip_price_male"))
+      : null,
+    vip_price_female: formData.get("vip_price_female")
+      ? Number(formData.get("vip_price_female"))
+      : null,
     enable_gendered_price: formData.get("enable_gendered_price") === "on",
     age_min: formData.get("age_min") ? Number(formData.get("age_min")) : null,
     age_max: formData.get("age_max") ? Number(formData.get("age_max")) : null,
@@ -323,7 +401,73 @@ export async function updateEvent(id: number, formData: FormData) {
     currency: (formData.get("currency") as string) || null,
     is_published: formData.get("is_published") === "on",
     is_cancelled: formData.get("is_cancelled") === "on",
+    // Dynamic pricing
+    early_bird_enabled: formData.get("early_bird_enabled") === "on",
+    early_bird_price: formData.get("early_bird_price")
+      ? Number(formData.get("early_bird_price"))
+      : null,
+    early_bird_price_male: formData.get("early_bird_price_male")
+      ? Number(formData.get("early_bird_price_male"))
+      : null,
+    early_bird_price_female: formData.get("early_bird_price_female")
+      ? Number(formData.get("early_bird_price_female"))
+      : null,
+    early_bird_deadline: (formData.get("early_bird_deadline") as string) || null,
+    last_minute_enabled: formData.get("last_minute_enabled") === "on",
+    last_minute_price: formData.get("last_minute_price")
+      ? Number(formData.get("last_minute_price"))
+      : null,
+    last_minute_price_male: formData.get("last_minute_price_male")
+      ? Number(formData.get("last_minute_price_male"))
+      : null,
+    last_minute_price_female: formData.get("last_minute_price_female")
+      ? Number(formData.get("last_minute_price_female"))
+      : null,
+    last_minute_mode: (formData.get("last_minute_mode") as string) || "date",
+    last_minute_activation:
+      (formData.get("last_minute_activation") as string) || null,
+    last_minute_days_before: formData.get("last_minute_days_before")
+      ? Number(formData.get("last_minute_days_before"))
+      : null,
   };
+
+  // Validate early bird deadline is before event start
+  if (event.early_bird_enabled && event.early_bird_deadline) {
+    const deadline = new Date(event.early_bird_deadline);
+    const eventStart = new Date(
+      `${event.event_date}T${event.start_time || "23:59"}`
+    );
+    if (deadline >= eventStart) {
+      return { error: "Early bird deadline must be before the event start time." };
+    }
+  }
+
+  // Validate early bird ends before last minute starts
+  if (event.early_bird_enabled && event.last_minute_enabled) {
+    const earlyEnd = event.early_bird_deadline
+      ? new Date(event.early_bird_deadline)
+      : null;
+    let lastMinuteStart: Date | null = null;
+    if (event.last_minute_mode === "date" && event.last_minute_activation) {
+      lastMinuteStart = new Date(event.last_minute_activation);
+    } else if (
+      event.last_minute_mode === "days_before" &&
+      event.last_minute_days_before
+    ) {
+      const eventStart = new Date(
+        `${event.event_date}T${event.start_time || "00:00"}`
+      );
+      lastMinuteStart = new Date(
+        eventStart.getTime() -
+          event.last_minute_days_before * 24 * 60 * 60 * 1000
+      );
+    }
+    if (earlyEnd && lastMinuteStart && earlyEnd > lastMinuteStart) {
+      return {
+        error: "Early bird deadline must be before last minute activation.",
+      };
+    }
+  }
 
   const { error } = await supabase.from("events").update(event).eq("id", id);
 
@@ -993,7 +1137,7 @@ export async function getGalleries(params: {
 
   let query = supabase
     .from("galleries")
-    .select(`*, countries(name, code), gallery_images(id)`, { count: "exact" })
+    .select(`*, countries(name, code), gallery_images(id, storage_path, sort_order)`, { count: "exact" })
     .order("created_at", { ascending: false })
     .range(offset, offset + perPage - 1);
 
@@ -1010,12 +1154,42 @@ export async function getGallery(id: number) {
   const { data, error } = await supabase
     .from("galleries")
     .select(
-      `*, countries(id, name, code), gallery_images(id, storage_path, caption, sort_order)`
+      `*, countries(id, name, code), gallery_images(id, storage_path, caption, sort_order, venue_id, event_id)`
     )
     .eq("id", id)
     .single();
   if (error) throw new Error(error.message);
   return data;
+}
+
+// Get entity names for folder headers in gallery detail view
+export async function getGalleryEntityNames(
+  category: string,
+  entityIds: number[]
+) {
+  if (!entityIds.length) return {};
+  const { supabase } = await requireAdmin();
+
+  if (category === "venues") {
+    const { data } = await supabase
+      .from("venues")
+      .select("id, name")
+      .in("id", entityIds);
+    return Object.fromEntries((data ?? []).map((v) => [v.id, v.name]));
+  }
+  if (category === "events") {
+    const { data } = await supabase
+      .from("events")
+      .select("id, event_date, venues(name), cities(name)")
+      .in("id", entityIds);
+    return Object.fromEntries(
+      (data ?? []).map((e) => [
+        e.id,
+        `${e.event_date} — ${(e.cities as any)?.name ?? ""}${(e.venues as any)?.name ? ` @ ${(e.venues as any).name}` : ""}`,
+      ])
+    );
+  }
+  return {};
 }
 
 export async function saveGallery(formData: FormData) {
@@ -1058,6 +1232,271 @@ export async function deleteGallery(id: number) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/galleries");
   redirect("/admin/galleries");
+}
+
+// Get or auto-create the single gallery for a category + country.
+// e.g. one "Venues" gallery for UK, one "Events" gallery for Israel.
+// Ensure standard category galleries exist for a country (called from galleries page during render)
+export async function ensureCategoryGalleries(countryId: number) {
+  const { supabase } = await requireAdmin();
+
+  // Check which categories already exist
+  const { data: existing } = await supabase
+    .from("galleries")
+    .select("category")
+    .eq("country_id", countryId)
+    .in("category", ["events", "venues"]);
+
+  const existingCategories = new Set((existing ?? []).map((g: any) => g.category));
+  const missing = (["events", "venues"] as const).filter((c) => !existingCategories.has(c));
+  if (missing.length === 0) return;
+
+  // Get country name
+  const { data: country } = await supabase
+    .from("countries")
+    .select("name")
+    .eq("id", countryId)
+    .single();
+  const countryName = country?.name ?? "Unknown";
+
+  // Insert missing galleries
+  await supabase.from("galleries").insert(
+    missing.map((category) => ({
+      name: `${category === "venues" ? "Venue Photos" : "Event Photos"} — ${countryName}`,
+      category,
+      country_id: countryId,
+      is_active: true,
+    }))
+  );
+}
+
+export async function getOrCreateCategoryGallery(
+  category: "events" | "venues",
+  countryId: number
+) {
+  const { supabase } = await requireAdmin();
+
+  // Look for existing gallery
+  const { data: existing } = await supabase
+    .from("galleries")
+    .select("id")
+    .eq("category", category)
+    .eq("country_id", countryId)
+    .limit(1)
+    .single();
+
+  if (existing) return existing.id as number;
+
+  // Get country name for the gallery title
+  const { data: country } = await supabase
+    .from("countries")
+    .select("name")
+    .eq("id", countryId)
+    .single();
+
+  const label = category === "venues" ? "Venue Photos" : "Event Photos";
+
+  const { data: gallery, error } = await supabase
+    .from("galleries")
+    .insert({
+      name: `${label} — ${country?.name ?? "Unknown"}`,
+      category,
+      country_id: countryId,
+      is_active: true,
+    })
+    .select("id")
+    .single();
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/galleries");
+  return gallery.id as number;
+}
+
+// Get the gallery ID + entity-filtered images for a venue
+export async function getVenueGalleryData(venueId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { data: venue } = await supabase
+    .from("venues")
+    .select("country_id")
+    .eq("id", venueId)
+    .single();
+  if (!venue) throw new Error("Venue not found");
+
+  const galleryId = await getOrCreateCategoryGallery("venues", venue.country_id);
+
+  const { data: images } = await supabase
+    .from("gallery_images")
+    .select("id, storage_path, caption, sort_order, created_at")
+    .eq("gallery_id", galleryId)
+    .eq("venue_id", venueId)
+    .order("sort_order");
+
+  return { galleryId, images: images ?? [] };
+}
+
+// Get the gallery ID + entity-filtered images for an event
+export async function getEventGalleryData(eventId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { data: event } = await supabase
+    .from("events")
+    .select("country_id")
+    .eq("id", eventId)
+    .single();
+  if (!event) throw new Error("Event not found");
+
+  const galleryId = await getOrCreateCategoryGallery("events", event.country_id);
+
+  const { data: images } = await supabase
+    .from("gallery_images")
+    .select("id, storage_path, caption, sort_order, created_at")
+    .eq("gallery_id", galleryId)
+    .eq("event_id", eventId)
+    .order("sort_order");
+
+  return { galleryId, images: images ?? [] };
+}
+
+// Set a gallery image as cover: reorder to first position + update entity's cover_image
+export async function setEntityCoverImage(
+  entityType: "venue" | "event",
+  entityId: number,
+  imageId: number
+) {
+  "use server";
+  const { supabase } = await requireAdmin();
+
+  const table = entityType === "venue" ? "venues" : "events";
+  const entityCol = entityType === "venue" ? "venue_id" : "event_id";
+  const category = entityType === "venue" ? "venues" : "events";
+
+  const { data: entity } = await supabase
+    .from(table)
+    .select("country_id")
+    .eq("id", entityId)
+    .single();
+  if (!entity) throw new Error(`${entityType} not found`);
+
+  const galleryId = await getOrCreateCategoryGallery(category, entity.country_id);
+
+  // Get all entity images in this gallery
+  const { data: images } = await supabase
+    .from("gallery_images")
+    .select("id, storage_path, sort_order")
+    .eq("gallery_id", galleryId)
+    .eq(entityCol, entityId)
+    .order("sort_order");
+
+  if (!images?.length) throw new Error("No images found");
+
+  const target = images.find((img) => img.id === imageId);
+  if (!target) throw new Error("Image not found");
+
+  // Reorder: put target first, shift others
+  const reordered = [target, ...images.filter((img) => img.id !== imageId)];
+  await Promise.all(
+    reordered.map((img, idx) =>
+      supabase.from("gallery_images").update({ sort_order: idx }).eq("id", img.id)
+    )
+  );
+
+  // Update entity's cover_image field
+  await supabase.from(table).update({ cover_image: target.storage_path }).eq("id", entityId);
+
+  revalidatePath(`/admin/${table}/${entityId}`);
+  revalidatePath("/admin/galleries");
+}
+
+// Sync entity cover_image from its first gallery image (after reorder/delete/upload)
+export async function syncEntityCover(
+  entityType: "venue" | "event",
+  entityId: number
+) {
+  "use server";
+  const { supabase } = await requireAdmin();
+
+  const table = entityType === "venue" ? "venues" : "events";
+  const entityCol = entityType === "venue" ? "venue_id" : "event_id";
+  const category = entityType === "venue" ? "venues" : "events";
+
+  const { data: entity } = await supabase
+    .from(table)
+    .select("country_id")
+    .eq("id", entityId)
+    .single();
+  if (!entity) return;
+
+  const galleryId = await getOrCreateCategoryGallery(category, entity.country_id);
+
+  // Get first image by sort_order
+  const { data: first } = await supabase
+    .from("gallery_images")
+    .select("storage_path")
+    .eq("gallery_id", galleryId)
+    .eq(entityCol, entityId)
+    .order("sort_order")
+    .limit(1)
+    .maybeSingle();
+
+  await supabase
+    .from(table)
+    .update({ cover_image: first?.storage_path ?? null })
+    .eq("id", entityId);
+
+  revalidatePath(`/admin/${table}/${entityId}`);
+}
+
+// Clear an event's custom cover_image so it falls back to its venue's cover
+export async function clearEventCover(eventId: number) {
+  "use server";
+  const { supabase } = await requireAdmin();
+  await supabase.from("events").update({ cover_image: null }).eq("id", eventId);
+  revalidatePath(`/admin/events/${eventId}`);
+}
+
+// Migrate a legacy cover_image into the gallery (one-time, called from client)
+export async function migrateCoverToGallery(
+  entityType: "venue" | "event",
+  entityId: number,
+  storagePath: string
+) {
+  "use server";
+  const { supabase } = await requireAdmin();
+
+  const table = entityType === "venue" ? "venues" : "events";
+  const entityCol = entityType === "venue" ? "venue_id" : "event_id";
+  const category = entityType === "venue" ? "venues" : "events";
+
+  const { data: entity } = await supabase
+    .from(table)
+    .select("country_id")
+    .eq("id", entityId)
+    .single();
+  if (!entity) return;
+
+  const galleryId = await getOrCreateCategoryGallery(category, entity.country_id);
+
+  // Check if already linked
+  const { data: existing } = await supabase
+    .from("gallery_images")
+    .select("id")
+    .eq("gallery_id", galleryId)
+    .eq(entityCol, entityId)
+    .eq("storage_path", storagePath)
+    .limit(1);
+
+  if (existing && existing.length > 0) return; // already migrated
+
+  await supabase.from("gallery_images").insert({
+    gallery_id: galleryId,
+    storage_path: storagePath,
+    [entityCol]: entityId,
+    sort_order: 0,
+    caption: "Cover image",
+  });
+
+  revalidatePath("/admin/galleries");
 }
 
 // ─── Shared lookups ──────────────────────────────────────────
@@ -1638,16 +2077,31 @@ export async function getAllMembers() {
     .from("profiles")
     .select(`id, first_name, middle_name, last_name, email, phone, home_phone, mobile_phone, work_phone,
              gender, date_of_birth,
-             role, is_active, created_at, avatar_url,
+             role, is_active, created_at, updated_at, avatar_url,
              faith, relationship_status, has_children,
              subscribed_email, subscribed_phone, subscribed_sms,
              occupation, education, sexual_preference, admin_comments,
-             city_id,
+             bio, city_id,
              cities(name), countries(name, code)`)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
   return data ?? [];
+}
+
+// ─── Active VIP user IDs ─────────────────────────────────────
+
+export async function getVipUserIds(): Promise<Set<string>> {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("vip_subscriptions")
+    .select("user_id")
+    .eq("status", "active");
+
+  if (error) throw new Error(error.message);
+
+  return new Set((data ?? []).map((r) => r.user_id));
 }
 
 // ─── Member event activity (latest registration per user) ───
@@ -1662,14 +2116,16 @@ export async function getMemberEventActivity() {
 
   if (error) throw new Error(error.message);
 
-  // Build map: user_id -> latest registration date
+  // Build maps: user_id -> latest registration date, user_id -> event count
   const activity: Record<string, string> = {};
+  const counts: Record<string, number> = {};
   for (const row of data ?? []) {
     if (!activity[row.user_id]) {
       activity[row.user_id] = row.registered_at;
     }
+    counts[row.user_id] = (counts[row.user_id] ?? 0) + 1;
   }
-  return activity;
+  return { activity, counts };
 }
 
 // ─── Enhanced Member detail ─────────────────────────────────

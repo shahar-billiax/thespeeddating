@@ -1,12 +1,13 @@
-import { getAllMembers, getCities, getMemberEventActivity } from "@/lib/admin/actions";
+import { getAllMembers, getCities, getMemberEventActivity, getVipUserIds } from "@/lib/admin/actions";
 import { MembersTable } from "@/components/admin/members-table";
 
 
 export default async function AdminMembersPage() {
-  const [members, cities, eventActivity] = await Promise.all([
+  const [members, cities, eventData, vipUserIds] = await Promise.all([
     getAllMembers(),
     getCities(),
     getMemberEventActivity(),
+    getVipUserIds(),
   ]);
 
   return (
@@ -15,7 +16,9 @@ export default async function AdminMembersPage() {
       <MembersTable
         members={members as any}
         cities={cities}
-        eventActivity={eventActivity}
+        eventActivity={eventData.activity}
+        eventCounts={eventData.counts}
+        vipUserIds={[...vipUserIds]}
       />
     </div>
   );

@@ -1,25 +1,23 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Pencil, Save, X, ExternalLink, Trash2, MapPin, Phone, Globe, Mail, User,
+  Pencil, Save, X, ExternalLink, Trash2, MapPin, User, Upload, Loader2,
 } from "lucide-react";
-import { quickUpdateVenue, deleteVenue } from "@/lib/admin/actions";
+import { quickUpdateVenue, deleteVenue, getVenueGalleryData, setEntityCoverImage } from "@/lib/admin/actions";
 import { AdminSearchInput } from "./admin-data-table";
-import { CoverImageUpload } from "./cover-image-upload";
+import { EntityGallery } from "./entity-gallery";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -60,7 +58,7 @@ function InlineField({
   if (editing) {
     return (
       <div>
-        <p className="text-sm font-medium text-muted-foreground">{label}</p>
+        <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</p>
         <div className="flex items-start gap-2 mt-1">
           {multiline ? (
             <Textarea
@@ -96,7 +94,7 @@ function InlineField({
 
   return (
     <div className="group">
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">{label}</p>
       <div className="flex items-center gap-2 mt-1">
         {type === "url" && value ? (
           <a href={String(value)} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
@@ -146,11 +144,40 @@ export function VenueDetailClient({
   venueId: number;
 }) {
   const [eventSearch, setEventSearch] = useState("");
+  const [activeTab, setActiveTab] = useState("events");
   const [isPending, startTransition] = useTransition();
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [coverError, setCoverError] = useState<string | null>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+
+  async function handleCoverUpload(file: File) {
+    setCoverUploading(true);
+    try {
+      const data = await getVenueGalleryData(venueId);
+      const formData = new FormData();
+      formData.append("files", file);
+      formData.append("venue_id", String(venueId));
+      const res = await fetch(`/api/admin/galleries/${data.galleryId}/images`, {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (result.error) throw new Error(result.error);
+      if (result.images?.[0]?.id) {
+        await setEntityCoverImage("venue", venueId, result.images[0].id);
+      }
+      router.refresh();
+    } catch (err) {
+      console.error("Cover upload failed:", err);
+      setCoverError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setCoverUploading(false);
+    }
+  }
 
   const upcomingEvents = venueEvents.filter((e) => getEventStatus(e) === "upcoming");
-  const pastEvents = venueEvents.filter((e) => getEventStatus(e) !== "upcoming");
 
   const filteredEvents = eventSearch.trim()
     ? venueEvents.filter((e) => {
@@ -170,9 +197,9 @@ export function VenueDetailClient({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">{venue.name}</h1>
           <p className="text-muted-foreground flex items-center gap-1">
@@ -229,39 +256,34 @@ export function VenueDetailClient({
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Total Events</p>
-            <p className="text-2xl font-bold">{venueEvents.length}</p>
+      {/* Summary cards — 3 cards with accent borders */}
+      <div className="grid grid-cols-3 gap-3">
+        <Card className="border-l-2 border-l-blue-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Total Events</p>
+            <p className="text-xl font-bold mt-0.5">{venueEvents.length}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Upcoming</p>
-            <p className="text-2xl font-bold text-green-600">{upcomingEvents.length}</p>
+        <Card className="border-l-2 border-l-green-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Upcoming</p>
+            <p className="text-xl font-bold text-green-600 mt-0.5">{upcomingEvents.length}</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Type</p>
-            <p className="font-medium">{venue.venue_type ?? "—"}</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-4">
-            <p className="text-sm text-muted-foreground">Phone</p>
-            <p className="font-medium">{venue.phone ?? "—"}</p>
+        <Card className="border-l-2 border-l-purple-400">
+          <CardContent className="pt-3 pb-3">
+            <p className="text-xs text-muted-foreground">Type</p>
+            <p className="font-medium mt-0.5">{venue.venue_type ?? "—"}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="events">
+      {/* Tabs — reduced from 4 to 3 (Contact merged into Details) */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="events">Events ({venueEvents.length})</TabsTrigger>
-          <TabsTrigger value="details">Venue Details</TabsTrigger>
-          <TabsTrigger value="contact">Contact & Internal</TabsTrigger>
+          <TabsTrigger value="details">Details</TabsTrigger>
+          <TabsTrigger value="images">Images</TabsTrigger>
         </TabsList>
 
         {/* Events tab */}
@@ -322,68 +344,147 @@ export function VenueDetailClient({
           )}
         </TabsContent>
 
-        {/* Details tab - inline editable */}
+        {/* Details tab - TWO COLUMN with Contact & Internal merged in */}
         <TabsContent value="details" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="md:col-span-2">
-              <CardHeader><CardTitle className="text-base">Cover Image</CardTitle></CardHeader>
-              <CardContent>
-                <div className="max-w-md">
-                  <CoverImageUpload
-                    currentImage={venue.cover_image}
-                    onSave={(storagePath) => quickUpdateVenue(venueId, { cover_image: storagePath })}
-                    label="Venue photo shown on event cards"
-                  />
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            {/* Left column */}
+            <div className="lg:col-span-3 space-y-4">
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Location</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  <InlineField label="Address" value={venue.address} fieldName="address" venueId={venueId} />
+                  <InlineField label="Venue Type" value={venue.venue_type} fieldName="venue_type" venueId={venueId} />
+                  <InlineField label="Dress Code" value={venue.dress_code} fieldName="dress_code" venueId={venueId} />
+                  <InlineField label="Transport Info" value={venue.transport_info} fieldName="transport_info" venueId={venueId} multiline />
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader><CardTitle className="text-base">Location</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <InlineField label="Address" value={venue.address} fieldName="address" venueId={venueId} />
-                <InlineField label="Venue Type" value={venue.venue_type} fieldName="venue_type" venueId={venueId} />
-                <InlineField label="Dress Code" value={venue.dress_code} fieldName="dress_code" venueId={venueId} />
-                <InlineField label="Transport Info" value={venue.transport_info} fieldName="transport_info" venueId={venueId} multiline />
-              </CardContent>
-            </Card>
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Details</CardTitle></CardHeader>
+                <CardContent className="space-y-3">
+                  <InlineField label="Description" value={venue.description} fieldName="description" venueId={venueId} multiline />
+                  <InlineField label="Phone" value={venue.phone} fieldName="phone" venueId={venueId} />
+                  <InlineField label="Website" value={venue.website} fieldName="website" venueId={venueId} type="url" />
+                  <InlineField label="Map URL" value={venue.map_url} fieldName="map_url" venueId={venueId} type="url" />
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
-              <CardHeader><CardTitle className="text-base">Details</CardTitle></CardHeader>
-              <CardContent className="space-y-4">
-                <InlineField label="Description" value={venue.description} fieldName="description" venueId={venueId} multiline />
-                <InlineField label="Phone" value={venue.phone} fieldName="phone" venueId={venueId} />
-                <InlineField label="Website" value={venue.website} fieldName="website" venueId={venueId} type="url" />
-                <InlineField label="Map URL" value={venue.map_url} fieldName="map_url" venueId={venueId} type="url" />
-              </CardContent>
-            </Card>
+            {/* Right column — Cover, Contact, Notes */}
+            <div className="lg:col-span-2 space-y-4">
+              {/* Cover Image */}
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Cover Image</CardTitle></CardHeader>
+                <CardContent>
+                  <div>
+                    {venue.cover_image ? (
+                      <div className="group/cover relative rounded-lg overflow-hidden border border-border/40 bg-muted/20">
+                        <div className="relative aspect-[16/9] w-full">
+                          <img
+                            src={`${supabaseUrl}/storage/v1/object/public/media/${venue.cover_image}`}
+                            alt="Cover"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover/cover:bg-black/30 transition-colors flex items-center justify-center">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="opacity-0 group-hover/cover:opacity-100 transition-opacity"
+                              onClick={() => coverInputRef.current?.click()}
+                              disabled={coverUploading}
+                            >
+                              {coverUploading ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                              ) : (
+                                <Upload className="h-4 w-4 mr-1.5" />
+                              )}
+                              {coverUploading ? "Uploading..." : "Change cover"}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => coverInputRef.current?.click()}
+                        disabled={coverUploading}
+                        className="w-full aspect-[16/9] rounded-lg border-2 border-dashed border-border/40 bg-muted/20 hover:border-primary/40 hover:bg-muted/40 transition-colors flex items-center justify-center cursor-pointer"
+                      >
+                        <div className="text-center text-muted-foreground">
+                          {coverUploading ? (
+                            <Loader2 className="h-8 w-8 mx-auto mb-1 animate-spin opacity-60" />
+                          ) : (
+                            <Upload className="h-8 w-8 mx-auto mb-1 opacity-40" />
+                          )}
+                          <span className="text-sm">{coverUploading ? "Uploading..." : "Upload cover image"}</span>
+                        </div>
+                      </button>
+                    )}
+                    <input
+                      ref={coverInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        e.target.value = "";
+                        if (file) {
+                          setCoverError(null);
+                          handleCoverUpload(file);
+                        }
+                      }}
+                    />
+                    {coverError && (
+                      <p className="text-xs text-destructive mt-2">{coverError}</p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-2">
+                      The cover is the first photo in the gallery.{" "}
+                      <button
+                        type="button"
+                        className="text-primary hover:underline"
+                        onClick={() => setActiveTab("images")}
+                      >
+                        Manage all images
+                      </button>
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Contact Person — merged from old Contact & Internal tab */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Contact Person
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <InlineField label="Name" value={venue.contact_person_name} fieldName="contact_person_name" venueId={venueId} />
+                  <InlineField label="Email" value={venue.contact_person_email} fieldName="contact_person_email" venueId={venueId} />
+                  <InlineField label="Phone" value={venue.contact_person_phone} fieldName="contact_person_phone" venueId={venueId} />
+                </CardContent>
+              </Card>
+
+              {/* Internal Notes — merged from old Contact & Internal tab */}
+              <Card>
+                <CardHeader className="pb-3"><CardTitle className="text-base">Internal Notes</CardTitle></CardHeader>
+                <CardContent>
+                  <InlineField label="Notes" value={venue.internal_notes} fieldName="internal_notes" venueId={venueId} multiline />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </TabsContent>
 
-        {/* Contact & Internal tab */}
-        <TabsContent value="contact" className="mt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Contact Person
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <InlineField label="Name" value={venue.contact_person_name} fieldName="contact_person_name" venueId={venueId} />
-                <InlineField label="Email" value={venue.contact_person_email} fieldName="contact_person_email" venueId={venueId} />
-                <InlineField label="Phone" value={venue.contact_person_phone} fieldName="contact_person_phone" venueId={venueId} />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle className="text-base">Internal Notes</CardTitle></CardHeader>
-              <CardContent>
-                <InlineField label="Notes" value={venue.internal_notes} fieldName="internal_notes" venueId={venueId} multiline />
-              </CardContent>
-            </Card>
-          </div>
+        {/* Images tab */}
+        <TabsContent value="images" className="mt-4">
+          <EntityGallery
+            entityType="venue"
+            entityId={venueId}
+            currentCoverImage={venue.cover_image}
+            getGalleryData={getVenueGalleryData}
+          />
         </TabsContent>
       </Tabs>
     </div>

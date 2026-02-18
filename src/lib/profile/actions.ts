@@ -4,36 +4,48 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+const EDUCATION_LEVEL_MAP: Record<string, number> = {
+  high_school: 1,
+  some_college: 2,
+  bachelors: 3,
+  masters: 4,
+  doctorate: 5,
+};
+
 const profileSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
-  middle_name: z.string().optional(),
+  middle_name: z.string().optional().nullable(),
   last_name: z.string().min(1, "Last name is required"),
-  bio: z.string().optional(),
-  occupation: z.string().optional(),
-  education: z.string().optional(),
-  relationship_status: z.enum(["single", "divorced", "widowed", "separated"]).optional(),
-  has_children: z.boolean().optional(),
+  bio: z.string().optional().nullable(),
+  occupation: z.string().optional().nullable(),
+  education: z.enum(["high_school", "some_college", "bachelors", "masters", "doctorate"]).optional().nullable().catch(null),
+  relationship_status: z.enum(["single", "divorced", "widowed", "separated"]).optional().nullable().catch(null),
+  has_children: z.boolean().optional().nullable(),
   faith: z.enum([
-    "secular",
-    "conservative",
-    "orthodox",
-    "traditional",
-    "reform",
-    "liberal",
-    "modern_orthodox",
-    "atheist",
-  ]).optional(),
-  height_cm: z.coerce.number().positive().optional(),
+    "Jewish - Orthodox",
+    "Jewish - Conservative",
+    "Jewish - Reform",
+    "Jewish - Traditional",
+    "Jewish - Secular",
+    "Christian",
+    "Muslim",
+    "Buddhist",
+    "Hindu",
+    "Spiritual",
+    "Not religious",
+    "Other",
+  ]).optional().nullable().catch(null),
+  height_cm: z.coerce.number().positive().optional().nullable(),
   country_id: z.coerce.number().positive().optional().nullable(),
   city_id: z.coerce.number().positive().optional().nullable(),
-  phone: z.string().optional(),
-  home_phone: z.string().optional(),
-  mobile_phone: z.string().optional(),
-  work_phone: z.string().optional(),
-  whatsapp: z.string().optional(),
-  instagram: z.string().optional(),
-  facebook: z.string().optional(),
-  sexual_preference: z.enum(["men", "women", "both"]).optional(),
+  phone: z.string().optional().nullable(),
+  home_phone: z.string().optional().nullable(),
+  mobile_phone: z.string().optional().nullable(),
+  work_phone: z.string().optional().nullable(),
+  whatsapp: z.string().optional().nullable(),
+  instagram: z.string().optional().nullable(),
+  facebook: z.string().optional().nullable(),
+  sexual_preference: z.enum(["men", "women", "both"]).optional().nullable().catch(null),
   subscribed_email: z.boolean().optional(),
   subscribed_phone: z.boolean().optional(),
   subscribed_sms: z.boolean().optional(),
@@ -55,6 +67,7 @@ export async function updateProfile(formData: FormData) {
     redirect("/login");
   }
 
+  const hasChildrenVal = formData.get("has_children") as string;
   const rawData = {
     first_name: formData.get("first_name"),
     middle_name: formData.get("middle_name") || null,
@@ -63,7 +76,7 @@ export async function updateProfile(formData: FormData) {
     occupation: formData.get("occupation") || null,
     education: formData.get("education") || null,
     relationship_status: formData.get("relationship_status") || null,
-    has_children: formData.get("has_children") === "true",
+    has_children: hasChildrenVal === "true" ? true : hasChildrenVal === "false" ? false : null,
     faith: formData.get("faith") || null,
     height_cm: formData.get("height_cm") ? Number(formData.get("height_cm")) : null,
     country_id: formData.get("country_id") ? Number(formData.get("country_id")) : null,
@@ -90,9 +103,15 @@ export async function updateProfile(formData: FormData) {
     };
   }
 
+  // Sync education_level (compatibility column) when education changes
+  const updateData: Record<string, unknown> = { ...result.data };
+  if (result.data.education && EDUCATION_LEVEL_MAP[result.data.education]) {
+    updateData.education_level = EDUCATION_LEVEL_MAP[result.data.education];
+  }
+
   const { error } = await supabase
     .from("profiles")
-    .update(result.data)
+    .update(updateData as any)
     .eq("id", user.id);
 
   if (error) {

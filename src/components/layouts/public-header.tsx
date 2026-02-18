@@ -21,10 +21,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Crown, ChevronDown, User, Heart, Settings, LogOut, Shield, Check } from "lucide-react";
+import { Menu, Crown, ChevronDown, User, Users, Heart, Settings, LogOut, Shield, Check, Sparkles, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 
-export function PublicHeader({ user }: { user: { email: string; role?: string } | null }) {
+export function PublicHeader({ user }: { user: { email: string; role?: string; compatIncomplete?: boolean } | null }) {
   const t = useTranslations();
   const locale = useLocale();
   const country = useCountry();
@@ -89,8 +89,11 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                     size="sm"
                     className="gap-1.5 text-[13px] focus-visible:ring-0 focus-visible:border-transparent data-[state=open]:bg-accent"
                   >
-                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="relative h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
                       <User className="h-3.5 w-3.5 text-primary" />
+                      {user.compatIncomplete && (
+                        <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-purple-500 ring-2 ring-white" />
+                      )}
                     </div>
                     {t("nav.my_account")}
                     <ChevronDown className="h-3 w-3 opacity-50" />
@@ -110,18 +113,45 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                     </>
                   )}
                   <DropdownMenuItem
+                    className="cursor-pointer font-medium"
+                    onSelect={() => router.push("/dashboard")}
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    {t("nav.my_dashboard")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {user.compatIncomplete && (
+                    <>
+                      <div
+                        className="mx-2 my-1.5 flex cursor-pointer items-center gap-2 rounded-md bg-purple-50 px-2.5 py-2 text-xs text-purple-700 hover:bg-purple-100 transition-colors"
+                        onClick={() => router.push("/onboarding")}
+                      >
+                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-purple-500" />
+                        <span>{t("nav.complete_compatibility")}</span>
+                      </div>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  <DropdownMenuItem
                     className="cursor-pointer"
-                    onSelect={() => router.push("/profile")}
+                    onSelect={() => router.push("/dashboard/profile")}
                   >
                     <Settings className="h-4 w-4" />
                     {t("nav.account_settings")}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
-                    onSelect={() => router.push("/matches")}
+                    onSelect={() => router.push("/dashboard/matches")}
                   >
                     <Heart className="h-4 w-4" />
                     {t("nav.matches")}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onSelect={() => router.push("/dashboard/compatibility")}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {t("nav.compatibility")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -282,7 +312,25 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                       </Link>
                     )}
                     <Link
-                      href="/profile"
+                      href="/dashboard"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 text-[15px] font-semibold py-2.5 px-3 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                    >
+                      <LayoutDashboard className="h-4 w-4" />
+                      {t("nav.my_dashboard")}
+                    </Link>
+                    {user.compatIncomplete && (
+                      <Link
+                        href="/onboarding"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2 text-[13px] font-medium mx-1 mb-2 px-3 py-2 rounded-lg bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors"
+                      >
+                        <Sparkles className="h-3.5 w-3.5 shrink-0 text-purple-500" />
+                        {t("nav.complete_compatibility")}
+                      </Link>
+                    )}
+                    <Link
+                      href="/dashboard/profile"
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                     >
@@ -290,12 +338,20 @@ export function PublicHeader({ user }: { user: { email: string; role?: string } 
                       {t("nav.account_settings")}
                     </Link>
                     <Link
-                      href="/matches"
+                      href="/dashboard/matches"
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
                     >
                       <Heart className="h-4 w-4 text-muted-foreground" />
                       {t("nav.matches")}
+                    </Link>
+                    <Link
+                      href="/dashboard/compatibility"
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-muted transition-colors"
+                    >
+                      <Sparkles className="h-4 w-4 text-muted-foreground" />
+                      {t("nav.compatibility")}
                     </Link>
                   </div>
                 )}

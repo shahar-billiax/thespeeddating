@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getGalleries, getCountries, getAdminCountryId } from "@/lib/admin/actions";
+import { getGalleries, getCountries, getAdminCountryId, ensureCategoryGalleries } from "@/lib/admin/actions";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,11 @@ export default async function AdminGalleriesPage({
 
   const adminCountryId = await getAdminCountryId();
   const effectiveCountry = params.country ?? (adminCountryId ? String(adminCountryId) : undefined);
+
+  // Auto-create standard category galleries (events, venues) for the active country
+  if (effectiveCountry) {
+    await ensureCategoryGalleries(Number(effectiveCountry));
+  }
 
   const [{ galleries, total, page, perPage }, countries, mediaCount] =
     await Promise.all([
@@ -79,26 +84,87 @@ export default async function AdminGalleriesPage({
         )}
         {galleries.map((gallery: any) => {
           const imageCount = gallery.gallery_images?.length ?? 0;
-          const firstImage = gallery.gallery_images?.[0];
-          const coverUrl = firstImage
-            ? `${supabaseUrl}/storage/v1/object/public/media/${firstImage.storage_path}`
-            : null;
+          const sortedImages = [...(gallery.gallery_images ?? [])].sort(
+            (a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)
+          );
+          const previewImages = sortedImages.slice(0, 4).map(
+            (img: any) =>
+              `${supabaseUrl}/storage/v1/object/public/media/${img.storage_path}`
+          );
+          const extraCount = imageCount - 4;
 
           return (
             <Link key={gallery.id} href={`/admin/galleries/${gallery.id}`}>
               <Card className="hover:border-primary transition-colors cursor-pointer overflow-hidden">
-                {/* Cover image */}
-                <div className="aspect-[16/9] bg-muted relative">
-                  {coverUrl ? (
+                {/* Photo grid preview */}
+                <div className="aspect-[16/9] bg-muted relative overflow-hidden">
+                  {previewImages.length === 0 && (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Image className="h-8 w-8 text-muted-foreground/30" />
+                    </div>
+                  )}
+                  {previewImages.length === 1 && (
                     <img
-                      src={coverUrl}
+                      src={previewImages[0]}
                       alt={gallery.name}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Image className="h-8 w-8 text-muted-foreground/30" />
+                  )}
+                  {previewImages.length === 2 && (
+                    <div className="w-full h-full grid grid-cols-2 gap-0.5">
+                      {previewImages.map((url: string, i: number) => (
+                        <img
+                          key={i}
+                          src={url}
+                          alt=""
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {previewImages.length === 3 && (
+                    <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-0.5">
+                      <img
+                        src={previewImages[0]}
+                        alt=""
+                        className="w-full h-full object-cover row-span-2"
+                        loading="lazy"
+                      />
+                      <img
+                        src={previewImages[1]}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <img
+                        src={previewImages[2]}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  {previewImages.length >= 4 && (
+                    <div className="w-full h-full grid grid-cols-2 grid-rows-2 gap-0.5">
+                      {previewImages.slice(0, 4).map((url: string, i: number) => (
+                        <div key={i} className="relative overflow-hidden">
+                          <img
+                            src={url}
+                            alt=""
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          {i === 3 && extraCount > 0 && (
+                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                              <span className="text-white font-semibold text-lg">
+                                +{extraCount}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   )}
                   <div className="absolute top-2 right-2 flex gap-1.5">

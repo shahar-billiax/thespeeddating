@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Briefcase,
   Calendar,
+  Crown,
   ExternalLink,
   GraduationCap,
   Heart,
@@ -73,7 +75,7 @@ function InfoRow({
   );
 }
 
-function MemberCard({ member: m }: { member: MemberRow }) {
+function MemberCard({ member: m, isVip }: { member: MemberRow; isVip: boolean }) {
   const age = getAge(m.date_of_birth);
 
   return (
@@ -130,6 +132,12 @@ function MemberCard({ member: m }: { member: MemberRow }) {
             )}
 
             <div className="flex flex-wrap gap-1 mt-1.5">
+              {isVip && (
+                <Badge variant="outline" className="border-amber-300 text-amber-700 text-[10px] px-1.5 py-0 gap-0.5">
+                  <Crown className="h-2.5 w-2.5" />
+                  VIP
+                </Badge>
+              )}
               <Badge
                 variant={m.is_active ? "default" : "destructive"}
                 className="text-[10px] px-1.5 py-0"
@@ -200,7 +208,9 @@ function MemberCard({ member: m }: { member: MemberRow }) {
   );
 }
 
-export function MembersCardView({ members }: { members: MemberRow[] }) {
+export function MembersCardView({ members, vipUserIds = [] }: { members: MemberRow[]; vipUserIds?: string[] }) {
+  const vipSet = useMemo(() => new Set(vipUserIds), [vipUserIds]);
+
   if (members.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
@@ -213,7 +223,7 @@ export function MembersCardView({ members }: { members: MemberRow[] }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4">
       {members.map((m) => (
-        <MemberCard key={m.id} member={m} />
+        <MemberCard key={m.id} member={m} isVip={vipSet.has(m.id)} />
       ))}
     </div>
   );

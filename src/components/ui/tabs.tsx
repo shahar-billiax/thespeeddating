@@ -3,19 +3,27 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Tabs as TabsPrimitive } from "radix-ui"
+import { useLocale } from "next-intl"
 
 import { cn } from "@/lib/utils"
 
 function Tabs({
   className,
   orientation = "horizontal",
+  dir,
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
+  // Radix defaults to dir="ltr" which breaks RTL layouts.
+  // Derive direction from locale when no explicit dir is given.
+  const locale = useLocale();
+  const resolvedDir = dir ?? (locale === "he" ? "rtl" : "ltr");
+
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
       data-orientation={orientation}
       orientation={orientation}
+      dir={resolvedDir}
       className={cn(
         "group/tabs flex gap-2 data-[orientation=horizontal]:flex-col",
         className

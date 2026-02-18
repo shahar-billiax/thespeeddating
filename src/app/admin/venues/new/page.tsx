@@ -9,13 +9,10 @@ export default async function NewVenuePage() {
   ]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Add Venue</h1>
-      <VenueForm
-        countries={countries}
-        cities={cities}
-        defaultCountryId={adminCountryId ?? undefined}
-      />
-    </div>
+    <VenueForm
+      countries={countries}
+      cities={cities}
+      defaultCountryId={adminCountryId ?? undefined}
+    />
   );
 }

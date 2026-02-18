@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Users, Clock, ArrowRight } from "lucide-react";
+import type { PricingTierInfo } from "@/lib/pricing";
 
 interface EventCardProps {
   event: {
@@ -30,6 +31,7 @@ interface EventCardProps {
     registrations_count: number;
     male_registrations: number;
     female_registrations: number;
+    activeTier?: PricingTierInfo;
   };
   locale: string;
   translations: {
@@ -41,6 +43,8 @@ interface EventCardProps {
     men: string;
     women: string;
     view_event?: string;
+    early_bird?: string;
+    last_minute?: string;
   };
 }
 
@@ -161,11 +165,53 @@ export function EventCard({ event, locale, translations }: EventCardProps) {
 
           {/* Price & CTA */}
           <div className="mt-auto pt-3 border-t border-border/30 flex items-center justify-between gap-2">
-            <p className="text-base font-bold text-foreground tracking-tight">{getPrice()}</p>
-            <span className="text-xs font-semibold text-primary flex items-center gap-1 group-hover:gap-1.5 transition-all">
-              {translations.view_event || "View Event"}
-              <ArrowRight className="h-3 w-3 rtl:rotate-180" />
-            </span>
+            <div className="min-w-0">
+              {event.activeTier && event.activeTier.tier !== "standard" ? (
+                event.activeTier.isGendered && event.activeTier.priceMale != null && event.activeTier.priceFemale != null ? (
+                  <div className="text-sm font-bold text-foreground tracking-tight space-y-0.5">
+                    <p>{translations.men}: {currencyFormatter.format(event.activeTier.priceMale)}{" "}
+                      {event.activeTier.standardPriceMale != null && (
+                        <span className="text-xs font-normal text-muted-foreground line-through">{currencyFormatter.format(event.activeTier.standardPriceMale)}</span>
+                      )}
+                    </p>
+                    <p>{translations.women}: {currencyFormatter.format(event.activeTier.priceFemale)}{" "}
+                      {event.activeTier.standardPriceFemale != null && (
+                        <span className="text-xs font-normal text-muted-foreground line-through">{currencyFormatter.format(event.activeTier.standardPriceFemale)}</span>
+                      )}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <p className="text-base font-bold text-foreground tracking-tight">
+                      {currencyFormatter.format(event.activeTier.price)}
+                    </p>
+                    <p className="text-xs text-muted-foreground line-through">
+                      {currencyFormatter.format(event.activeTier.standardPrice)}
+                    </p>
+                  </div>
+                )
+              ) : (
+                <p className="text-base font-bold text-foreground tracking-tight">
+                  {getPrice()}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {event.activeTier?.tier === "early_bird" && (
+                <Badge className="text-[10px] px-1.5 py-0 h-5 bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold">
+                  {translations.early_bird || "Early Bird"}
+                </Badge>
+              )}
+              {event.activeTier?.tier === "last_minute" && (
+                <Badge className="text-[10px] px-1.5 py-0 h-5 bg-amber-50 text-amber-700 border-amber-200 font-semibold">
+                  {translations.last_minute || "Last Minute"}
+                </Badge>
+              )}
+              <span className="text-xs font-semibold text-primary flex items-center gap-1 group-hover:gap-1.5 transition-all">
+                {translations.view_event || "View Event"}
+                <ArrowRight className="h-3 w-3 rtl:rotate-180" />
+              </span>
+            </div>
           </div>
         </div>
       </Card>

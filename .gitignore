@@ -45,3 +45,18 @@ migrate_sqlserver_to_postgres.py
 
 # playwright mcp
 .playwright-mcp/
+
+# local claude settings
+.claude/
+
+# env overrides
+.env.remote
+
+# screenshots / audit images (working files, not source)
+*.png
+*.jpg
+*.jpeg
+*.pdf
+
+# stray OS files
+nul

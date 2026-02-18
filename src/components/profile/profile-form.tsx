@@ -52,6 +52,31 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
+// ─── Constants ──────────────────────────────────────────────
+
+const FAITH_OPTIONS = [
+  { value: "Jewish - Orthodox", key: "faith_jewish_orthodox" },
+  { value: "Jewish - Conservative", key: "faith_jewish_conservative" },
+  { value: "Jewish - Reform", key: "faith_jewish_reform" },
+  { value: "Jewish - Traditional", key: "faith_jewish_traditional" },
+  { value: "Jewish - Secular", key: "faith_jewish_secular" },
+  { value: "Christian", key: "faith_christian" },
+  { value: "Muslim", key: "faith_muslim" },
+  { value: "Buddhist", key: "faith_buddhist" },
+  { value: "Hindu", key: "faith_hindu" },
+  { value: "Spiritual", key: "faith_spiritual" },
+  { value: "Not religious", key: "faith_not_religious" },
+  { value: "Other", key: "faith_other" },
+] as const;
+
+const EDUCATION_OPTIONS = [
+  { value: "high_school", level: 1, key: "education_high_school" },
+  { value: "some_college", level: 2, key: "education_some_college" },
+  { value: "bachelors", level: 3, key: "education_bachelors" },
+  { value: "masters", level: 4, key: "education_masters" },
+  { value: "doctorate", level: 5, key: "education_doctorate" },
+] as const;
+
 // ─── Types ──────────────────────────────────────────────────
 
 interface Profile {
@@ -146,13 +171,17 @@ function ReadOnlyValue({
 function SectionIcon({
   icon: Icon,
   label,
+  iconClassName,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
+  iconClassName?: string;
 }) {
   return (
-    <CardTitle className="text-base flex items-center gap-2">
-      <Icon className="h-4 w-4 text-muted-foreground" />
+    <CardTitle className="text-base flex items-center gap-2.5">
+      <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${iconClassName || "bg-muted text-muted-foreground"}`}>
+        <Icon className="h-3.5 w-3.5" />
+      </div>
       {label}
     </CardTitle>
   );
@@ -226,20 +255,20 @@ function AvatarUpload({
   }
 
   return (
-    <div className="flex items-center gap-5">
-      <div className="relative shrink-0">
-        <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-border bg-muted flex items-center justify-center">
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-6">
+      <div className="relative shrink-0 group">
+        <div className="h-28 w-28 rounded-full overflow-hidden ring-4 ring-primary/10 ring-offset-2 ring-offset-background bg-muted flex items-center justify-center transition-all group-hover:ring-primary/20">
           {displayUrl ? (
             <Image
               src={displayUrl}
               alt="Profile"
-              width={96}
-              height={96}
+              width={112}
+              height={112}
               className="h-full w-full object-cover"
               unoptimized
             />
           ) : (
-            <span className="text-2xl font-semibold text-muted-foreground">
+            <span className="text-3xl font-bold text-muted-foreground/60">
               {initials}
             </span>
           )}
@@ -249,8 +278,17 @@ function AvatarUpload({
             </div>
           )}
         </div>
+        {!uploading && (
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            className="absolute bottom-0 end-0 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md ring-2 ring-background hover:bg-primary/90 transition-colors"
+          >
+            <Camera className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
-      <div className="space-y-2">
+      <div className="text-center sm:text-start space-y-2">
         <p className="text-xs text-muted-foreground">{t("profile.photo_hint")}</p>
         <div className="flex items-center gap-2">
           <Button
@@ -381,7 +419,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
       <form onSubmit={handleSubmit}>
         {/* Profile Photo Card */}
         <Card className="mb-6">
-          <CardContent className="pt-6">
+          <CardContent className="py-6 px-6">
             <AvatarUpload
               avatarUrl={avatarUrl}
               initials={getInitials(formData.first_name, formData.last_name)}
@@ -397,7 +435,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
             {/* Basic Information */}
             <Card>
               <CardHeader className="pb-4">
-                <SectionIcon icon={User} label={t("profile.basic_info")} />
+                <SectionIcon icon={User} label={t("profile.basic_info")} iconClassName="bg-blue-100 text-blue-600" />
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -462,7 +500,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
             {/* Contact Details */}
             <Card>
               <CardHeader className="pb-4">
-                <SectionIcon icon={Phone} label={t("profile.contact_details")} />
+                <SectionIcon icon={Phone} label={t("profile.contact_details")} iconClassName="bg-emerald-100 text-emerald-600" />
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -547,7 +585,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
             {/* Personal Details */}
             <Card>
               <CardHeader className="pb-4">
-                <SectionIcon icon={Heart} label={t("profile.personal_details")} />
+                <SectionIcon icon={Heart} label={t("profile.personal_details")} iconClassName="bg-pink-100 text-pink-600" />
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -571,13 +609,23 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="education">{t("profile.education")}</Label>
-                    <Input
-                      id="education"
-                      name="education"
+                    <Label>{t("profile.education")}</Label>
+                    <Select
                       value={formData.education || ""}
-                      onChange={(e) => updateField("education", e.target.value || null)}
-                    />
+                      onValueChange={(v) => updateField("education", v || null)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("profile.select_education")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {EDUCATION_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {t(`profile.${opt.key}`)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <input type="hidden" name="education" value={formData.education || ""} />
                   </div>
                   <div className="space-y-2">
                     <Label>{t("profile.relationship_status")}</Label>
@@ -607,14 +655,11 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                         <SelectValue placeholder={t("profile.select_faith")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="secular">{t("profile.secular")}</SelectItem>
-                        <SelectItem value="conservative">{t("profile.conservative")}</SelectItem>
-                        <SelectItem value="orthodox">{t("profile.orthodox")}</SelectItem>
-                        <SelectItem value="traditional">{t("profile.traditional")}</SelectItem>
-                        <SelectItem value="reform">{t("profile.reform")}</SelectItem>
-                        <SelectItem value="liberal">{t("profile.liberal")}</SelectItem>
-                        <SelectItem value="modern_orthodox">{t("profile.modern_orthodox")}</SelectItem>
-                        <SelectItem value="atheist">{t("profile.atheist")}</SelectItem>
+                        {FAITH_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {t(`profile.${opt.key}`)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <input type="hidden" name="faith" value={formData.faith || ""} />
@@ -648,19 +693,28 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
                     </Select>
                     <input type="hidden" name="sexual_preference" value={formData.sexual_preference || ""} />
                   </div>
-                </div>
-
-                {/* Has Children - Switch */}
-                <div className="flex items-center justify-between pt-2 border-t">
-                  <Label htmlFor="has_children" className="cursor-pointer">
-                    {t("profile.has_children")}
-                  </Label>
-                  <Switch
-                    id="has_children"
-                    checked={formData.has_children ?? false}
-                    onCheckedChange={(checked) => updateField("has_children", checked)}
-                  />
-                  <input type="hidden" name="has_children" value={formData.has_children ? "true" : "false"} />
+                  <div className="space-y-2">
+                    <Label>{t("profile.children")}</Label>
+                    <Select
+                      value={formData.has_children === true ? "yes" : formData.has_children === false ? "no" : ""}
+                      onValueChange={(v) =>
+                        updateField("has_children", v === "yes" ? true : v === "no" ? false : null)
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={t("profile.select_children")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="yes">{t("profile.yes")}</SelectItem>
+                        <SelectItem value="no">{t("profile.no")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <input
+                      type="hidden"
+                      name="has_children"
+                      value={formData.has_children === true ? "true" : formData.has_children === false ? "false" : ""}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -668,7 +722,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
             {/* Location */}
             <Card>
               <CardHeader className="pb-4">
-                <SectionIcon icon={MapPin} label={t("profile.location")} />
+                <SectionIcon icon={MapPin} label={t("profile.location")} iconClassName="bg-amber-100 text-amber-600" />
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -721,66 +775,74 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
             {/* Preferences */}
             <Card>
               <CardHeader className="pb-4">
-                <SectionIcon icon={Bell} label={t("profile.preferences")} />
+                <SectionIcon icon={Bell} label={t("profile.preferences")} iconClassName="bg-violet-100 text-violet-600" />
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="subscribed_email" className="cursor-pointer">
-                    {t("profile.email_notifications")}
-                  </Label>
+              <CardContent className="space-y-1">
+                <label htmlFor="subscribed_email" className="flex items-center justify-between rounded-lg border p-3.5 cursor-pointer hover:bg-muted/30 transition-colors">
+                  <div>
+                    <p className="text-sm font-medium">{t("profile.email_notifications")}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t("profile.email_notifications_desc")}</p>
+                  </div>
                   <Switch
                     id="subscribed_email"
                     checked={formData.subscribed_email}
                     onCheckedChange={(v) => updateField("subscribed_email", v)}
                   />
                   <input type="hidden" name="subscribed_email" value={formData.subscribed_email ? "true" : "false"} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="subscribed_phone" className="cursor-pointer">
-                    {t("profile.phone_notifications")}
-                  </Label>
+                </label>
+                <label htmlFor="subscribed_phone" className="flex items-center justify-between rounded-lg border p-3.5 cursor-pointer hover:bg-muted/30 transition-colors">
+                  <div>
+                    <p className="text-sm font-medium">{t("profile.phone_notifications")}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t("profile.phone_notifications_desc")}</p>
+                  </div>
                   <Switch
                     id="subscribed_phone"
                     checked={formData.subscribed_phone}
                     onCheckedChange={(v) => updateField("subscribed_phone", v)}
                   />
                   <input type="hidden" name="subscribed_phone" value={formData.subscribed_phone ? "true" : "false"} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="subscribed_sms" className="cursor-pointer">
-                    {t("profile.sms_notifications")}
-                  </Label>
+                </label>
+                <label htmlFor="subscribed_sms" className="flex items-center justify-between rounded-lg border p-3.5 cursor-pointer hover:bg-muted/30 transition-colors">
+                  <div>
+                    <p className="text-sm font-medium">{t("profile.sms_notifications")}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t("profile.sms_notifications_desc")}</p>
+                  </div>
                   <Switch
                     id="subscribed_sms"
                     checked={formData.subscribed_sms}
                     onCheckedChange={(v) => updateField("subscribed_sms", v)}
                   />
                   <input type="hidden" name="subscribed_sms" value={formData.subscribed_sms ? "true" : "false"} />
-                </div>
+                </label>
               </CardContent>
             </Card>
           </div>
         </div>
 
-        {/* ─── Save/Cancel Bar ───────────────────────── */}
-        <div className="flex items-center justify-between pt-6 mt-6 border-t">
-          <div>
-            {hasUnsavedChanges && (
+        {/* ─── Sticky Save/Cancel Bar ────────────────── */}
+        <div
+          className={`sticky bottom-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 mt-6 transition-all duration-300 ${
+            hasUnsavedChanges
+              ? "translate-y-0 opacity-100"
+              : "translate-y-2 opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="border-t bg-background/95 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center justify-between">
               <p className="text-sm text-amber-600 flex items-center gap-1.5">
                 <AlertTriangle className="h-3.5 w-3.5" />
                 {t("profile.unsaved_changes")}
               </p>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            {hasUnsavedChanges && (
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                {t("common.cancel")}
-              </Button>
-            )}
-            <Button type="submit" disabled={isPending || !hasUnsavedChanges}>
-              {isPending ? t("common.saving") : t("profile.save")}
-            </Button>
+              <div className="flex items-center gap-3">
+                <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
+                  {t("common.cancel")}
+                </Button>
+                <Button type="submit" size="sm" disabled={isPending}>
+                  {isPending && <Loader2 className="h-3.5 w-3.5 me-1.5 animate-spin" />}
+                  {isPending ? t("common.saving") : t("profile.save")}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </form>
@@ -788,7 +850,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
       {/* ─── Change Password ─────────────────────────── */}
       <Card>
         <CardHeader>
-          <SectionIcon icon={Shield} label={t("profile.change_password")} />
+          <SectionIcon icon={Shield} label={t("profile.change_password")} iconClassName="bg-slate-100 text-slate-600" />
           <CardDescription>{t("profile.change_password_desc")}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -831,7 +893,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
       {/* ─── Data & Privacy ──────────────────────────── */}
       <Card>
         <CardHeader>
-          <SectionIcon icon={Lock} label={t("profile.data_privacy")} />
+          <SectionIcon icon={Lock} label={t("profile.data_privacy")} iconClassName="bg-red-100 text-red-600" />
           <CardDescription>{t("profile.data_privacy_desc")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

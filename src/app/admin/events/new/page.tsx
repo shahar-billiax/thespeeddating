@@ -9,13 +9,10 @@ export default async function NewEventPage() {
   ]);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-3xl font-bold">Create Event</h1>
-      <EventForm
-        countries={countries}
-        cities={cities}
-        defaultCountryId={adminCountryId ?? undefined}
-      />
-    </div>
+    <EventForm
+      countries={countries}
+      cities={cities}
+      defaultCountryId={adminCountryId ?? undefined}
+    />
   );
 }

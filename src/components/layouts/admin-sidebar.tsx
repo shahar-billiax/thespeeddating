@@ -24,6 +24,7 @@ import {
   Languages,
   File,
   Menu,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -55,6 +56,7 @@ function useNavGroups() {
       label: t("admin.products"),
       items: [
         { href: "/admin/matchmaking", label: t("admin.matchmaking"), icon: Heart },
+        { href: "/admin/compatibility", label: t("admin.compatibility"), icon: Sparkles },
         { href: "/admin/vip", label: t("admin.vip_membership"), icon: Crown },
       ],
     },

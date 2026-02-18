@@ -17,7 +17,6 @@ import {
   Star,
   Shield,
   Zap,
-  AlertCircle,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { CmsContent } from "@/components/cms/cms-content";
@@ -62,7 +61,7 @@ export default async function VIPPage() {
     activeSubscription = data;
   }
 
-  const { plans, benefits: benefitsData, notice, currency } = vipData;
+  const { plans, benefits: benefitsData, currency } = vipData;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat(locale === "he" ? "he-IL" : "en-GB", {
@@ -203,11 +202,9 @@ export default async function VIPPage() {
                           {t("vip.per_month")}
                         </span>
                       </div>
-                      {plan.months > 1 && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {formatPrice(plan.total_price)} {t("vip.total")}
-                        </p>
-                      )}
+                      <p className={`text-sm text-muted-foreground mt-1${plan.months <= 1 ? " invisible" : ""}`}>
+                        {formatPrice(plan.total_price)} {t("vip.total")}
+                      </p>
                     </div>
 
                     <div className="space-y-3 mb-8">
@@ -248,20 +245,6 @@ export default async function VIPPage() {
             </div>
           )}
 
-          {/* Auto-Renewal Notice */}
-          {notice && (
-            <div className="max-w-2xl mx-auto">
-              <Card className="border-0 shadow-sm p-6 bg-amber-50 dark:bg-amber-950/20">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-muted-foreground">
-                    <p className="font-medium text-foreground mb-1">{t("vip.notice_title")}</p>
-                    <p>{notice}</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          )}
         </div>
       </section>
     </div>

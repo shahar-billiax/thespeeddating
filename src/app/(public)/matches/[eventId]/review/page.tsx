@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import {
   AlertCircle,
   ArrowLeft,
@@ -21,6 +21,7 @@ export default async function ReviewPage({
 }) {
   const { eventId } = await params;
   const t = await getTranslations();
+  const locale = await getLocale();
   const data = await getSubmittedChoices(Number(eventId));
 
   if ("error" in data) {
@@ -49,7 +50,7 @@ export default async function ReviewPage({
   const passCount = data.choices!.filter((c) => c.choice === "no").length;
 
   const eventDate = new Date(data.event!.date);
-  const formattedDate = eventDate.toLocaleDateString("en-GB", {
+  const formattedDate = eventDate.toLocaleDateString(locale === "he" ? "he-IL" : "en-GB", {
     weekday: "short",
     day: "numeric",
     month: "short",

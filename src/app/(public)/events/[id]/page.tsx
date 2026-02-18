@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 import { ArrowLeft, Calendar, Clock, MapPin, Users, Ticket, ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
+import { getActivePricingTier } from "@/lib/pricing";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -136,6 +137,32 @@ export default async function EventDetailPage({ params }: PageProps) {
     currency: currency,
   });
 
+  // Compute active pricing tier
+  const activeTier = getActivePricingTier({
+    price: event.price,
+    price_male: event.price_male,
+    price_female: event.price_female,
+    enable_gendered_price: event.enable_gendered_price,
+    vip_price: event.vip_price,
+    vip_price_male: event.vip_price_male,
+    vip_price_female: event.vip_price_female,
+    currency: currency,
+    early_bird_enabled: event.early_bird_enabled,
+    early_bird_price: event.early_bird_price,
+    early_bird_price_male: event.early_bird_price_male,
+    early_bird_price_female: event.early_bird_price_female,
+    early_bird_deadline: event.early_bird_deadline,
+    last_minute_enabled: event.last_minute_enabled,
+    last_minute_price: event.last_minute_price,
+    last_minute_price_male: event.last_minute_price_male,
+    last_minute_price_female: event.last_minute_price_female,
+    last_minute_activation: event.last_minute_activation,
+    last_minute_days_before: event.last_minute_days_before,
+    last_minute_mode: event.last_minute_mode,
+    event_date: event.event_date,
+    start_time: event.start_time,
+  });
+
   // Format age range
   const getAgeRange = () => {
     if (event.enable_gendered_age) {
@@ -220,9 +247,9 @@ export default async function EventDetailPage({ params }: PageProps) {
             },
             description: event.description || undefined,
             eventStatus: event.is_cancelled ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
-            offers: event.price ? {
+            offers: activeTier.price > 0 ? {
               "@type": "Offer",
-              price: event.price,
+              price: activeTier.price,
               priceCurrency: event.countries?.currency || "GBP",
               availability: "https://schema.org/InStock",
             } : undefined,
@@ -382,27 +409,102 @@ export default async function EventDetailPage({ params }: PageProps) {
                 <Card className="border-0 shadow-[0_4px_20px_rgba(0,0,0,0.06),0_1px_4px_rgba(0,0,0,0.04)] ring-1 ring-border/40 overflow-hidden p-0 gap-0">
                   {/* Price header */}
                   <div className="p-6 pb-5 bg-gradient-to-b from-primary/[0.04] via-primary/[0.02] to-transparent">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="text-4xl font-extrabold text-foreground tracking-tight">
-                        {event.price ? currencyFormatter.format(event.price) : t("events.free")}
-                      </span>
-                      {event.price ? (
-                        <span className="text-sm text-muted-foreground font-medium">{t("events.per_person")}</span>
-                      ) : null}
-                    </div>
-                    {event.enable_gendered_price && event.price_male && event.price_female && (
-                      <div className="text-sm text-muted-foreground space-y-0.5 mt-1">
-                        <p>{t("events.men")}: {currencyFormatter.format(event.price_male)}</p>
-                        <p>{t("events.women")}: {currencyFormatter.format(event.price_female)}</p>
+                    {/* Tier badge */}
+                    {activeTier.tier !== "standard" && (
+                      <Badge
+                        className={`mb-2 text-xs font-semibold ${
+                          activeTier.tier === "early_bird"
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border-amber-200"
+                        }`}
+                      >
+                        {t(activeTier.labelKey)}
+                        {activeTier.savingsPercent > 0 &&
+                          ` — ${t("events.save_percent", { percent: activeTier.savingsPercent })}`}
+                      </Badge>
+                    )}
+
+                    {/* Current price */}
+                    {activeTier.isGendered && activeTier.priceMale != null && activeTier.priceFemale != null ? (
+                      <div className="space-y-1 mb-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-extrabold text-foreground tracking-tight">
+                            {t("events.men")}: {currencyFormatter.format(activeTier.priceMale)}
+                          </span>
+                          {activeTier.tier !== "standard" && activeTier.standardPriceMale != null && (
+                            <span className="text-sm text-muted-foreground line-through">
+                              {currencyFormatter.format(activeTier.standardPriceMale)}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-extrabold text-foreground tracking-tight">
+                            {t("events.women")}: {currencyFormatter.format(activeTier.priceFemale)}
+                          </span>
+                          {activeTier.tier !== "standard" && activeTier.standardPriceFemale != null && (
+                            <span className="text-sm text-muted-foreground line-through">
+                              {currencyFormatter.format(activeTier.standardPriceFemale)}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="text-4xl font-extrabold text-foreground tracking-tight">
+                          {activeTier.price > 0
+                            ? currencyFormatter.format(activeTier.price)
+                            : t("events.free")}
+                        </span>
+                        {activeTier.price > 0 && (
+                          <span className="text-sm text-muted-foreground font-medium">
+                            {t("events.per_person")}
+                          </span>
+                        )}
                       </div>
                     )}
-                    {event.vip_price && (
-                      <p className="text-sm text-amber-600 font-medium mt-1">
-                        VIP: {currencyFormatter.format(event.vip_price)}
+
+                    {/* Strikethrough original price (flat only) */}
+                    {activeTier.tier !== "standard" && !activeTier.isGendered && activeTier.standardPrice > 0 && (
+                      <p className="text-sm text-muted-foreground line-through">
+                        {t("events.standard_price")}: {currencyFormatter.format(activeTier.standardPrice)}
                       </p>
                     )}
+
+                    {/* Early bird deadline countdown */}
+                    {activeTier.tier === "early_bird" && activeTier.tierBoundary && (
+                      <p className="text-xs text-emerald-600 mt-2 font-medium">
+                        {t("events.early_bird_ends")}{" "}
+                        {new Intl.DateTimeFormat(locale, {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }).format(activeTier.tierBoundary)}
+                      </p>
+                    )}
+
+                    {/* Last minute label */}
+                    {activeTier.tier === "last_minute" && (
+                      <p className="text-xs text-amber-600 mt-2 font-medium">
+                        {t("events.last_minute_active")}
+                      </p>
+                    )}
+
+                    {/* VIP pricing */}
+                    {activeTier.isGendered && activeTier.vipPriceMale != null && activeTier.vipPriceFemale != null ? (
+                      <div className="text-sm text-amber-600 font-medium mt-1 space-y-0.5">
+                        <p>VIP {t("events.men")}: {currencyFormatter.format(activeTier.vipPriceMale)}</p>
+                        <p>VIP {t("events.women")}: {currencyFormatter.format(activeTier.vipPriceFemale)}</p>
+                      </div>
+                    ) : activeTier.vipPrice != null && activeTier.vipPrice > 0 ? (
+                      <p className="text-sm text-amber-600 font-medium mt-1">
+                        VIP: {currencyFormatter.format(activeTier.vipPrice)}
+                      </p>
+                    ) : null}
                     {event.special_offer && event.special_offer_value && (
-                      <Badge variant="default" className="mt-2">{event.special_offer}</Badge>
+                      <Badge variant="default" className="mt-2">
+                        {event.special_offer}
+                      </Badge>
                     )}
                   </div>
 
@@ -499,12 +601,31 @@ export default async function EventDetailPage({ params }: PageProps) {
       <div className="fixed bottom-0 inset-x-0 z-40 lg:hidden border-t border-border/30 bg-background/95 backdrop-blur-xl p-4 shadow-[0_-2px_16px_rgba(0,0,0,0.06)]">
         <div className="section-container flex items-center justify-between gap-4">
           <div>
-            <span className="text-xl font-bold tracking-tight">
-              {event.price ? currencyFormatter.format(event.price) : t("events.free")}
-            </span>
-            {event.price ? (
-              <span className="text-xs text-muted-foreground ms-1.5 font-medium">{t("events.per_person")}</span>
-            ) : null}
+            {activeTier.isGendered && activeTier.priceMale != null && activeTier.priceFemale != null ? (
+              <div className="text-sm font-bold tracking-tight leading-tight">
+                <span>{t("events.men")}: {currencyFormatter.format(activeTier.priceMale)}</span>
+                <span className="text-muted-foreground/40 mx-1">/</span>
+                <span>{t("events.women")}: {currencyFormatter.format(activeTier.priceFemale)}</span>
+              </div>
+            ) : (
+              <>
+                <span className="text-xl font-bold tracking-tight">
+                  {activeTier.price > 0
+                    ? currencyFormatter.format(activeTier.price)
+                    : t("events.free")}
+                </span>
+                {activeTier.tier !== "standard" && activeTier.standardPrice > 0 && (
+                  <span className="text-xs text-muted-foreground line-through ms-1.5">
+                    {currencyFormatter.format(activeTier.standardPrice)}
+                  </span>
+                )}
+                {activeTier.price > 0 && activeTier.tier === "standard" && (
+                  <span className="text-xs text-muted-foreground ms-1.5 font-medium">
+                    {t("events.per_person")}
+                  </span>
+                )}
+              </>
+            )}
           </div>
           <div className="flex-1 max-w-[220px]">
             <CTAButton />

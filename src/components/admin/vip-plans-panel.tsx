@@ -170,11 +170,9 @@ export function VipPlansPanel({
                     <p className="text-xs text-muted-foreground">
                       {l.per_month}
                     </p>
-                    {plan.months > 1 && (
-                      <p className="text-xs text-muted-foreground">
-                        {formatPrice(plan.total_price)} {l.total}
-                      </p>
-                    )}
+                    <p className={`text-xs text-muted-foreground${plan.months <= 1 ? " invisible" : ""}`}>
+                      {formatPrice(plan.total_price)} {l.total}
+                    </p>
                   </div>
 
                   {/* Actions */}

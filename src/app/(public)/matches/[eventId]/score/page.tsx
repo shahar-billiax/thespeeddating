@@ -1,10 +1,11 @@
 import { getEnhancedScoreData } from "@/lib/matches/actions";
+import { getProfileCompletionStatus } from "@/lib/compatibility/actions";
 import { MatchingFlow } from "@/components/matches/matching-flow";
 import type { MatchQuestion } from "@/components/matches/match-questions";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { AlertCircle, ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft, Sparkles } from "lucide-react";
 
 export default async function ScorePage({
   params,
@@ -56,6 +57,15 @@ export default async function ScorePage({
     );
   }
 
+  // Check if compatibility profile is complete
+  let compatIncomplete = false;
+  try {
+    const status = await getProfileCompletionStatus();
+    compatIncomplete = !status.overall_complete;
+  } catch {
+    // Not critical — just hide the banner
+  }
+
   return (
     <div className="section-container max-w-4xl py-10 sm:py-16 min-h-screen">
       <div className="mb-8">
@@ -71,6 +81,19 @@ export default async function ScorePage({
           {t("matches.score_instruction")}
         </p>
       </div>
+
+      {compatIncomplete && (
+        <Link
+          href="/compatibility"
+          className="flex items-center gap-3 p-3 mb-6 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+        >
+          <Sparkles className="h-5 w-5 text-primary shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium">{t("matches.complete_compat_profile")}</p>
+            <p className="text-xs text-muted-foreground">{t("matches.complete_compat_profile_desc")}</p>
+          </div>
+        </Link>
+      )}
 
       <MatchingFlow
         eventId={Number(eventId)}

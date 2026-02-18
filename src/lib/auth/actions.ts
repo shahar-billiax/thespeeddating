@@ -107,7 +107,7 @@ export async function signIn(formData: FormData) {
     return { error: error.message };
   }
 
-  const redirectTo = (formData.get("redirect") as string) || "/";
+  const redirectTo = (formData.get("redirect") as string) || "/dashboard";
   redirect(redirectTo);
 }
 

@@ -6,6 +6,7 @@ import { ParticipantCard, type Participant } from "./participant-card";
 import { ConnectionSelector } from "./connection-selector";
 import { ContactSharingToggles, type ContactShares } from "./contact-sharing-toggles";
 import { MatchQuestions, type MatchQuestion } from "./match-questions";
+import { DateQualityRating, DEFAULT_RATINGS, type DateQualityRatings } from "./date-quality-rating";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,7 +18,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, Check, Clock, Loader2, Send, ArrowLeft } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { saveDraftScore, submitFinalScores } from "@/lib/matches/actions";
+import { submitDateRating, submitEventFeedback } from "@/lib/compatibility/actions";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
@@ -32,6 +37,12 @@ interface ScoreData {
   shareInstagram: boolean;
   shareFacebook: boolean;
   answers: Record<number, string>;
+  conversationQuality: number;
+  longTermPotential: number;
+  physicalChemistry: number;
+  comfortLevel: number;
+  valuesAlignment: number;
+  energyCompatibility: number;
 }
 
 interface MatchingFlowProps {
@@ -61,7 +72,7 @@ export function MatchingFlow({
     const initial: Record<string, ScoreData> = {};
     for (const p of participants) {
       if (draftScores?.[p.id]) {
-        initial[p.id] = draftScores[p.id];
+        initial[p.id] = { ...DEFAULT_RATINGS, ...draftScores[p.id] };
       }
     }
     return initial;
@@ -72,6 +83,14 @@ export function MatchingFlow({
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [ratingsExpanded, setRatingsExpanded] = useState(false);
+
+  // Event feedback state (collected in confirmation dialog)
+  const [eventFeedback, setEventFeedback] = useState({
+    overall_satisfaction: 3,
+    met_aligned_people: false,
+    would_attend_again: true,
+  });
 
   const selectedParticipant = selectedIndex !== null ? participants[selectedIndex] : null;
 
@@ -90,10 +109,12 @@ export function MatchingFlow({
   const allScored = completedCount === participants.length;
   const progressPercent = participants.length > 0 ? (completedCount / participants.length) * 100 : 0;
 
+  const defaultScore: ScoreData = { choice: null, ...defaults, answers: {}, ...DEFAULT_RATINGS };
+
   // Current score for the selected participant
   const currentScore: ScoreData = selectedParticipant
-    ? scores[selectedParticipant.id] ?? { choice: null, ...defaults, answers: {} }
-    : { choice: null, ...defaults, answers: {} };
+    ? scores[selectedParticipant.id] ?? defaultScore
+    : defaultScore;
 
   // Check if current person has all required fields
   const requiredQuestionsFilled = questions
@@ -111,16 +132,25 @@ export function MatchingFlow({
       setScores((prev) => ({
         ...prev,
         [selectedParticipant.id]: {
-          ...(prev[selectedParticipant.id] ?? { choice: null, ...defaults, answers: {} }),
+          ...(prev[selectedParticipant.id] ?? defaultScore),
           ...updates,
         },
       }));
     },
-    [selectedParticipant, defaults]
+    [selectedParticipant, defaultScore]
   );
 
   function setChoice(choice: Choice) {
     updateScore({ choice });
+    if (choice === "date" || choice === "friend") {
+      setRatingsExpanded(true);
+    } else {
+      setRatingsExpanded(false);
+    }
+  }
+
+  function setRatings(ratings: DateQualityRatings) {
+    updateScore(ratings);
   }
 
   function setShare(field: keyof ContactShares, value: boolean) {
@@ -186,8 +216,10 @@ export function MatchingFlow({
 
     if (direction === "next" && selectedIndex < participants.length - 1) {
       setSelectedIndex(selectedIndex + 1);
+      setRatingsExpanded(false);
     } else if (direction === "prev" && selectedIndex > 0) {
       setSelectedIndex(selectedIndex - 1);
+      setRatingsExpanded(false);
     }
   }
 
@@ -209,15 +241,50 @@ export function MatchingFlow({
     }
 
     const result = await submitFinalScores(eventId);
-    setSubmitting(false);
-    setShowConfirm(false);
 
     if (result.error) {
+      setSubmitting(false);
+      setShowConfirm(false);
       toast.error(result.error);
-    } else {
-      toast.success(t("submission_success"));
-      router.push("/matches");
+      return;
     }
+
+    // Submit event feedback
+    try {
+      await submitEventFeedback({
+        event_id: eventId,
+        ...eventFeedback,
+      });
+    } catch {
+      // Event feedback is supplementary; don't block submission
+    }
+
+    // Submit date ratings for participants with "date" or "friend" choices
+    for (const p of participants) {
+      const score = scores[p.id];
+      if (score && (score.choice === "date" || score.choice === "friend")) {
+        try {
+          await submitDateRating({
+            event_id: eventId,
+            to_user_id: p.id,
+            would_meet_again: score.choice === "date" || score.choice === "friend",
+            conversation_quality: score.conversationQuality ?? 3,
+            long_term_potential: score.longTermPotential ?? 3,
+            physical_chemistry: score.physicalChemistry ?? 3,
+            comfort_level: score.comfortLevel ?? 3,
+            values_alignment: score.valuesAlignment ?? 3,
+            energy_compatibility: score.energyCompatibility ?? 3,
+          });
+        } catch {
+          // Date ratings are supplementary; don't block submission
+        }
+      }
+    }
+
+    setSubmitting(false);
+    setShowConfirm(false);
+    toast.success(t("submission_success"));
+    router.push("/matches");
   }
 
   // Deadline display
@@ -286,6 +353,22 @@ export function MatchingFlow({
                   />
                 </CardContent>
               </Card>
+            )}
+
+            {currentScore.choice !== null && (
+              <DateQualityRating
+                ratings={{
+                  conversationQuality: currentScore.conversationQuality,
+                  longTermPotential: currentScore.longTermPotential,
+                  physicalChemistry: currentScore.physicalChemistry,
+                  comfortLevel: currentScore.comfortLevel,
+                  valuesAlignment: currentScore.valuesAlignment,
+                  energyCompatibility: currentScore.energyCompatibility,
+                }}
+                onChange={setRatings}
+                expanded={ratingsExpanded}
+                onToggle={() => setRatingsExpanded((prev) => !prev)}
+              />
             )}
 
             {questions.length > 0 && (
@@ -380,16 +463,18 @@ export function MatchingFlow({
         {t("review_submit")}
       </Button>
 
-      {/* Confirmation dialog */}
+      {/* Confirmation dialog with event feedback */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{t("confirm_submission_title")}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
             {t("confirm_submission_text")}
           </p>
-          <div className="max-h-64 overflow-y-auto space-y-1 mt-2 border rounded-lg p-3">
+
+          {/* Choices summary */}
+          <div className="max-h-48 overflow-y-auto space-y-1 border rounded-lg p-3">
             {participants.map((p) => {
               const s = scores[p.id];
               return (
@@ -411,6 +496,54 @@ export function MatchingFlow({
               );
             })}
           </div>
+
+          {/* Event feedback section */}
+          <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+            <p className="text-sm font-medium">{t("how_was_event")}</p>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm">{t("overall_satisfaction")}</Label>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {eventFeedback.overall_satisfaction}/5
+                </span>
+              </div>
+              <Slider
+                min={1}
+                max={5}
+                step={1}
+                value={[eventFeedback.overall_satisfaction]}
+                onValueChange={([v]) =>
+                  setEventFeedback((prev) => ({ ...prev, overall_satisfaction: v }))
+                }
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground">
+                <span>{t("poor")}</span>
+                <span>{t("excellent")}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label className="text-sm">{t("met_aligned")}</Label>
+              <Switch
+                checked={eventFeedback.met_aligned_people}
+                onCheckedChange={(v) =>
+                  setEventFeedback((prev) => ({ ...prev, met_aligned_people: v }))
+                }
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label className="text-sm">{t("attend_again")}</Label>
+              <Switch
+                checked={eventFeedback.would_attend_again}
+                onCheckedChange={(v) =>
+                  setEventFeedback((prev) => ({ ...prev, would_attend_again: v }))
+                }
+              />
+            </div>
+          </div>
+
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowConfirm(false)}>
               {t("back")}

@@ -67,7 +67,37 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 3. Admin protection
+  // 3. Dashboard protection (require authenticated user)
+  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+    if (!user) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 4. Redirect logged-in users to dashboard (homepage + old member routes)
+  if (user) {
+    const pathname = request.nextUrl.pathname;
+    const redirectMap: Record<string, string> = {
+      "/": "/dashboard",
+      "/profile": "/dashboard/profile",
+      "/compatibility": "/dashboard/compatibility",
+    };
+
+    // Check exact matches
+    if (redirectMap[pathname]) {
+      return NextResponse.redirect(new URL(redirectMap[pathname], request.url));
+    }
+
+    // Check /matches prefix (but not /matchmaking)
+    if (pathname === "/matches" || pathname.match(/^\/matches\/\d/)) {
+      const dashboardPath = pathname.replace(/^\/matches/, "/dashboard/matches");
+      return NextResponse.redirect(new URL(dashboardPath, request.url));
+    }
+  }
+
+  // 5. Admin protection
   if (request.nextUrl.pathname.startsWith("/admin")) {
     if (!user) {
       const loginUrl = new URL("/login", request.url);

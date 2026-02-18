@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getMyEvents, getSubmissionProgress } from "@/lib/matches/actions";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,13 +54,14 @@ export default async function MatchesPage() {
 
 async function EventCard({ event }: { event: any }) {
   const t = await getTranslations();
+  const locale = await getLocale();
   let progress = null;
   if (event.status === "score" && event.hasDraft) {
     progress = await getSubmissionProgress(event.eventId);
   }
 
   const eventDate = new Date(event.date);
-  const formattedDate = eventDate.toLocaleDateString("en-GB", {
+  const formattedDate = eventDate.toLocaleDateString(locale === "he" ? "he-IL" : "en-GB", {
     weekday: "short",
     day: "numeric",
     month: "short",
@@ -79,7 +80,7 @@ async function EventCard({ event }: { event: any }) {
               <span className="inline-flex items-center gap-1">
                 <Calendar className="h-3.5 w-3.5" />
                 {formattedDate}
-                {event.time && ` at ${event.time.slice(0, 5)}`}
+                {event.time && ` ${t("matches.at_time", { time: event.time.slice(0, 5) })}`}
               </span>
               {event.city && (
                 <span className="inline-flex items-center gap-1">
@@ -91,7 +92,7 @@ async function EventCard({ event }: { event: any }) {
             </div>
           </div>
 
-          <div className="shrink-0">
+          <div className="shrink-0 flex items-center gap-2">
             {event.status === "score" && (
               <Button asChild size="sm">
                 <Link href={`/matches/${event.eventId}/score`}>
@@ -154,6 +155,7 @@ async function EventCard({ event }: { event: any }) {
 
 async function DeadlineInfo({ deadline }: { deadline: string }) {
   const t = await getTranslations();
+  const locale = await getLocale();
   const deadlineDate = new Date(deadline);
   const hoursLeft = (deadlineDate.getTime() - Date.now()) / (1000 * 60 * 60);
 
@@ -169,7 +171,7 @@ async function DeadlineInfo({ deadline }: { deadline: string }) {
     >
       <Clock className="h-3 w-3" />
       {t("matches.deadline")}:{" "}
-      {deadlineDate.toLocaleDateString("en-GB", {
+      {deadlineDate.toLocaleDateString(locale === "he" ? "he-IL" : "en-GB", {
         day: "numeric",
         month: "short",
         hour: "2-digit",

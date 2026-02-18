@@ -3,7 +3,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -40,6 +39,11 @@ export type MembersFilterState = {
   registeredWithinMonths: number | null;
   eventWithinMonths: number | null;
   hasComments: string;
+  vipFilter: string;
+  hasPhoto: string;
+  hasBio: string;
+  eventCountFilter: string;
+  updatedWithinMonths: number | null;
 };
 
 export const DEFAULT_FILTERS: MembersFilterState = {
@@ -63,6 +67,11 @@ export const DEFAULT_FILTERS: MembersFilterState = {
   registeredWithinMonths: null,
   eventWithinMonths: null,
   hasComments: "all",
+  vipFilter: "all",
+  hasPhoto: "all",
+  hasBio: "all",
+  eventCountFilter: "all",
+  updatedWithinMonths: null,
 };
 
 const FAITH_OPTIONS = [
@@ -375,6 +384,15 @@ export function MembersFilterPanel({
               noLabel="Inactive"
             />
           </FilterField>
+
+          <FilterField label="VIP Status">
+            <TriStateToggle
+              value={filters.vipFilter}
+              onChange={(v) => onFilterChange("vipFilter", v)}
+              yesLabel="VIP"
+              noLabel="Non-VIP"
+            />
+          </FilterField>
         </FilterSection>
 
         <Separator />
@@ -476,43 +494,119 @@ export function MembersFilterPanel({
         {/* ── Activity ── */}
         <FilterSection title="Activity">
           <FilterField label="Registered within last">
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min={1}
-                max={120}
-                placeholder="—"
-                value={filters.registeredWithinMonths ?? ""}
-                onChange={(e) =>
-                  onFilterChange(
-                    "registeredWithinMonths",
-                    e.target.value ? Number(e.target.value) : null
-                  )
-                }
-                className="h-8 text-xs w-16"
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={120}
+                  placeholder="—"
+                  value={filters.registeredWithinMonths ?? ""}
+                  onChange={(e) =>
+                    onFilterChange(
+                      "registeredWithinMonths",
+                      e.target.value ? Number(e.target.value) : null
+                    )
+                  }
+                  className="h-8 text-xs w-16"
+                />
+                <span className="text-xs text-muted-foreground">months</span>
+              </div>
+              <TimePresetButtons
+                value={filters.registeredWithinMonths}
+                onChange={(v) => onFilterChange("registeredWithinMonths", v)}
               />
-              <span className="text-xs text-muted-foreground">months</span>
             </div>
           </FilterField>
 
           <FilterField label="Attended event within last">
-            <div className="flex items-center gap-2">
-              <Input
-                type="number"
-                min={1}
-                max={120}
-                placeholder="—"
-                value={filters.eventWithinMonths ?? ""}
-                onChange={(e) =>
-                  onFilterChange(
-                    "eventWithinMonths",
-                    e.target.value ? Number(e.target.value) : null
-                  )
-                }
-                className="h-8 text-xs w-16"
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={120}
+                  placeholder="—"
+                  value={filters.eventWithinMonths ?? ""}
+                  onChange={(e) =>
+                    onFilterChange(
+                      "eventWithinMonths",
+                      e.target.value ? Number(e.target.value) : null
+                    )
+                  }
+                  className="h-8 text-xs w-16"
+                />
+                <span className="text-xs text-muted-foreground">months</span>
+              </div>
+              <TimePresetButtons
+                value={filters.eventWithinMonths}
+                onChange={(v) => onFilterChange("eventWithinMonths", v)}
               />
-              <span className="text-xs text-muted-foreground">months</span>
             </div>
+          </FilterField>
+
+          <FilterField label="Total events attended">
+            <Select
+              value={filters.eventCountFilter}
+              onValueChange={(v) => onFilterChange("eventCountFilter", v)}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="0">Never attended</SelectItem>
+                <SelectItem value="1+">1+ events</SelectItem>
+                <SelectItem value="3+">3+ events</SelectItem>
+                <SelectItem value="5+">5+ events</SelectItem>
+                <SelectItem value="10+">10+ events</SelectItem>
+              </SelectContent>
+            </Select>
+          </FilterField>
+
+          <FilterField label="Profile updated within last">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min={1}
+                  max={120}
+                  placeholder="—"
+                  value={filters.updatedWithinMonths ?? ""}
+                  onChange={(e) =>
+                    onFilterChange(
+                      "updatedWithinMonths",
+                      e.target.value ? Number(e.target.value) : null
+                    )
+                  }
+                  className="h-8 text-xs w-16"
+                />
+                <span className="text-xs text-muted-foreground">months</span>
+              </div>
+              <TimePresetButtons
+                value={filters.updatedWithinMonths}
+                onChange={(v) => onFilterChange("updatedWithinMonths", v)}
+              />
+            </div>
+          </FilterField>
+        </FilterSection>
+
+        <Separator />
+
+        {/* ── Profile Completeness ── */}
+        <FilterSection title="Profile">
+          <FilterField label="Has Profile Photo">
+            <TriStateToggle
+              value={filters.hasPhoto}
+              onChange={(v) => onFilterChange("hasPhoto", v)}
+            />
+          </FilterField>
+
+          <FilterField label="Has Bio">
+            <TriStateToggle
+              value={filters.hasBio}
+              onChange={(v) => onFilterChange("hasBio", v)}
+            />
           </FilterField>
         </FilterSection>
 
@@ -520,23 +614,32 @@ export function MembersFilterPanel({
 
         {/* ── Subscriptions ── */}
         <FilterSection title="Subscriptions">
-          <div className="space-y-2">
-            <SubscriptionCheckbox
-              label="Email newsletter"
+          <FilterField label="Email Newsletter">
+            <TriStateToggle
               value={filters.subscribedEmail}
               onChange={(v) => onFilterChange("subscribedEmail", v)}
+              yesLabel="Subscribed"
+              noLabel="Not Sub."
             />
-            <SubscriptionCheckbox
-              label="Phone contact"
+          </FilterField>
+
+          <FilterField label="Phone Contact">
+            <TriStateToggle
               value={filters.subscribedPhone}
               onChange={(v) => onFilterChange("subscribedPhone", v)}
+              yesLabel="Subscribed"
+              noLabel="Not Sub."
             />
-            <SubscriptionCheckbox
-              label="SMS messages"
+          </FilterField>
+
+          <FilterField label="SMS Messages">
+            <TriStateToggle
               value={filters.subscribedSms}
               onChange={(v) => onFilterChange("subscribedSms", v)}
+              yesLabel="Subscribed"
+              noLabel="Not Sub."
             />
-          </div>
+          </FilterField>
         </FilterSection>
 
         <Separator />
@@ -558,43 +661,38 @@ export function MembersFilterPanel({
   );
 }
 
-// ─── Subscription checkbox helper ───────────────────────────
+// ─── Time preset buttons ────────────────────────────────────
 
-function SubscriptionCheckbox({
-  label,
+function TimePresetButtons({
   value,
   onChange,
 }: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
+  value: number | null;
+  onChange: (v: number | null) => void;
 }) {
+  const presets = [
+    { label: "1mo", months: 1 },
+    { label: "3mo", months: 3 },
+    { label: "6mo", months: 6 },
+    { label: "1yr", months: 12 },
+  ];
   return (
-    <label className="flex items-center gap-2.5 cursor-pointer group">
-      <Checkbox
-        checked={value === "yes"}
-        onCheckedChange={(checked) => {
-          if (checked) onChange("yes");
-          else onChange("all");
-        }}
-        className="data-[state=checked]:bg-primary"
-      />
-      <span className="text-xs group-hover:text-foreground text-muted-foreground transition-colors flex-1">
-        {label}
-      </span>
-      {value !== "all" && (
+    <div className="flex gap-1">
+      {presets.map((p) => (
         <button
+          key={p.months}
           type="button"
-          className="text-[10px] text-muted-foreground hover:text-destructive transition-colors"
-          onClick={(e) => {
-            e.preventDefault();
-            onChange("all");
-          }}
+          onClick={() => onChange(value === p.months ? null : p.months)}
+          className={`text-[10px] px-2 py-0.5 rounded-full border transition-colors ${
+            value === p.months
+              ? "bg-primary text-primary-foreground border-primary"
+              : "text-muted-foreground hover:text-foreground hover:border-foreground/30"
+          }`}
         >
-          clear
+          {p.label}
         </button>
-      )}
-    </label>
+      ))}
+    </div>
   );
 }
 
@@ -621,5 +719,10 @@ export function countActiveFilters(filters: MembersFilterState): number {
   if (filters.registeredWithinMonths !== null) count++;
   if (filters.eventWithinMonths !== null) count++;
   if (filters.hasComments !== "all") count++;
+  if (filters.vipFilter !== "all") count++;
+  if (filters.hasPhoto !== "all") count++;
+  if (filters.hasBio !== "all") count++;
+  if (filters.eventCountFilter !== "all") count++;
+  if (filters.updatedWithinMonths !== null) count++;
   return count;
 }

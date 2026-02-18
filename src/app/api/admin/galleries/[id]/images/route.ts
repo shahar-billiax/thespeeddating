@@ -19,9 +19,10 @@ async function requireAdmin() {
   return user;
 }
 
-// GET - List all images for a gallery
+// GET - List images for a gallery, optionally filtered by entity
+// Query params: ?venue_id=X or ?event_id=X
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const user = await requireAdmin();
@@ -32,11 +33,18 @@ export async function GET(
   const admin = createAdminClient();
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 
-  const { data, error } = await admin
+  let query = admin
     .from("gallery_images")
     .select("*")
     .eq("gallery_id", Number(id))
     .order("sort_order", { ascending: true });
+
+  const venueId = request.nextUrl.searchParams.get("venue_id");
+  const eventId = request.nextUrl.searchParams.get("event_id");
+  if (venueId) query = query.eq("venue_id", Number(venueId));
+  if (eventId) query = query.eq("event_id", Number(eventId));
+
+  const { data, error } = await query;
 
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -56,6 +64,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  try {
   const user = await requireAdmin();
   if (!user)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -81,6 +90,8 @@ export async function POST(
     // Adding from media library
     const body = await request.json();
     const items: { storage_path: string; caption?: string }[] = body.images;
+    const venueId = body.venue_id ? Number(body.venue_id) : null;
+    const eventId = body.event_id ? Number(body.event_id) : null;
 
     if (!items?.length) {
       return NextResponse.json(
@@ -94,6 +105,8 @@ export async function POST(
       storage_path: item.storage_path,
       caption: item.caption || null,
       sort_order: nextOrder++,
+      ...(venueId ? { venue_id: venueId } : {}),
+      ...(eventId ? { event_id: eventId } : {}),
     }));
 
     const { data, error } = await admin
@@ -114,10 +127,17 @@ export async function POST(
     // Direct file upload
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
+    const fmVenueId = formData.get("venue_id") ? Number(formData.get("venue_id")) : null;
+    const fmEventId = formData.get("event_id") ? Number(formData.get("event_id")) : null;
 
-    if (files.length === 0) {
+    // Filter to actual File/Blob entries (reject strings from malformed uploads)
+    const validFiles = files.filter(
+      (f): f is File => typeof f !== "string" && f instanceof Blob && f.size > 0
+    );
+
+    if (validFiles.length === 0) {
       return NextResponse.json(
-        { error: "No files provided" },
+        { error: "No valid files provided" },
         { status: 400 }
       );
     }
@@ -129,11 +149,18 @@ export async function POST(
       "image/webp",
       "image/svg+xml",
     ];
+    const allowedExts = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"];
 
-    for (const file of files) {
-      if (!allowedTypes.some((t) => file.type.startsWith(t))) {
+    for (const file of validFiles) {
+      const fileType = file.type || "";
+      const fileName = file.name || "";
+      const ext = fileName.toLowerCase().replace(/.*(\.[^.]+)$/, "$1");
+      if (
+        !allowedTypes.some((t) => fileType.startsWith(t)) &&
+        !allowedExts.includes(ext)
+      ) {
         return NextResponse.json(
-          { error: `Unsupported file type: ${file.type}` },
+          { error: `Unsupported file type: ${fileType || fileName || "unknown"}` },
           { status: 400 }
         );
       }
@@ -147,18 +174,26 @@ export async function POST(
 
     const uploaded = [];
 
-    for (const file of files) {
-      const sanitized = file.name
+    // Map extensions to MIME types for fallback when file.type is missing
+    const extToMime: Record<string, string> = {
+      ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+      ".gif": "image/gif", ".webp": "image/webp", ".svg": "image/svg+xml",
+    };
+
+    for (const file of validFiles) {
+      const sanitized = (file.name || "upload")
         .replace(/[^a-zA-Z0-9.-]/g, "_")
         .replace(/_+/g, "_");
       const storagePath = `${Date.now()}-${sanitized}`;
+      const ext = (file.name || "").toLowerCase().replace(/.*(\.[^.]+)$/, "$1");
+      const mimeType = file.type || extToMime[ext] || "application/octet-stream";
 
       const buffer = Buffer.from(await file.arrayBuffer());
 
       const { error: uploadError } = await admin.storage
         .from("media")
         .upload(storagePath, buffer, {
-          contentType: file.type,
+          contentType: mimeType,
           upsert: false,
         });
 
@@ -170,13 +205,13 @@ export async function POST(
       }
 
       // Also create a media_files record so it's in the media library
-      await (admin as any)
-        .from("media_files")
+      await admin
+        .from("media_files" as any)
         .insert({
-          filename: file.name,
+          filename: file.name || sanitized,
           storage_path: storagePath,
           file_size: file.size,
-          mime_type: file.type,
+          mime_type: mimeType,
         });
 
       // Create gallery_images record
@@ -186,6 +221,8 @@ export async function POST(
           gallery_id: galleryId,
           storage_path: storagePath,
           sort_order: nextOrder++,
+          ...(fmVenueId ? { venue_id: fmVenueId } : {}),
+          ...(fmEventId ? { event_id: fmEventId } : {}),
         })
         .select()
         .single();
@@ -202,5 +239,12 @@ export async function POST(
     }
 
     return NextResponse.json({ images: uploaded });
+  }
+  } catch (err) {
+    console.error("Gallery images POST error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Unknown server error" },
+      { status: 500 }
+    );
   }
 }

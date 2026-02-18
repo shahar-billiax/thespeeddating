@@ -16,22 +16,17 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   rectSortingStrategy,
-  useSortable,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import {
   ArrowLeft,
-  GripVertical,
   Trash2,
   Upload,
   Library,
   Loader2,
   Pencil,
   X,
-  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -49,6 +44,7 @@ import {
 import { MediaGallerySheet } from "./media-gallery-sheet";
 import { GalleryDialog } from "./gallery-dialog";
 import { deleteGallery } from "@/lib/admin/actions";
+import { SortableImageCard } from "./sortable-image-card";
 import type { MediaFile } from "./media-gallery-panel";
 import Link from "next/link";
 
@@ -60,6 +56,8 @@ interface GalleryImage {
   sort_order: number;
   url: string;
   created_at: string;
+  venue_id?: number | null;
+  event_id?: number | null;
 }
 
 interface GalleryData {
@@ -75,155 +73,7 @@ interface GalleryData {
 interface GalleryDetailClientProps {
   gallery: GalleryData;
   countries: { id: number; name: string; code: string }[];
-}
-
-/* ------------------------------------------------------------------ */
-/*  Sortable image card                                                */
-/* ------------------------------------------------------------------ */
-
-function SortableImageCard({
-  image,
-  onDelete,
-  onCaptionSave,
-}: {
-  image: GalleryImage;
-  onDelete: (id: number) => void;
-  onCaptionSave: (id: number, caption: string) => void;
-}) {
-  const [editing, setEditing] = useState(false);
-  const [captionValue, setCaptionValue] = useState(image.caption || "");
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: image.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
-  const handleStartEdit = () => {
-    setCaptionValue(image.caption || "");
-    setEditing(true);
-    setTimeout(() => inputRef.current?.focus(), 0);
-  };
-
-  const handleSaveCaption = () => {
-    onCaptionSave(image.id, captionValue);
-    setEditing(false);
-  };
-
-  const handleCancelEdit = () => {
-    setCaptionValue(image.caption || "");
-    setEditing(false);
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="group relative border rounded-lg overflow-hidden bg-background shadow-sm"
-    >
-      {/* Drag handle */}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute top-2 left-2 z-10 p-1 rounded bg-white/90 shadow-sm cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-      >
-        <GripVertical className="h-4 w-4 text-muted-foreground" />
-      </div>
-
-      {/* Delete button */}
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <button
-            type="button"
-            className="absolute top-2 right-2 z-10 p-1 rounded bg-destructive/80 hover:bg-destructive text-white opacity-0 group-hover:opacity-100 transition-opacity"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove image?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will remove the image from this gallery. The file will remain
-              in the media library.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => onDelete(image.id)}>
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Image */}
-      <div className="aspect-square bg-muted">
-        <img
-          src={image.url}
-          alt={image.caption || "Gallery image"}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          draggable={false}
-        />
-      </div>
-
-      {/* Caption */}
-      <div className="p-2 border-t min-h-[40px]">
-        {editing ? (
-          <div className="flex gap-1">
-            <Input
-              ref={inputRef}
-              value={captionValue}
-              onChange={(e) => setCaptionValue(e.target.value)}
-              className="h-7 text-xs"
-              placeholder="Add caption..."
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSaveCaption();
-                if (e.key === "Escape") handleCancelEdit();
-              }}
-            />
-            <button
-              type="button"
-              onClick={handleSaveCaption}
-              className="shrink-0 p-1 rounded hover:bg-muted"
-            >
-              <Check className="h-3.5 w-3.5 text-green-600" />
-            </button>
-            <button
-              type="button"
-              onClick={handleCancelEdit}
-              className="shrink-0 p-1 rounded hover:bg-muted"
-            >
-              <X className="h-3.5 w-3.5 text-muted-foreground" />
-            </button>
-          </div>
-        ) : (
-          <div
-            className="flex items-center gap-1 cursor-pointer group/caption"
-            onClick={handleStartEdit}
-          >
-            <span className="text-xs text-muted-foreground truncate flex-1">
-              {image.caption || (
-                <span className="italic">No caption</span>
-              )}
-            </span>
-            <Pencil className="h-3 w-3 text-muted-foreground/50 group-hover/caption:text-muted-foreground shrink-0" />
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  entityNames?: Record<number, string>;
 }
 
 /* ------------------------------------------------------------------ */
@@ -233,6 +83,7 @@ function SortableImageCard({
 export function GalleryDetailClient({
   gallery,
   countries,
+  entityNames = {},
 }: GalleryDetailClientProps) {
   const router = useRouter();
   const [images, setImages] = useState<GalleryImage[]>(gallery.gallery_images);
@@ -519,50 +370,141 @@ export function GalleryDetailClient({
         </CardContent>
       </Card>
 
-      {/* Image grid */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">
-              Images ({images.length})
-            </CardTitle>
-            {images.length > 0 && (
-              <p className="text-xs text-muted-foreground">
-                Drag to reorder &middot; Click caption to edit
-              </p>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {images.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No images yet. Upload files or browse all images to add.</p>
-            </div>
+      {/* Image grid — grouped by entity for venues/events galleries */}
+      {(() => {
+        const isGrouped =
+          (gallery.category === "venues" || gallery.category === "events") &&
+          Object.keys(entityNames).length > 0;
+        const entityKey = gallery.category === "venues" ? "venue_id" : "event_id";
+
+        // Group images by entity
+        const groups: { key: string; label: string; imgs: GalleryImage[] }[] = [];
+        if (isGrouped) {
+          const byEntity = new Map<number | null, GalleryImage[]>();
+          for (const img of images) {
+            const eid = (img as any)[entityKey] ?? null;
+            if (!byEntity.has(eid)) byEntity.set(eid, []);
+            byEntity.get(eid)!.push(img);
+          }
+          // Named folders first, then unlinked
+          for (const [eid, imgs] of byEntity) {
+            if (eid != null) {
+              groups.push({
+                key: String(eid),
+                label: entityNames[eid] ?? `#${eid}`,
+                imgs,
+              });
+            }
+          }
+          const unlinked = byEntity.get(null);
+          if (unlinked?.length) {
+            groups.push({ key: "unlinked", label: "Other / Unlinked", imgs: unlinked });
+          }
+        }
+
+        return isGrouped ? (
+          groups.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center text-muted-foreground">
+                No images yet. Upload files or browse all images to add.
+              </CardContent>
+            </Card>
           ) : (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={images.map((i) => i.id)}
-                strategy={rectSortingStrategy}
-              >
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {images.map((image) => (
-                    <SortableImageCard
-                      key={image.id}
-                      image={image}
-                      onDelete={handleDeleteImage}
-                      onCaptionSave={handleCaptionSave}
-                    />
-                  ))}
+            <div className="space-y-4">
+              {groups.map((group) => (
+                <Card key={group.key}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-sm font-semibold">
+                        {group.label}
+                        <span className="text-muted-foreground font-normal ml-2">
+                          ({group.imgs.length})
+                        </span>
+                      </CardTitle>
+                      {group.key !== "unlinked" && (
+                        <Link
+                          href={`/admin/${gallery.category === "venues" ? "venues" : "events"}/${group.key}`}
+                          className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1"
+                        >
+                          View {gallery.category === "venues" ? "venue" : "event"}
+                          <ArrowLeft className="h-3 w-3 rotate-180" />
+                        </Link>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={group.imgs.map((i) => i.id)}
+                        strategy={rectSortingStrategy}
+                      >
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                          {group.imgs.map((image) => (
+                            <SortableImageCard
+                              key={image.id}
+                              image={image}
+                              onDelete={handleDeleteImage}
+                              onCaptionSave={handleCaptionSave}
+                            />
+                          ))}
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )
+        ) : (
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">
+                  Images ({images.length})
+                </CardTitle>
+                {images.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Drag to reorder &middot; Click caption to edit
+                  </p>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {images.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>No images yet. Upload files or browse all images to add.</p>
                 </div>
-              </SortableContext>
-            </DndContext>
-          )}
-        </CardContent>
-      </Card>
+              ) : (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={images.map((i) => i.id)}
+                    strategy={rectSortingStrategy}
+                  >
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                      {images.map((image) => (
+                        <SortableImageCard
+                          key={image.id}
+                          image={image}
+                          onDelete={handleDeleteImage}
+                          onCaptionSave={handleCaptionSave}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              )}
+            </CardContent>
+          </Card>
+        );
+      })()}
 
       {/* Media picker sheet */}
       <MediaGallerySheet

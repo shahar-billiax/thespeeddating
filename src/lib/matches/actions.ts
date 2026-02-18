@@ -614,6 +614,7 @@ export async function getMatchResults(eventId: number) {
 
     return {
       id: r.id,
+      userId: otherId,
       type: r.result_type as "mutual_date" | "mutual_friend",
       firstName: otherProfile?.first_name ?? "Unknown",
       lastName: otherProfile?.last_name ?? "",

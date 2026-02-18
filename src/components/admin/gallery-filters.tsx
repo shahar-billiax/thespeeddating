@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select";
 import { useAdminCountry } from "@/lib/admin-country-context";
 
-const CATEGORIES = ["events", "venues", "homepage", "success_stories"];
+const CATEGORIES = ["events", "venues", "homepage", "success_stories", "general"];
 
 export function GalleryFilters({
   countries,

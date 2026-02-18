@@ -15,7 +15,7 @@ import {
 import { Plus } from "lucide-react";
 import { useAdminCountry } from "@/lib/admin-country-context";
 
-const CATEGORIES = ["events", "venues", "homepage", "success_stories"];
+const CATEGORIES = ["events", "venues", "homepage", "success_stories", "general"];
 
 interface GalleryDialogProps {
   countries: { id: number; name: string; code: string }[];

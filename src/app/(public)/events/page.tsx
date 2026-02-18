@@ -7,6 +7,7 @@ import { EventFilters } from "@/components/events/event-filters";
 import { EventCard } from "@/components/events/event-card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "lucide-react";
+import { getActivePricingTier } from "@/lib/pricing";
 import {
   Pagination,
   PaginationContent,
@@ -102,6 +103,21 @@ async function EventsList({ searchParams }: { searchParams: Awaited<PageProps['s
       price_male,
       price_female,
       enable_gendered_price,
+      vip_price,
+      vip_price_male,
+      vip_price_female,
+      early_bird_enabled,
+      early_bird_price,
+      early_bird_price_male,
+      early_bird_price_female,
+      early_bird_deadline,
+      last_minute_enabled,
+      last_minute_price,
+      last_minute_price_male,
+      last_minute_price_female,
+      last_minute_activation,
+      last_minute_days_before,
+      last_minute_mode,
       limit_male,
       limit_female,
       cities:city_id (
@@ -191,32 +207,60 @@ async function EventsList({ searchParams }: { searchParams: Awaited<PageProps['s
   };
 
   // Format events for cards
-  const formattedEvents = events.map((event) => ({
-    id: event.id,
-    event_date: event.event_date,
-    start_time: event.start_time,
-    event_type: event.event_type,
-    image_url: getImageUrl(event),
-    city_name: event.cities?.name || "",
-    venue_name: event.venues?.name || "",
-    age_min: event.age_min,
-    age_max: event.age_max,
-    age_min_male: event.age_min_male,
-    age_max_male: event.age_max_male,
-    age_min_female: event.age_min_female,
-    age_max_female: event.age_max_female,
-    enable_gendered_age: event.enable_gendered_age,
-    price: event.price,
-    price_male: event.price_male,
-    price_female: event.price_female,
-    enable_gendered_price: event.enable_gendered_price,
-    currency: countryData.currency,
-    limit_male: event.limit_male,
-    limit_female: event.limit_female,
-    registrations_count: registrationCounts[event.id]?.total || 0,
-    male_registrations: registrationCounts[event.id]?.male || 0,
-    female_registrations: registrationCounts[event.id]?.female || 0,
-  }));
+  const formattedEvents = events.map((event) => {
+    const activeTier = getActivePricingTier({
+      price: event.price,
+      price_male: event.price_male,
+      price_female: event.price_female,
+      enable_gendered_price: event.enable_gendered_price,
+      vip_price: event.vip_price,
+      vip_price_male: event.vip_price_male,
+      vip_price_female: event.vip_price_female,
+      currency: countryData.currency,
+      early_bird_enabled: event.early_bird_enabled,
+      early_bird_price: event.early_bird_price,
+      early_bird_price_male: event.early_bird_price_male,
+      early_bird_price_female: event.early_bird_price_female,
+      early_bird_deadline: event.early_bird_deadline,
+      last_minute_enabled: event.last_minute_enabled,
+      last_minute_price: event.last_minute_price,
+      last_minute_price_male: event.last_minute_price_male,
+      last_minute_price_female: event.last_minute_price_female,
+      last_minute_activation: event.last_minute_activation,
+      last_minute_days_before: event.last_minute_days_before,
+      last_minute_mode: event.last_minute_mode,
+      event_date: event.event_date,
+      start_time: event.start_time,
+    });
+
+    return {
+      id: event.id,
+      event_date: event.event_date,
+      start_time: event.start_time,
+      event_type: event.event_type,
+      image_url: getImageUrl(event),
+      city_name: event.cities?.name || "",
+      venue_name: event.venues?.name || "",
+      age_min: event.age_min,
+      age_max: event.age_max,
+      age_min_male: event.age_min_male,
+      age_max_male: event.age_max_male,
+      age_min_female: event.age_min_female,
+      age_max_female: event.age_max_female,
+      enable_gendered_age: event.enable_gendered_age,
+      price: event.price,
+      price_male: event.price_male,
+      price_female: event.price_female,
+      enable_gendered_price: event.enable_gendered_price,
+      currency: countryData.currency,
+      limit_male: event.limit_male,
+      limit_female: event.limit_female,
+      registrations_count: registrationCounts[event.id]?.total || 0,
+      male_registrations: registrationCounts[event.id]?.male || 0,
+      female_registrations: registrationCounts[event.id]?.female || 0,
+      activeTier,
+    };
+  });
 
   const totalPages = count ? Math.ceil(count / EVENTS_PER_PAGE) : 1;
 
@@ -245,6 +289,8 @@ async function EventsList({ searchParams }: { searchParams: Awaited<PageProps['s
               men: t("events.men"),
               women: t("events.women"),
               view_event: t("events.view_event"),
+              early_bird: t("events.pricing_early_bird"),
+              last_minute: t("events.pricing_last_minute"),
             }}
           />
         ))}

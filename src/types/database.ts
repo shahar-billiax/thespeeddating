@@ -275,6 +275,7 @@ export type Database = {
           id: number
           paid_amount: number | null
           payment_status: string
+          pricing_tier: string
           promotion_code_id: number | null
           registered_at: string
           status: string
@@ -293,6 +294,7 @@ export type Database = {
           id?: number
           paid_amount?: number | null
           payment_status?: string
+          pricing_tier?: string
           promotion_code_id?: number | null
           registered_at?: string
           status?: string
@@ -311,6 +313,7 @@ export type Database = {
           id?: number
           paid_amount?: number | null
           payment_status?: string
+          pricing_tier?: string
           promotion_code_id?: number | null
           registered_at?: string
           status?: string
@@ -358,6 +361,11 @@ export type Database = {
           currency: string | null
           description: string | null
           dress_code: string | null
+          early_bird_deadline: string | null
+          early_bird_enabled: boolean
+          early_bird_price: number | null
+          early_bird_price_female: number | null
+          early_bird_price_male: number | null
           enable_gendered_age: boolean
           enable_gendered_price: boolean
           end_time: string | null
@@ -366,6 +374,13 @@ export type Database = {
           id: number
           is_cancelled: boolean
           is_published: boolean
+          last_minute_activation: string | null
+          last_minute_days_before: number | null
+          last_minute_enabled: boolean
+          last_minute_mode: string | null
+          last_minute_price: number | null
+          last_minute_price_female: number | null
+          last_minute_price_male: number | null
           limit_female: number | null
           limit_male: number | null
           match_results_released: boolean
@@ -381,6 +396,8 @@ export type Database = {
           updated_at: string
           venue_id: number | null
           vip_price: number | null
+          vip_price_female: number | null
+          vip_price_male: number | null
         }
         Insert: {
           age_max?: number | null
@@ -396,6 +413,11 @@ export type Database = {
           currency?: string | null
           description?: string | null
           dress_code?: string | null
+          early_bird_deadline?: string | null
+          early_bird_enabled?: boolean
+          early_bird_price?: number | null
+          early_bird_price_female?: number | null
+          early_bird_price_male?: number | null
           enable_gendered_age?: boolean
           enable_gendered_price?: boolean
           end_time?: string | null
@@ -404,6 +426,13 @@ export type Database = {
           id?: number
           is_cancelled?: boolean
           is_published?: boolean
+          last_minute_activation?: string | null
+          last_minute_days_before?: number | null
+          last_minute_enabled?: boolean
+          last_minute_mode?: string | null
+          last_minute_price?: number | null
+          last_minute_price_female?: number | null
+          last_minute_price_male?: number | null
           limit_female?: number | null
           limit_male?: number | null
           match_results_released?: boolean
@@ -419,6 +448,8 @@ export type Database = {
           updated_at?: string
           venue_id?: number | null
           vip_price?: number | null
+          vip_price_female?: number | null
+          vip_price_male?: number | null
         }
         Update: {
           age_max?: number | null
@@ -434,6 +465,11 @@ export type Database = {
           currency?: string | null
           description?: string | null
           dress_code?: string | null
+          early_bird_deadline?: string | null
+          early_bird_enabled?: boolean
+          early_bird_price?: number | null
+          early_bird_price_female?: number | null
+          early_bird_price_male?: number | null
           enable_gendered_age?: boolean
           enable_gendered_price?: boolean
           end_time?: string | null
@@ -442,6 +478,13 @@ export type Database = {
           id?: number
           is_cancelled?: boolean
           is_published?: boolean
+          last_minute_activation?: string | null
+          last_minute_days_before?: number | null
+          last_minute_enabled?: boolean
+          last_minute_mode?: string | null
+          last_minute_price?: number | null
+          last_minute_price_female?: number | null
+          last_minute_price_male?: number | null
           limit_female?: number | null
           limit_male?: number | null
           match_results_released?: boolean
@@ -457,6 +500,8 @@ export type Database = {
           updated_at?: string
           venue_id?: number | null
           vip_price?: number | null
+          vip_price_female?: number | null
+          vip_price_male?: number | null
         }
         Relationships: [
           {
@@ -521,33 +566,53 @@ export type Database = {
         Row: {
           caption: string | null
           created_at: string
+          event_id: number | null
           gallery_id: number
           id: number
           sort_order: number
           storage_path: string
+          venue_id: number | null
         }
         Insert: {
           caption?: string | null
           created_at?: string
+          event_id?: number | null
           gallery_id: number
           id?: number
           sort_order?: number
           storage_path: string
+          venue_id?: number | null
         }
         Update: {
           caption?: string | null
           created_at?: string
+          event_id?: number | null
           gallery_id?: number
           id?: number
           sort_order?: number
           storage_path?: string
+          venue_id?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "gallery_images_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "gallery_images_gallery_id_fkey"
             columns: ["gallery_id"]
             isOneToOne: false
             referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_images_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
             referencedColumns: ["id"]
           },
         ]

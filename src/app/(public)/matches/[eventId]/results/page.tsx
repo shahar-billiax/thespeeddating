@@ -3,6 +3,7 @@ import {
   getVipBonusData,
   checkVipStatus,
 } from "@/lib/matches/actions";
+import { getCompatibilityScoresForUsers } from "@/lib/compatibility/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,11 @@ import {
   ArrowLeft,
   MapPin,
   Calendar,
+  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 
 export default async function ResultsPage({
   params,
@@ -29,6 +32,7 @@ export default async function ResultsPage({
 }) {
   const { eventId } = await params;
   const t = await getTranslations();
+  const locale = await getLocale();
   const data = await getMatchResults(Number(eventId));
 
   if ("error" in data) {
@@ -60,6 +64,17 @@ export default async function ResultsPage({
   const vipData = await getVipBonusData(Number(eventId));
   const isVip = await checkVipStatus();
 
+  // Fetch deep compatibility scores for all matched users
+  let compatScores: Record<string, { score: number; dealbreakers_passed: boolean }> = {};
+  try {
+    const profileIds = data.matches!.map((m: any) => m.userId).filter(Boolean);
+    if (profileIds.length > 0) {
+      compatScores = await getCompatibilityScoresForUsers(profileIds);
+    }
+  } catch {
+    // Not critical
+  }
+
   return (
     <div className="section-container max-w-2xl py-10 sm:py-16">
       <div className="mb-8">
@@ -77,7 +92,7 @@ export default async function ResultsPage({
           {(data.event as any)?.date && (
             <span className="inline-flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5" />
-              {new Date((data.event as any).date).toLocaleDateString("en-GB", {
+              {new Date((data.event as any).date).toLocaleDateString(locale === "he" ? "he-IL" : "en-GB", {
                 weekday: "short",
                 day: "numeric",
                 month: "short",
@@ -116,7 +131,7 @@ export default async function ResultsPage({
           </div>
           <div className="space-y-3">
             {dateMatches.map((match) => (
-              <MatchCard key={match.id} match={match} type="date" />
+              <MatchCard key={match.id} match={match} type="date" compatScore={compatScores[(match as any).userId]} labels={{ date: t("matches.date"), friend: t("matches.friend"), compatible: t("matches.compatible_percent", { score: "{score}" }), passesDealbreakers: t("matches.passes_dealbreakers"), noContacts: t("matches.no_shared_contacts") }} />
             ))}
           </div>
         </div>
@@ -138,7 +153,7 @@ export default async function ResultsPage({
           </div>
           <div className="space-y-3">
             {friendMatches.map((match) => (
-              <MatchCard key={match.id} match={match} type="friend" />
+              <MatchCard key={match.id} match={match} type="friend" compatScore={compatScores[(match as any).userId]} labels={{ date: t("matches.date"), friend: t("matches.friend"), compatible: t("matches.compatible_percent", { score: "{score}" }), passesDealbreakers: t("matches.passes_dealbreakers"), noContacts: t("matches.no_shared_contacts") }} />
             ))}
           </div>
         </div>
@@ -197,7 +212,7 @@ export default async function ResultsPage({
                     ) : (
                       <Users className="h-3 w-3 me-1" />
                     )}
-                    {p.choice === "date" ? "Date" : "Friend"}
+                    {p.choice === "date" ? t("matches.date") : t("matches.friend")}
                   </Badge>
                 </div>
               ))}
@@ -232,6 +247,8 @@ export default async function ResultsPage({
 function MatchCard({
   match,
   type,
+  compatScore,
+  labels,
 }: {
   match: {
     id: number;
@@ -245,6 +262,8 @@ function MatchCard({
     sharedContacts: Record<string, string | null | undefined>;
   };
   type: "date" | "friend";
+  compatScore?: { score: number; dealbreakers_passed: boolean };
+  labels: { date: string; friend: string; compatible: string; passesDealbreakers: string; noContacts: string };
 }) {
   const contacts = match.sharedContacts;
   const hasContacts = Object.values(contacts).some((v) => v);
@@ -292,9 +311,25 @@ function MatchCard({
                 ) : (
                   <Users className="h-3 w-3 me-1" />
                 )}
-                {type === "date" ? "Date" : "Friend"}
+                {type === "date" ? labels.date : labels.friend}
               </Badge>
             </div>
+
+            {/* Compatibility badges */}
+            {compatScore && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                <span className="inline-flex items-center gap-1 rounded-md border border-purple-200 bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
+                  <Sparkles className="h-3 w-3" />
+                  {labels.compatible.replace("{score}", String(compatScore.score))}
+                </span>
+                {compatScore.dealbreakers_passed && (
+                  <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">
+                    <ShieldCheck className="h-3 w-3" />
+                    {labels.passesDealbreakers}
+                  </span>
+                )}
+              </div>
+            )}
 
             {match.bio && (
               <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
@@ -336,7 +371,7 @@ function MatchCard({
               </div>
             ) : (
               <p className="text-xs text-muted-foreground/60 mt-2">
-                No shared contact details
+                {labels.noContacts}
               </p>
             )}
           </div>

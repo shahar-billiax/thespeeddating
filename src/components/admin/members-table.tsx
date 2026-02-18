@@ -14,7 +14,7 @@ import {
 import {
   Sheet, SheetContent, SheetTrigger,
 } from "@/components/ui/sheet";
-import { ChevronDown, ExternalLink, Filter, LayoutGrid, List, X } from "lucide-react";
+import { ChevronDown, Crown, ExternalLink, Filter, LayoutGrid, List, X } from "lucide-react";
 import { useAdminCountry } from "@/lib/admin-country-context";
 import {
   MembersFilterPanel,
@@ -41,6 +41,7 @@ type MemberRow = {
   role: string;
   is_active: boolean;
   created_at: string;
+  updated_at: string;
   avatar_url: string | null;
   faith: string | null;
   relationship_status: string | null;
@@ -52,6 +53,7 @@ type MemberRow = {
   education: string | null;
   sexual_preference: string | null;
   admin_comments: string | null;
+  bio: string | null;
   city_id: number | null;
   cities: { name: string } | null;
   countries: { name: string; code: string } | null;
@@ -111,7 +113,7 @@ function compareFn(a: MemberRow, b: MemberRow, key: SortKey, dir: SortDir): numb
 
 // ─── Table row ──────────────────────────────────────────────
 
-function MemberRowItem({ member: m }: { member: MemberRow }) {
+function MemberRowItem({ member: m, isVip }: { member: MemberRow; isVip: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const age = getAge(m.date_of_birth);
 
@@ -136,6 +138,11 @@ function MemberRowItem({ member: m }: { member: MemberRow }) {
               {m.first_name} {m.last_name}
               <ExternalLink className="h-3 w-3 shrink-0" />
             </Link>
+            {isVip && (
+              <span className="inline-flex items-center text-amber-600 text-[10px] font-semibold leading-none" title="Active VIP subscription">
+                <Crown className="h-3 w-3" />
+              </span>
+            )}
           </div>
         </TableCell>
         <TableCell className="text-sm hidden lg:table-cell max-w-[150px] truncate">{m.email}</TableCell>
@@ -160,7 +167,7 @@ function MemberRowItem({ member: m }: { member: MemberRow }) {
           </Badge>
         </TableCell>
         <TableCell className="text-sm text-muted-foreground hidden xl:table-cell">
-          {new Date(m.created_at).toLocaleDateString()}
+          {new Date(m.created_at).toLocaleDateString("en-GB")}
         </TableCell>
       </TableRow>
       {expanded && (
@@ -196,7 +203,7 @@ function MemberRowItem({ member: m }: { member: MemberRow }) {
               </div>
               <div>
                 <span className="text-muted-foreground">Joined: </span>
-                <span>{new Date(m.created_at).toLocaleDateString()}</span>
+                <span>{new Date(m.created_at).toLocaleDateString("en-GB")}</span>
               </div>
             </div>
           </TableCell>
@@ -330,6 +337,43 @@ function ActiveFilterChips({
       clear: () => onFilterChange("hasComments", "all"),
     });
   }
+  if (filters.vipFilter !== "all") {
+    chips.push({
+      label: `VIP: ${filters.vipFilter === "yes" ? "Yes" : "No"}`,
+      clear: () => onFilterChange("vipFilter", "all"),
+    });
+  }
+  if (filters.hasPhoto !== "all") {
+    chips.push({
+      label: `Photo: ${filters.hasPhoto === "yes" ? "Yes" : "No"}`,
+      clear: () => onFilterChange("hasPhoto", "all"),
+    });
+  }
+  if (filters.hasBio !== "all") {
+    chips.push({
+      label: `Bio: ${filters.hasBio === "yes" ? "Yes" : "No"}`,
+      clear: () => onFilterChange("hasBio", "all"),
+    });
+  }
+  if (filters.eventCountFilter !== "all") {
+    const labels: Record<string, string> = {
+      "0": "Never attended",
+      "1+": "1+ events",
+      "3+": "3+ events",
+      "5+": "5+ events",
+      "10+": "10+ events",
+    };
+    chips.push({
+      label: `Events: ${labels[filters.eventCountFilter] ?? filters.eventCountFilter}`,
+      clear: () => onFilterChange("eventCountFilter", "all"),
+    });
+  }
+  if (filters.updatedWithinMonths !== null) {
+    chips.push({
+      label: `Updated: last ${filters.updatedWithinMonths}mo`,
+      clear: () => onFilterChange("updatedWithinMonths", null),
+    });
+  }
 
   if (chips.length === 0) return null;
 
@@ -363,11 +407,16 @@ export function MembersTable({
   members,
   cities,
   eventActivity,
+  eventCounts = {},
+  vipUserIds = [],
 }: {
   members: MemberRow[];
   cities: City[];
   eventActivity: Record<string, string>;
+  eventCounts?: Record<string, number>;
+  vipUserIds?: string[];
 }) {
+  const vipSet = useMemo(() => new Set(vipUserIds), [vipUserIds]);
   const { countryCode } = useAdminCountry();
 
   // Sort state
@@ -531,6 +580,43 @@ export function MembersTable({
           : !m.admin_comments || m.admin_comments.trim().length === 0
       );
     }
+    if (filters.vipFilter !== "all") {
+      list = list.filter((m) =>
+        filters.vipFilter === "yes" ? vipSet.has(m.id) : !vipSet.has(m.id)
+      );
+    }
+    if (filters.hasPhoto !== "all") {
+      list = list.filter((m) =>
+        filters.hasPhoto === "yes"
+          ? m.avatar_url && m.avatar_url.trim().length > 0
+          : !m.avatar_url || m.avatar_url.trim().length === 0
+      );
+    }
+    if (filters.hasBio !== "all") {
+      list = list.filter((m) =>
+        filters.hasBio === "yes"
+          ? m.bio && m.bio.trim().length > 0
+          : !m.bio || m.bio.trim().length === 0
+      );
+    }
+    if (filters.eventCountFilter !== "all") {
+      list = list.filter((m) => {
+        const count = eventCounts[m.id] ?? 0;
+        switch (filters.eventCountFilter) {
+          case "0": return count === 0;
+          case "1+": return count >= 1;
+          case "3+": return count >= 3;
+          case "5+": return count >= 5;
+          case "10+": return count >= 10;
+          default: return true;
+        }
+      });
+    }
+    if (filters.updatedWithinMonths !== null && filters.updatedWithinMonths > 0) {
+      const cutoff = new Date();
+      cutoff.setMonth(cutoff.getMonth() - filters.updatedWithinMonths);
+      list = list.filter((m) => new Date(m.updated_at) >= cutoff);
+    }
     if (filters.search.trim()) {
       const term = filters.search.toLowerCase().trim();
       list = list.filter(
@@ -546,7 +632,7 @@ export function MembersTable({
     }
 
     return list;
-  }, [members, filters, eventActivity]);
+  }, [members, filters, eventActivity, eventCounts, vipSet]);
 
   const sorted = useMemo(() => {
     if (!sortKey) return filtered;
@@ -653,14 +739,14 @@ export function MembersTable({
                   <EmptyTableRow colSpan={8} search={filters.search} entityName="members" />
                 ) : (
                   sorted.map((m) => (
-                    <MemberRowItem key={m.id} member={m} />
+                    <MemberRowItem key={m.id} member={m} isVip={vipSet.has(m.id)} />
                   ))
                 )}
               </TableBody>
             </Table>
           </div>
         ) : (
-          <MembersCardView members={sorted as any} />
+          <MembersCardView members={sorted as any} vipUserIds={vipUserIds} />
         )}
       </div>
 
