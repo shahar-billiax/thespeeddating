@@ -765,6 +765,7 @@ export async function getBlogPosts(params: {
   page?: number;
   language?: string;
   published?: string;
+  q?: string;
 }) {
   const { supabase } = await requireAdmin();
   const page = params.page ?? 1;
@@ -780,6 +781,7 @@ export async function getBlogPosts(params: {
   if (params.language) query = query.eq("language_code", params.language);
   if (params.published === "true") query = query.eq("is_published", true);
   if (params.published === "false") query = query.eq("is_published", false);
+  if (params.q) query = query.ilike("title", `%${params.q}%`);
 
   const { data, count, error } = await query;
   if (error) throw new Error(error.message);
@@ -812,8 +814,8 @@ export async function saveBlogPost(formData: FormData) {
     body_html: formData.get("body_html") as string,
     language_code: (formData.get("language_code") as string) || "en",
     featured_image: (formData.get("featured_image") as string) || null,
-    is_published: formData.get("is_published") === "on",
-    published_at: formData.get("is_published") === "on"
+    is_published: formData.get("is_published") === "on" || formData.get("is_published") === "true",
+    published_at: formData.get("is_published") === "on" || formData.get("is_published") === "true"
       ? new Date().toISOString()
       : null,
   };

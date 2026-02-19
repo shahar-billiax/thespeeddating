@@ -31,31 +31,33 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <Label htmlFor="name">{t("contact.name")}</Label>
-        <Input
-          id="name"
-          name="name"
-          type="text"
-          required
-          placeholder={t("contact.name_placeholder")}
-          disabled={isSubmitting}
-          className="mt-1.5"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <Label htmlFor="name">{t("contact.name")}</Label>
+          <Input
+            id="name"
+            name="name"
+            type="text"
+            required
+            placeholder={t("contact.name_placeholder")}
+            disabled={isSubmitting}
+            className="mt-1.5"
+          />
+        </div>
 
-      <div>
-        <Label htmlFor="email">{t("contact.email")}</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          required
-          placeholder={t("contact.email_placeholder")}
-          disabled={isSubmitting}
-          className="mt-1.5"
-        />
+        <div>
+          <Label htmlFor="email">{t("contact.email")}</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            required
+            placeholder={t("contact.email_placeholder")}
+            disabled={isSubmitting}
+            className="mt-1.5"
+          />
+        </div>
       </div>
 
       <div>
@@ -78,7 +80,7 @@ export function ContactForm() {
           name="message"
           required
           placeholder={t("contact.message_placeholder")}
-          rows={6}
+          rows={5}
           disabled={isSubmitting}
           className="mt-1.5"
         />

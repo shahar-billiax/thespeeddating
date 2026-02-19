@@ -62,6 +62,7 @@ export function LifeAlignmentForm({ initialData }: LifeAlignmentFormProps) {
   const t = useTranslations();
   const [isPending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const educationLabels = [
     "",
@@ -93,9 +94,23 @@ export function LifeAlignmentForm({ initialData }: LifeAlignmentFormProps) {
   });
 
   function handleSave() {
+    // Show a hint for missing required fields but still allow partial saves
+    const missing: string[] = [];
+    if (!form.faith) missing.push(t("compat.field_faith"));
+    if (!form.practice_frequency) missing.push(t("compat.field_practice_frequency"));
+    if (!form.wants_children) missing.push(t("compat.field_wants_children"));
+    setValidationError(missing.length > 0
+      ? t("compat.required_fields_missing", { fields: missing.join(", ") })
+      : null);
+
     setSaved(false);
+    // Clear children_timeline when not applicable
+    const dataToSave = {
+      ...form,
+      children_timeline: form.wants_children === "yes" ? form.children_timeline : null,
+    };
     startTransition(async () => {
-      await updateLifeAlignmentProfile(form);
+      await updateLifeAlignmentProfile(dataToSave);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     });
@@ -357,13 +372,18 @@ export function LifeAlignmentForm({ initialData }: LifeAlignmentFormProps) {
       </Card>
 
       {/* Save */}
-      <div className="flex items-center gap-4">
-        <Button onClick={handleSave} disabled={isPending}>
-          {isPending ? t("compat.saving") : t("compat.save_life_alignment")}
-        </Button>
-        {saved && (
-          <span className="text-sm text-green-600">{t("compat.saved")}</span>
+      <div className="space-y-2">
+        {validationError && (
+          <p className="text-sm text-amber-600">{validationError}</p>
         )}
+        <div className="flex items-center gap-4">
+          <Button onClick={handleSave} disabled={isPending}>
+            {isPending ? t("compat.saving") : t("compat.save_life_alignment")}
+          </Button>
+          {saved && (
+            <span className="text-sm text-green-600">{t("compat.saved")}</span>
+          )}
+        </div>
       </div>
     </div>
   );

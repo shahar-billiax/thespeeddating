@@ -57,7 +57,7 @@ export default async function DashboardLayout({
   const profileCompletion = Math.min(baseCompletion + compatCompletion, 100);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col overflow-hidden">
       <PublicHeader
         user={
           user
@@ -69,7 +69,7 @@ export default async function DashboardLayout({
             : null
         }
       />
-      <div className="flex flex-1 flex-col md:flex-row">
+      <div className="flex flex-1 min-h-0 flex-col md:flex-row overflow-hidden">
         <DashboardSidebar
           user={{
             firstName: profile?.first_name || "",
@@ -79,7 +79,7 @@ export default async function DashboardLayout({
             profileCompletion,
           }}
         />
-        <main className="flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

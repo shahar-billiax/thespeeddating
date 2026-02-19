@@ -269,22 +269,20 @@ export function OnboardingWizard({ profile, compatProfile, dealbreakers }: Onboa
             </Button>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          {step < 3 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setStep(step + 1)}
-              disabled={isPending}
-              className="text-muted-foreground"
-            >
-              {t("compat.skip_for_now")}
-            </Button>
-          )}
-          <Button onClick={saveAndNext} disabled={isPending}>
-            {getButtonLabel()}
-          </Button>
-        </div>
+        <Button onClick={saveAndNext} disabled={isPending}>
+          {getButtonLabel()}
+        </Button>
+      </div>
+
+      {/* Skip the entire questionnaire — nothing is saved */}
+      <div className="text-center pt-2">
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="text-muted-foreground text-xs hover:underline"
+          disabled={isPending}
+        >
+          {t("compat.skip_questionnaire")}
+        </button>
       </div>
     </div>
   );
@@ -293,16 +291,15 @@ export function OnboardingWizard({ profile, compatProfile, dealbreakers }: Onboa
 // ─── Helpers ────────────────────────────────────────────────────────
 
 function getInitialStep(profile: any, compatProfile: any, dealbreakers: any): number {
-  const lifeFields = [
-    profile?.faith,
-    profile?.religion_importance,
-    profile?.wants_children,
-    profile?.career_ambition,
-    profile?.education_level,
-  ];
-  const lifeComplete = lifeFields.filter((f: any) => f != null && f !== "").length >= 3;
+  // Step 0 is only complete when the required SELECT fields are filled.
+  // Slider fields (religion_importance, career_ambition, education_level) default to 3
+  // on save, so they cannot be used as a completion signal.
+  const step0Done =
+    profile?.faith != null && profile?.faith !== "" &&
+    profile?.practice_frequency != null && profile?.practice_frequency !== "" &&
+    profile?.wants_children != null && profile?.wants_children !== "";
 
-  if (!lifeComplete) return 0;
+  if (!step0Done) return 0;
   if (!compatProfile) return 1;
   if (!dealbreakers) return 2;
   return 3;

@@ -55,8 +55,8 @@ export function RegisterForm() {
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
-          {step === 1 && (
-            <>
+          <div className={step === 1 ? undefined : "hidden"}>
+            <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="firstName">{t("profile.first_name")}</Label>
@@ -81,8 +81,8 @@ export function RegisterForm() {
               <Button type="button" className="w-full h-11 shadow-sm" onClick={handleNext}>
                 {t("common.next")}
               </Button>
-            </>
-          )}
+            </div>
+          </div>
 
           {step === 2 && (
             <>

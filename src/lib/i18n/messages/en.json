@@ -949,7 +949,12 @@
     "step_life_alignment": "Life Alignment",
     "step_personality": "Personality Assessment",
     "step_dealbreakers": "Dealbreakers",
-    "step_about_you": "About You"
+    "step_about_you": "About You",
+    "required_fields_missing": "Please also fill in: {fields}.",
+    "field_faith": "religion / faith",
+    "field_practice_frequency": "practice frequency",
+    "field_wants_children": "whether you want children",
+    "skip_questionnaire": "Skip for now — I'll fill this in later"
   },
   "admin": {
     "dashboard": "Dashboard",

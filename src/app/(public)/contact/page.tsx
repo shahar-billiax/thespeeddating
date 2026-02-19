@@ -62,15 +62,15 @@ export default async function ContactPage() {
   const email = cmsContact?.email || fallbackContact.email;
 
   return (
-    <div>
-      {/* Hero Section */}
-      <section className="page-hero">
+    <div className="min-h-[calc(100vh-4rem)]">
+      {/* Hero Section — compact */}
+      <section className="relative bg-gradient-to-b from-primary/5 to-background py-6 md:py-8">
         <div className="section-container">
           <div className="mx-auto max-w-3xl text-center">
-            <h1 className="mb-3 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
+            <h1 className="mb-1.5 text-2xl font-bold tracking-tight sm:text-3xl">
               {page?.title || t("contact.title")}
             </h1>
-            <p className="text-base text-muted-foreground sm:text-lg max-w-xl mx-auto">
+            <p className="text-sm text-muted-foreground sm:text-base max-w-xl mx-auto">
               {t("contact.subtitle")}
             </p>
           </div>
@@ -79,7 +79,7 @@ export default async function ContactPage() {
 
       {/* CMS Content */}
       {page?.content_html && (
-        <section className="section-container py-8">
+        <section className="section-container py-4">
           <div className="mx-auto max-w-4xl">
             <CmsContent html={page.content_html} />
           </div>
@@ -87,7 +87,7 @@ export default async function ContactPage() {
       )}
 
       {/* Main Content */}
-      <section className="section-container py-12 md:py-16">
+      <section className="section-container py-6 md:py-8">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-8 lg:grid-cols-5">
             {/* Contact Info Column */}

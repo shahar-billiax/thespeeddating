@@ -1,12 +1,8 @@
 import Link from "next/link";
 import { getBlogPosts } from "@/lib/admin/actions";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { BlogPostsTable } from "@/components/admin/blog-posts-table";
 import { Plus } from "lucide-react";
-import { AdminPagination } from "@/components/admin/pagination";
 
 export default async function AdminBlogPage({
   searchParams,
@@ -15,9 +11,10 @@ export default async function AdminBlogPage({
 }) {
   const params = await searchParams;
   const { posts, total, page, perPage } = await getBlogPosts({
-    page: params.page ? Number(params.page) : 1,
-    language: params.language,
+    page:      params.page      ? Number(params.page) : 1,
+    language:  params.language,
     published: params.published,
+    q:         params.q,
   });
 
   return (
@@ -32,48 +29,7 @@ export default async function AdminBlogPage({
         </Button>
       </div>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Language</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {posts.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                  No blog posts
-                </TableCell>
-              </TableRow>
-            ) : (
-              posts.map((post: any) => (
-                <TableRow key={post.id}>
-                  <TableCell>
-                    <Link href={`/admin/blog/${post.id}/edit`} className="font-medium hover:underline">
-                      {post.title}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{post.language_code === "he" ? "Hebrew" : "English"}</TableCell>
-                  <TableCell>
-                    <Badge variant={post.is_published ? "default" : "secondary"}>
-                      {post.is_published ? "Published" : "Draft"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <AdminPagination total={total} page={page} perPage={perPage} />
+      <BlogPostsTable posts={posts} total={total} page={page} perPage={perPage} />
     </div>
   );
 }

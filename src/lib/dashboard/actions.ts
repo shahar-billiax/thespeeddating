@@ -154,14 +154,32 @@ export async function getPendingActions() {
     }
   }
 
-  // Check if compatibility profile is incomplete
-  const { data: compatProfile } = await supabase
-    .from("compatibility_profiles" as any)
-    .select("user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+  // Check if compatibility questionnaire is incomplete.
+  // A user is considered incomplete if life alignment required fields are missing
+  // OR if the 20-question assessment hasn't been saved yet.
+  const [{ data: profileFields }, { data: compatProfile }] = await Promise.all([
+    (supabase as any)
+      .from("profiles")
+      .select("faith, religion_importance, practice_frequency, wants_children, career_ambition, work_life_philosophy, education_level")
+      .eq("id", user.id)
+      .single(),
+    supabase
+      .from("compatibility_profiles" as any)
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+  ]);
 
-  if (!compatProfile) {
+  const lifeAlignmentIncomplete =
+    !profileFields?.faith ||
+    profileFields?.religion_importance == null || profileFields?.religion_importance === "" ||
+    !profileFields?.practice_frequency ||
+    !profileFields?.wants_children ||
+    profileFields?.career_ambition == null || profileFields?.career_ambition === "" ||
+    profileFields?.work_life_philosophy == null || profileFields?.work_life_philosophy === "" ||
+    profileFields?.education_level == null || profileFields?.education_level === "";
+
+  if (lifeAlignmentIncomplete || !compatProfile) {
     actions.push({
       type: "complete_profile",
       label: "compatibility",

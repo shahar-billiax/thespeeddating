@@ -752,7 +752,7 @@ export function MembersTable({
 
       {/* ── Desktop filter sidebar (right side, always visible on lg+) ── */}
       <aside className="hidden lg:block w-[280px] xl:w-[300px] shrink-0">
-        <div className="sticky top-4 max-h-[calc(100vh-120px)] flex flex-col border rounded-lg overflow-hidden bg-background">
+        <div className="sticky top-4 h-[calc(100vh-120px)] flex flex-col border rounded-lg overflow-hidden bg-background">
           <MembersFilterPanel {...filterPanelProps} />
         </div>
       </aside>

@@ -24,10 +24,12 @@ export default async function PublicLayout({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col overflow-hidden">
       <PublicHeader user={user ? { email: user.email!, role, compatIncomplete } : null} />
-      <main id="main-content" className="flex-1">{children}</main>
-      <PublicFooter />
+      <div className="flex-1 overflow-y-auto">
+        <main id="main-content">{children}</main>
+        <PublicFooter />
+      </div>
     </div>
   );
 }

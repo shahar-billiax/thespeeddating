@@ -18,39 +18,24 @@ export function StatCard({
   iconClassName,
 }: StatCardProps) {
   return (
-    <Card className="group relative overflow-hidden transition-shadow hover:shadow-md">
-      {/* Subtle decorative corner */}
-      <div
-        className={cn(
-          "pointer-events-none absolute -end-6 -top-6 h-16 w-16 rounded-full opacity-20 transition-opacity group-hover:opacity-30",
-          iconClassName ? iconClassName.replace(/text-/, "bg-") : "bg-primary"
-        )}
-      />
-
-      <CardContent className="relative p-5">
-        <div className="flex items-start gap-4">
-          {/* Icon container */}
-          <div
-            className={cn(
-              "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105",
-              iconClassName || "bg-primary/10 text-primary"
-            )}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
-
-          {/* Value and label */}
-          <div className="min-w-0 flex-1">
-            <p className="text-3xl font-bold leading-none tracking-tight">
-              {value}
-            </p>
-            <p className="mt-1.5 text-sm text-muted-foreground">{label}</p>
-            {subtitle && (
-              <p className="mt-0.5 text-xs text-muted-foreground/70">
-                {subtitle}
-              </p>
-            )}
-          </div>
+    <Card className="transition-shadow hover:shadow-md">
+      <CardContent className="flex h-full items-center justify-center gap-4 p-5">
+        <div
+          className={cn(
+            "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl",
+            iconClassName || "bg-primary/10 text-primary"
+          )}
+        >
+          <Icon className="h-6 w-6" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-2xl font-bold leading-tight tracking-tight">
+            {value}
+          </p>
+          <p className="text-sm text-muted-foreground">{label}</p>
+          {subtitle && (
+            <p className="text-xs text-muted-foreground/60">{subtitle}</p>
+          )}
         </div>
       </CardContent>
     </Card>

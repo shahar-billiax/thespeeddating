@@ -41,14 +41,14 @@ export default async function AdminLayout({
       initialCountryId={initialCountryId}
       initialCountryCode={initialCountryCode}
     >
-      <div className="flex min-h-screen" dir="ltr">
+      <div className="flex h-screen overflow-hidden" dir="ltr">
         <AdminSidebar />
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <AdminTopbar
             user={{ email: user?.email || "" }}
             countries={countryList}
           />
-          <main className="flex-1 p-4 md:p-6">{children}</main>
+          <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
         </div>
       </div>
     </AdminCountryProvider>

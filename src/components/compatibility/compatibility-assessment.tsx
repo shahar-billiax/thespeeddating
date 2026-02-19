@@ -120,15 +120,14 @@ export function CompatibilityAssessment({ initialData }: CompatibilityAssessment
           {t("compat.previous_section")}
         </Button>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           {saved && (
             <span className="text-sm text-green-600">{t("compat.saved_short")}</span>
           )}
-          {currentCategory === CATEGORIES.length - 1 ? (
-            <Button onClick={handleSave} disabled={isPending}>
-              {isPending ? t("compat.saving") : t("compat.save_assessment")}
-            </Button>
-          ) : (
+          <Button variant="outline" onClick={handleSave} disabled={isPending}>
+            {isPending ? t("compat.saving") : t("compat.save_assessment")}
+          </Button>
+          {currentCategory < CATEGORIES.length - 1 && (
             <Button
               onClick={() =>
                 setCurrentCategory(Math.min(CATEGORIES.length - 1, currentCategory + 1))

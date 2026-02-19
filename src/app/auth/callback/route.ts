@@ -16,21 +16,29 @@ export async function GET(request: Request) {
       } = await supabase.auth.getUser();
 
       if (user && (next === "/" || next === "/dashboard")) {
-        // Compatibility fields exist in DB but not in generated types
-        const { data: profile } = await (supabase as any)
-          .from("profiles")
-          .select("faith, wants_children, education_level")
-          .eq("id", user.id)
-          .single();
-
-        const { data: compat } = await supabase
-          .from("compatibility_profiles" as any)
-          .select("user_id")
-          .eq("user_id", user.id)
-          .single();
+        // Check the same required fields that getInitialStep uses
+        const [{ data: profile }, { data: compat }] = await Promise.all([
+          (supabase as any)
+            .from("profiles")
+            .select("faith, religion_importance, practice_frequency, wants_children, career_ambition, work_life_philosophy, education_level")
+            .eq("id", user.id)
+            .single(),
+          supabase
+            .from("compatibility_profiles" as any)
+            .select("user_id")
+            .eq("user_id", user.id)
+            .single(),
+        ]);
 
         const needsOnboarding =
-          !profile?.faith || !profile?.wants_children || !compat;
+          !profile?.faith ||
+          profile?.religion_importance == null || profile?.religion_importance === "" ||
+          !profile?.practice_frequency ||
+          !profile?.wants_children ||
+          profile?.career_ambition == null || profile?.career_ambition === "" ||
+          profile?.work_life_philosophy == null || profile?.work_life_philosophy === "" ||
+          profile?.education_level == null || profile?.education_level === "" ||
+          !compat;
 
         if (needsOnboarding) {
           return NextResponse.redirect(`${origin}/onboarding`);

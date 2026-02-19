@@ -28,6 +28,7 @@ export default async function DashboardHomePage() {
   const [
     { data: profile },
     { data: compatProfile },
+    { data: dealbreakers },
     stats,
     upcomingEvents,
     pendingActions,
@@ -36,12 +37,17 @@ export default async function DashboardHomePage() {
     supabase
       .from("profiles")
       .select(
-        "first_name, last_name, avatar_url, bio, occupation, faith, date_of_birth, gender, city_id"
+        "first_name, last_name, avatar_url, bio, occupation, faith, religion_importance, practice_frequency, wants_children, career_ambition, work_life_philosophy, education_level, date_of_birth, gender, city_id"
       )
       .eq("id", user.id)
       .single(),
     supabase
       .from("compatibility_profiles" as any)
+      .select("user_id")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("dealbreaker_preferences" as any)
       .select("user_id")
       .eq("user_id", user.id)
       .maybeSingle(),
@@ -51,8 +57,12 @@ export default async function DashboardHomePage() {
     getRecentMatches(),
   ]);
 
-  // Calculate completion for welcome card
-  const profileFields = [
+  // Calculate completion for welcome card.
+  // Base profile fields = 70%; compatibility broken into 3×10%:
+  //   10% life alignment (all 7 life alignment fields set)
+  //   10% personality assessment (compatibility_profiles row exists)
+  //   10% dealbreaker preferences (dealbreaker_preferences row exists)
+  const coreProfileFields = [
     profile?.first_name,
     profile?.last_name,
     profile?.date_of_birth,
@@ -63,10 +73,30 @@ export default async function DashboardHomePage() {
     profile?.city_id,
     profile?.avatar_url,
   ];
-  const filledFields = profileFields.filter(Boolean).length;
-  const baseCompletion = Math.round((filledFields / profileFields.length) * 70);
-  const compatCompletion = compatProfile ? 30 : 0;
+  const filledFields = coreProfileFields.filter(Boolean).length;
+  const baseCompletion = Math.round((filledFields / coreProfileFields.length) * 70);
+
+  const p = profile as any;
+  const lifeAlignmentDone = !!(
+    p?.faith &&
+    p?.religion_importance != null && p?.religion_importance !== "" &&
+    p?.practice_frequency &&
+    p?.wants_children &&
+    p?.career_ambition != null && p?.career_ambition !== "" &&
+    p?.work_life_philosophy != null && p?.work_life_philosophy !== "" &&
+    p?.education_level != null && p?.education_level !== ""
+  );
+  const compatCompletion =
+    (lifeAlignmentDone ? 10 : 0) +
+    (compatProfile ? 10 : 0) +
+    (dealbreakers ? 10 : 0);
+
   const profileCompletion = Math.min(baseCompletion + compatCompletion, 100);
+
+  // Direct "Complete Now" to the right place:
+  // if compat questionnaire is incomplete → onboarding; otherwise → profile page
+  const compatIncomplete = !lifeAlignmentDone || !compatProfile;
+  const completeNowHref = compatIncomplete ? "/onboarding" : "/dashboard/profile";
 
   return (
     <div className="space-y-6">
@@ -74,6 +104,7 @@ export default async function DashboardHomePage() {
       <WelcomeCard
         firstName={profile?.first_name || ""}
         profileCompletion={profileCompletion}
+        completeHref={completeNowHref}
       />
 
       {/* Pending Actions — show prominently at top when they exist */}
@@ -99,7 +130,6 @@ export default async function DashboardHomePage() {
           icon={TrendingUp}
           label={t("dashboard.stats.compatibility_score")}
           value={`${profileCompletion}%`}
-          subtitle={t("dashboard.profile_completion")}
           iconClassName="bg-purple-50 text-purple-600"
         />
         <StatCard
@@ -118,14 +148,14 @@ export default async function DashboardHomePage() {
         />
       </div>
 
-      {/* Quick Actions */}
-      <QuickActionsGrid />
-
       {/* Two-column: Upcoming Events + Recent Matches */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <UpcomingEventsWidget events={upcomingEvents} />
         <RecentMatchesWidget matches={recentMatches} />
       </div>
+
+      {/* Quick Actions */}
+      <QuickActionsGrid />
     </div>
   );
 }

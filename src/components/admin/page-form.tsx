@@ -148,16 +148,14 @@ function NewPageForm() {
             </p>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Page Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Page</Label>
+          {/* ── Compact page info bar ── */}
+          <div className="rounded-lg border bg-card px-4 py-3 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <Label className="text-xs">Page</Label>
                 <input type="hidden" name="page_key" value={pageKey} />
                 <Select value={pageKey} onValueChange={handlePageKeyChange} required>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue placeholder="Select a page" />
                   </SelectTrigger>
                   <SelectContent>
@@ -187,11 +185,11 @@ function NewPageForm() {
                 </Select>
               </div>
 
-              <div>
-                <Label>Page Type</Label>
+              <div className="space-y-1">
+                <Label className="text-xs">Type</Label>
                 <input type="hidden" name="page_type" value={pageType} />
                 <Select value={pageType} onValueChange={setPageType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -209,21 +207,22 @@ function NewPageForm() {
                   </SelectContent>
                 </Select>
                 {selectedPageType && (
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground leading-tight">
                     {selectedPageType.description}
                   </p>
                 )}
               </div>
+            </div>
 
-              <div>
-                <Label>Title</Label>
-                <Input name="title" required />
+            <div className="grid grid-cols-[1fr_auto] gap-3 items-end">
+              <div className="space-y-1">
+                <Label className="text-xs">Title</Label>
+                <Input name="title" required className="h-8 text-sm" />
               </div>
-
-              <div>
-                <Label>Language</Label>
+              <div className="space-y-1">
+                <Label className="text-xs">Language</Label>
                 <Select name="language_code" defaultValue="en" required>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-8 text-sm w-32">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -232,35 +231,24 @@ function NewPageForm() {
                   </SelectContent>
                 </Select>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {pageType === "testimony" ? "Intro Content" : "Content"}
-              </CardTitle>
-              {pageType === "testimony" && (
-                <p className="text-sm text-muted-foreground">
-                  This content appears as the introduction above the testimonies.
-                </p>
-              )}
-              {(pageType === "faq" || pageType === "contact") && (
-                <p className="text-sm text-muted-foreground">
-                  This HTML content appears above the structured data section on the public page.
-                </p>
-              )}
-            </CardHeader>
-            <CardContent>
-              <PageEditor
-                ref={editorRef}
-                content={contentHtml}
-                onChange={setContentHtml}
-                onOpenMediaGallery={() => setMediaSheetOpen(true)}
-                onImageImported={() => setGalleryRefreshKey((k) => k + 1)}
-              />
-            </CardContent>
-          </Card>
+          {/* ── Content editor ── */}
+          {(pageType === "testimony" || pageType === "faq" || pageType === "contact") && (
+            <p className="text-xs text-muted-foreground -mb-2">
+              {pageType === "testimony"
+                ? "Intro content — appears above the testimonies on the public page."
+                : "Intro HTML — appears above the structured data section on the public page."}
+            </p>
+          )}
+          <PageEditor
+            ref={editorRef}
+            content={contentHtml}
+            onChange={setContentHtml}
+            onOpenMediaGallery={() => setMediaSheetOpen(true)}
+            onImageImported={() => setGalleryRefreshKey((k) => k + 1)}
+          />
 
           {pageType === "faq" && (
             <FaqEditor
@@ -463,136 +451,116 @@ function EditPageForm({
 
   return (
     <div className="flex gap-6">
-      <div className="flex-1 min-w-0 space-y-6 max-w-4xl">
-      {/* ── Language Switcher ── */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center gap-3">
-            <Globe className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">Language:</span>
-            <div className="flex gap-1 rounded-lg border bg-muted/30 p-1">
-              {LANGUAGES.map((lang) => {
-                const isActive = activeLanguage === lang.code;
-                const exists = !!langData[lang.code]?.id;
-                return (
-                  <button
-                    key={lang.code}
-                    type="button"
-                    onClick={() => setActiveLanguage(lang.code)}
-                    className={cn(
-                      "relative flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all",
-                      isActive
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                    )}
-                  >
-                    <span>{lang.label}</span>
-                    {exists ? (
-                      <Check className="h-3.5 w-3.5 text-green-600" />
-                    ) : (
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-dashed text-muted-foreground">
-                        new
-                      </Badge>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-          {!hasVersion && (
-            <p className="text-sm text-amber-600 mt-3 pl-7">
-              No {currentLangInfo.label} version exists yet. Fill in the content below and save to create it.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+      <div className="flex-1 min-w-0 space-y-4 max-w-4xl">
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-4">
         {error && (
           <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">
             {error}
           </p>
         )}
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Page Information</CardTitle>
-              <a
-                href={getPageUrl(pageKey)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
-              >
-                <ExternalLink className="h-4 w-4" />
-                View on Site
-              </a>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label>Page</Label>
-              <Input value={pageKey} disabled className="font-mono" />
-            </div>
-
-            <div>
-              <Label>Page Type</Label>
-              <div className="flex items-center gap-2 mt-1">
-                {selectedPageType && (
-                  <>
-                    <selectedPageType.icon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm">{selectedPageType.label}</span>
-                    <span className="text-xs text-muted-foreground">
-                      &mdash; {selectedPageType.description}
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label>Title ({currentLangInfo.label})</Label>
-              <Input
-                value={currentLang.title}
-                onChange={(e) => updateField("title", e.target.value)}
-                required
-                dir={activeLanguage === "he" ? "rtl" : "ltr"}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {pageType === "testimony"
-                ? `Intro Content (${currentLangInfo.label})`
-                : `Content (${currentLangInfo.label})`}
-            </CardTitle>
-            {pageType === "testimony" && (
-              <p className="text-sm text-muted-foreground">
-                This content appears as the introduction above the testimonies.
-              </p>
+        {/* ── Compact header bar: page meta + title + language switcher ── */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border bg-card px-4 py-2.5">
+          {/* Page key + type */}
+          <div className="flex items-center gap-2 shrink-0">
+            <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono text-muted-foreground">
+              {pageKey}
+            </code>
+            {selectedPageType && (
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <selectedPageType.icon className="h-3.5 w-3.5" />
+                {selectedPageType.label}
+              </span>
             )}
-            {(pageType === "faq" || pageType === "contact") && (
-              <p className="text-sm text-muted-foreground">
-                This HTML content appears above the structured data section on the public page.
-              </p>
-            )}
-          </CardHeader>
-          <CardContent>
-            <div dir={activeLanguage === "he" ? "rtl" : "ltr"}>
-              <PageEditor
-                ref={editorRef}
-                key={activeLanguage}
-                content={currentLang.contentHtml}
-                onChange={(html) => updateField("contentHtml", html)}
-                onOpenMediaGallery={() => setMediaSheetOpen(true)}
-                onImageImported={() => setGalleryRefreshKey((k) => k + 1)}
-              />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          <div className="w-px h-4 bg-border shrink-0" />
+
+          {/* Title input */}
+          <div className="flex items-center gap-2 flex-1 min-w-[180px]">
+            <Label htmlFor="page-title" className="text-xs shrink-0 text-muted-foreground">
+              Title
+            </Label>
+            <Input
+              id="page-title"
+              value={currentLang.title}
+              onChange={(e) => updateField("title", e.target.value)}
+              required
+              dir={activeLanguage === "he" ? "rtl" : "ltr"}
+              className="h-7 text-sm"
+            />
+          </div>
+
+          <div className="w-px h-4 bg-border shrink-0" />
+
+          {/* Language switcher */}
+          <div className="flex gap-0.5 rounded-md border bg-muted/40 p-0.5 shrink-0">
+            {LANGUAGES.map((lang) => {
+              const isActive = activeLanguage === lang.code;
+              const exists = !!langData[lang.code]?.id;
+              return (
+                <button
+                  key={lang.code}
+                  type="button"
+                  onClick={() => setActiveLanguage(lang.code)}
+                  className={cn(
+                    "flex items-center gap-1.5 rounded px-3 py-1 text-xs font-medium transition-all",
+                    isActive
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                  )}
+                >
+                  {lang.label}
+                  {exists ? (
+                    <Check className="h-3 w-3 text-green-600" />
+                  ) : (
+                    <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5 border-dashed leading-none">
+                      new
+                    </Badge>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* View on Site */}
+          <a
+            href={getPageUrl(pageKey)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-primary hover:underline shrink-0"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            View
+          </a>
+        </div>
+
+        {/* Missing version warning */}
+        {!hasVersion && (
+          <p className="text-xs text-amber-600 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 px-3 py-2 rounded-md">
+            No {currentLangInfo.label} version yet — fill in content below and save to create it.
+          </p>
+        )}
+
+        {/* ── Content editor (no extra Card wrapper — editor has its own border) ── */}
+        {(pageType === "testimony" || pageType === "faq" || pageType === "contact") && (
+          <p className="text-xs text-muted-foreground -mb-2">
+            {pageType === "testimony"
+              ? "Intro content — appears above the testimonies on the public page."
+              : "Intro HTML — appears above the structured data section on the public page."}
+          </p>
+        )}
+        <div dir={activeLanguage === "he" ? "rtl" : "ltr"}>
+          <PageEditor
+            ref={editorRef}
+            key={activeLanguage}
+            content={currentLang.contentHtml}
+            onChange={(html) => updateField("contentHtml", html)}
+            onOpenMediaGallery={() => setMediaSheetOpen(true)}
+            onImageImported={() => setGalleryRefreshKey((k) => k + 1)}
+          />
+        </div>
 
         {pageType === "faq" && (
           <FaqEditor

@@ -555,7 +555,7 @@ export const PageEditor = forwardRef<PageEditorRef, PageEditorProps>(
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg">
         {/* Toolbar */}
         <div className="flex flex-wrap gap-0.5 p-2 border-b bg-muted/50">
           {/* Block type selector */}

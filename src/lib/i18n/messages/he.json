@@ -953,7 +953,12 @@
     "step_life_alignment": "התאמת חיים",
     "step_personality": "הערכת אישיות",
     "step_dealbreakers": "קווים אדומים",
-    "step_about_you": "על עצמכם"
+    "step_about_you": "על עצמכם",
+    "required_fields_missing": "אנא מלאו גם את: {fields}.",
+    "field_faith": "דת / אמונה",
+    "field_practice_frequency": "תדירות קיום דתי",
+    "field_wants_children": "העדפה לגבי ילדים",
+    "skip_questionnaire": "דלגו כרגע — אמלא זאת מאוחר יותר"
   },
   "admin": {
     "dashboard": "Dashboard",

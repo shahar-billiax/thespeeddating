@@ -163,7 +163,7 @@ export function AdminSidebar() {
       </Sheet>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:block w-64 border-r bg-sidebar min-h-screen p-4 shrink-0">
+      <aside className="hidden md:block w-64 border-r bg-sidebar h-full shrink-0 overflow-y-auto p-4">
         <div className="mb-8">
           <Link href="/admin" className="text-lg font-bold text-sidebar-primary">
             TSD Admin

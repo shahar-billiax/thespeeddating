@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { z } from "zod/v4";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
@@ -56,7 +57,7 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SUPABASE_URL ? "" : ""}http://localhost:3000/auth/callback`,
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/auth/callback`,
     },
   });
 
@@ -65,8 +66,9 @@ export async function signUp(formData: FormData) {
   }
 
   if (data.user) {
-    // Create profile
-    const { error: profileError } = await supabase.from("profiles").insert({
+    // Create profile using admin client — the user has no session yet (email unconfirmed)
+    const adminClient = createAdminClient();
+    const { error: profileError } = await adminClient.from("profiles").insert({
       id: data.user.id,
       first_name: firstName,
       last_name: lastName,

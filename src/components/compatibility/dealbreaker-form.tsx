@@ -86,8 +86,9 @@ export function DealbreakerForm({ initialData }: DealbreakerFormProps) {
             <Label className="text-base font-medium">{t("compat.preferred_age_range")}</Label>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-muted-foreground text-sm">{t("compat.minimum_age")}</Label>
+                <Label htmlFor="preferred_age_min" className="text-muted-foreground text-sm">{t("compat.minimum_age")}</Label>
                 <Input
+                  id="preferred_age_min"
                   type="number"
                   min={18}
                   max={99}
@@ -101,8 +102,9 @@ export function DealbreakerForm({ initialData }: DealbreakerFormProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-muted-foreground text-sm">{t("compat.maximum_age")}</Label>
+                <Label htmlFor="preferred_age_max" className="text-muted-foreground text-sm">{t("compat.maximum_age")}</Label>
                 <Input
+                  id="preferred_age_max"
                   type="number"
                   min={18}
                   max={99}

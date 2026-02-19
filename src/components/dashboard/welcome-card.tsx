@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -11,6 +10,7 @@ import { cn } from "@/lib/utils";
 interface WelcomeCardProps {
   firstName: string;
   profileCompletion: number;
+  completeHref: string;
 }
 
 function getGreetingKey(): string {
@@ -27,7 +27,7 @@ function getProgressColor(completion: number): string {
   return "bg-rose-500";
 }
 
-export function WelcomeCard({ firstName, profileCompletion }: WelcomeCardProps) {
+export function WelcomeCard({ firstName, profileCompletion, completeHref }: WelcomeCardProps) {
   const t = useTranslations();
   const greetingKey = getGreetingKey();
   const isComplete = profileCompletion >= 100;
@@ -59,31 +59,25 @@ export function WelcomeCard({ firstName, profileCompletion }: WelcomeCardProps) 
                 </p>
               </div>
             ) : (
-              <div className="mt-3 max-w-sm">
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-medium text-muted-foreground">
+              <div className="mt-3 max-w-xs">
+                <div className="mb-1.5 flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground/80">
                     {t("dashboard.profile_completion")}
                   </span>
                   <span
                     className={cn(
-                      "rounded-full px-2 py-0.5 text-xs font-semibold",
-                      profileCompletion >= 70
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-amber-100 text-amber-700"
+                      "text-sm font-bold tabular-nums",
+                      profileCompletion >= 70 ? "text-blue-600" : "text-amber-600"
                     )}
                   >
                     {profileCompletion}%
                   </span>
                 </div>
-                <div className="relative">
-                  <Progress
-                    value={profileCompletion}
-                    className="h-2.5 bg-muted/50"
-                  />
-                  {/* Colored overlay for the progress indicator */}
+                {/* Progress track */}
+                <div className="h-3 w-full overflow-hidden rounded-full bg-black/10">
                   <div
                     className={cn(
-                      "absolute inset-y-0 start-0 rounded-full transition-all duration-500",
+                      "h-full rounded-full transition-all duration-700 ease-out",
                       getProgressColor(profileCompletion)
                     )}
                     style={{ width: `${profileCompletion}%` }}
@@ -99,7 +93,7 @@ export function WelcomeCard({ firstName, profileCompletion }: WelcomeCardProps) 
               asChild
               className="group shrink-0 gap-1.5 shadow-sm"
             >
-              <Link href="/dashboard/profile">
+              <Link href={completeHref}>
                 {t("dashboard.complete_now")}
                 <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>

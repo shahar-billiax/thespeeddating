@@ -820,31 +820,27 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
         </div>
 
         {/* ─── Sticky Save/Cancel Bar ────────────────── */}
-        <div
-          className={`sticky bottom-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 mt-6 transition-all duration-300 ${
-            hasUnsavedChanges
-              ? "translate-y-0 opacity-100"
-              : "translate-y-2 opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="border-t bg-background/95 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-amber-600 flex items-center gap-1.5">
-                <AlertTriangle className="h-3.5 w-3.5" />
-                {t("profile.unsaved_changes")}
-              </p>
-              <div className="flex items-center gap-3">
-                <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
-                  {t("common.cancel")}
-                </Button>
-                <Button type="submit" size="sm" disabled={isPending}>
-                  {isPending && <Loader2 className="h-3.5 w-3.5 me-1.5 animate-spin" />}
-                  {isPending ? t("common.saving") : t("profile.save")}
-                </Button>
+        {hasUnsavedChanges && (
+          <div className="sticky bottom-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 mt-6">
+            <div className="border-t bg-background/95 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-amber-600 flex items-center gap-1.5">
+                  <AlertTriangle className="h-3.5 w-3.5" />
+                  {t("profile.unsaved_changes")}
+                </p>
+                <div className="flex items-center gap-3">
+                  <Button type="button" variant="outline" size="sm" onClick={handleCancel}>
+                    {t("common.cancel")}
+                  </Button>
+                  <Button type="submit" size="sm" disabled={isPending}>
+                    {isPending && <Loader2 className="h-3.5 w-3.5 me-1.5 animate-spin" />}
+                    {isPending ? t("common.saving") : t("profile.save")}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </form>
 
       {/* ─── Change Password ─────────────────────────── */}
