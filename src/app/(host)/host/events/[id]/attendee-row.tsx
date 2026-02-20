@@ -40,47 +40,58 @@ function calculateAge(dob: string | null): string {
 export function AttendeeRow({ registration }: AttendeeRowProps) {
   const [checkedIn, setCheckedIn] = useState(!!registration.checked_in_at);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const p = registration.profiles;
 
   function handleToggle() {
+    setError(null);
     startTransition(async () => {
-      if (checkedIn) {
-        await uncheckInAttendee(registration.id);
-        setCheckedIn(false);
-      } else {
-        await checkInAttendee(registration.id);
-        setCheckedIn(true);
+      try {
+        if (checkedIn) {
+          await uncheckInAttendee(registration.id);
+          setCheckedIn(false);
+        } else {
+          await checkInAttendee(registration.id);
+          setCheckedIn(true);
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to update check-in");
       }
     });
   }
 
   return (
-    <tr className={checkedIn ? "bg-green-50" : "hover:bg-gray-50"}>
-      <td className="px-4 py-3">
-        <span className="font-medium">
-          {p?.first_name} {p?.last_name}
-        </span>
-      </td>
-      <td className="px-4 py-3 text-gray-600">{calculateAge(p?.date_of_birth ?? null)}</td>
-      <td className="px-4 py-3 text-gray-600 capitalize">{p?.gender ?? "—"}</td>
-      <td className="px-4 py-3 text-gray-600">{p?.email ?? "—"}</td>
-      <td className="px-4 py-3 text-gray-600">{p?.phone ?? "—"}</td>
-      <td className="px-4 py-3">
-        <Badge variant={registration.payment_status === "paid" ? "default" : "secondary"}>
-          {registration.payment_status ?? "unknown"}
-        </Badge>
-      </td>
-      <td className="px-4 py-3 print:hidden">
-        <Button
-          size="sm"
-          variant={checkedIn ? "outline" : "default"}
-          onClick={handleToggle}
-          disabled={isPending}
-          className={checkedIn ? "text-green-700 border-green-300" : ""}
-        >
-          {isPending ? "..." : checkedIn ? "✓ Checked in" : "Check in"}
-        </Button>
-      </td>
-    </tr>
+    <>
+      <tr className={checkedIn ? "bg-green-50" : "hover:bg-gray-50"}>
+        <td className="px-4 py-3">
+          <span className="font-medium">
+            {p?.first_name} {p?.last_name}
+          </span>
+        </td>
+        <td className="px-4 py-3 text-gray-600">{calculateAge(p?.date_of_birth ?? null)}</td>
+        <td className="px-4 py-3 text-gray-600 capitalize">{p?.gender ?? "—"}</td>
+        <td className="px-4 py-3 text-gray-600">{p?.email ?? "—"}</td>
+        <td className="px-4 py-3 text-gray-600">{p?.phone ?? "—"}</td>
+        <td className="px-4 py-3">
+          <Badge variant={registration.payment_status === "paid" ? "default" : "secondary"}>
+            {registration.payment_status ?? "unknown"}
+          </Badge>
+        </td>
+        <td className="px-4 py-3 print:hidden">
+          <Button
+            size="sm"
+            variant={checkedIn ? "outline" : "default"}
+            onClick={handleToggle}
+            disabled={isPending}
+            className={checkedIn ? "text-green-700 border-green-300" : ""}
+          >
+            {isPending ? "..." : checkedIn ? "✓ Checked in" : "Check in"}
+          </Button>
+          {error && (
+            <p className="text-xs text-red-600 mt-1">{error}</p>
+          )}
+        </td>
+      </tr>
+    </>
   );
 }

@@ -2500,13 +2500,14 @@ export async function getVenueHostesses(venueId: number) {
 
 export async function searchHostUsers(query: string) {
   const { supabase } = await requireAdmin();
+  const sanitizedQuery = query.replace(/[%_\\]/g, "\\$&");
 
   const { data, error } = await supabase
     .from("profiles")
     .select("id, first_name, last_name, email, role")
     .in("role", ["host", "host_plus"])
     .or(
-      `first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%`
+      `first_name.ilike.%${sanitizedQuery}%,last_name.ilike.%${sanitizedQuery}%,email.ilike.%${sanitizedQuery}%`
     )
     .limit(10);
 

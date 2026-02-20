@@ -743,7 +743,6 @@
 /* ===== PRINT STYLES ===== */
 @media print {
   /* Hide navigation, buttons, and non-essential UI when printing */
-  header,
   .print\:hidden {
     display: none !important;
   }
