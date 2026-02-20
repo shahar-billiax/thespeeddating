@@ -2471,3 +2471,66 @@ export async function deleteMatchQuestion(id: number) {
   revalidatePath("/admin/events");
   return { success: true };
 }
+
+export async function getVenueHostesses(venueId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("venue_hosts")
+    .select(
+      `
+      id,
+      user_id,
+      created_at,
+      profiles (
+        id,
+        first_name,
+        last_name,
+        email,
+        role
+      )
+    `
+    )
+    .eq("venue_id", venueId)
+    .order("created_at");
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function searchHostUsers(query: string) {
+  const { supabase } = await requireAdmin();
+
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, first_name, last_name, email, role")
+    .in("role", ["host", "host_plus"])
+    .or(
+      `first_name.ilike.%${query}%,last_name.ilike.%${query}%,email.ilike.%${query}%`
+    )
+    .limit(10);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function addVenueHostess(venueId: number, userId: string) {
+  const { supabase } = await requireAdmin();
+
+  const { error } = await supabase
+    .from("venue_hosts")
+    .insert({ venue_id: venueId, user_id: userId });
+
+  if (error) throw error;
+}
+
+export async function removeVenueHostess(venueHostId: number) {
+  const { supabase } = await requireAdmin();
+
+  const { error } = await supabase
+    .from("venue_hosts")
+    .delete()
+    .eq("id", venueHostId);
+
+  if (error) throw error;
+}
