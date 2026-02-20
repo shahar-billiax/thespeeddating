@@ -21,7 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Menu, Crown, ChevronDown, User, Users, Heart, Settings, LogOut, Shield, Check, Sparkles, LayoutDashboard } from "lucide-react";
+import { Menu, Crown, ChevronDown, User, Users, Heart, Settings, LogOut, Shield, Check, Sparkles, LayoutDashboard, CalendarCheck } from "lucide-react";
 import { useState } from "react";
 
 export function PublicHeader({ user }: { user: { email: string; role?: string; compatIncomplete?: boolean } | null }) {
@@ -108,6 +108,18 @@ export function PublicHeader({ user }: { user: { email: string; role?: string; c
                       >
                         <Shield className="h-4 w-4" />
                         {t("nav.admin_panel")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </>
+                  )}
+                  {(user.role === "host" || user.role === "host_plus" || user.role === "admin") && (
+                    <>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onSelect={() => router.push("/host")}
+                      >
+                        <CalendarCheck className="h-4 w-4" />
+                        Host Portal
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                     </>
@@ -309,6 +321,16 @@ export function PublicHeader({ user }: { user: { email: string; role?: string; c
                       >
                         <Shield className="h-4 w-4" />
                         {t("nav.admin_panel")}
+                      </Link>
+                    )}
+                    {(user.role === "host" || user.role === "host_plus" || user.role === "admin") && (
+                      <Link
+                        href="/host"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2 text-[15px] font-medium py-2.5 px-3 rounded-lg hover:bg-primary/10 text-primary transition-colors"
+                      >
+                        <CalendarCheck className="h-4 w-4" />
+                        Host Portal
                       </Link>
                     )}
                     <Link
