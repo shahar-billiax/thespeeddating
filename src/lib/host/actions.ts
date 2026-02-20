@@ -83,7 +83,7 @@ export async function getHostEvents(upcoming = false) {
     `
     )
     .in("venue_id", venueIds)
-    .order("event_date", { ascending: false });
+    .order("event_date", { ascending: upcoming });
 
   if (upcoming) {
     query = query.gte("event_date", now);
@@ -126,7 +126,11 @@ export async function getHostEventWithAttendees(eventId: number) {
     .in("venue_id", venueIds)
     .single();
 
-  if (eventError || !event) redirect("/host/events");
+  if (eventError) {
+    if (eventError.code === "PGRST116") redirect("/host/events");
+    throw eventError;
+  }
+  if (!event) redirect("/host/events");
 
   const { data: registrations, error: regError } = await supabase
     .from("event_registrations")
