@@ -269,6 +269,7 @@ export type Database = {
           admin_notes: string | null
           amount: number | null
           attended: boolean | null
+          checked_in_at: string | null
           currency: string | null
           event_id: number
           guest_details: Json | null
@@ -288,6 +289,7 @@ export type Database = {
           admin_notes?: string | null
           amount?: number | null
           attended?: boolean | null
+          checked_in_at?: string | null
           currency?: string | null
           event_id: number
           guest_details?: Json | null
@@ -307,6 +309,7 @@ export type Database = {
           admin_notes?: string | null
           amount?: number | null
           attended?: boolean | null
+          checked_in_at?: string | null
           currency?: string | null
           event_id?: number
           guest_details?: Json | null
@@ -1331,6 +1334,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "venue_images_venue_id_fkey"
+            columns: ["venue_id"]
+            isOneToOne: false
+            referencedRelation: "venues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_hosts: {
+        Row: {
+          created_at: string
+          id: number
+          user_id: string
+          venue_id: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          user_id: string
+          venue_id: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          user_id?: string
+          venue_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_hosts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_hosts_venue_id_fkey"
             columns: ["venue_id"]
             isOneToOne: false
             referencedRelation: "venues"
