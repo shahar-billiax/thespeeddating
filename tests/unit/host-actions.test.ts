@@ -64,6 +64,7 @@ describe("requireHost (via getHostVenues)", () => {
       }),
       in: vi.fn().mockReturnThis(),
       gte: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
     }));
     vi.mocked(createClient).mockResolvedValue(mock as any);
     const result = await getHostVenues();
@@ -82,6 +83,7 @@ describe("requireHost (via getHostVenues)", () => {
       }),
       in: vi.fn().mockReturnThis(),
       gte: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
     }));
     vi.mocked(createClient).mockResolvedValue(mock as any);
     const result = await getHostVenues();

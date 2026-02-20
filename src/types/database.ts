@@ -1655,7 +1655,12 @@ export type Database = {
     }
     Functions: {
       compute_matches: { Args: { p_event_id: number }; Returns: undefined }
+      host_check_in_attendee: {
+        Args: { p_registration_id: number; p_checked_in: boolean }
+        Returns: undefined
+      }
       is_admin: { Args: never; Returns: boolean }
+      is_venue_host: { Args: { p_venue_id: number }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
