@@ -739,3 +739,35 @@
     animation: none;
   }
 }
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* Hide navigation, buttons, and non-essential UI when printing */
+  header,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  body {
+    font-size: 11pt;
+    color: black;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    text-align: left;
+  }
+
+  thead {
+    background-color: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
