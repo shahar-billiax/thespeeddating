@@ -117,6 +117,26 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // 6. Host portal protection
+  if (request.nextUrl.pathname.startsWith("/host")) {
+    if (!user) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    const hostRoles = ["host", "host_plus", "admin"];
+    if (!profile || !hostRoles.includes(profile.role)) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
+  }
+
   // Set country/locale headers for downstream use
   response.headers.set("x-country", country);
   response.headers.set("x-locale", locale);
