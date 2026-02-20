@@ -98,7 +98,7 @@ async function EventMatchCard({ event }: { event: any }) {
           {/* Content */}
           <div className="flex flex-1 flex-col gap-2.5 border-s border-border/50 p-4">
             {/* Top row: title + action */}
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-semibold text-base leading-snug">

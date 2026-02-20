@@ -530,8 +530,8 @@
     "settings": "הגדרות",
     "stats": {
       "events_attended": "אירועים שהשתתפתי",
-      "mutual_matches": "התאמות הדדיות",
-      "compatibility_score": "התאמה",
+      "upcoming_events": "אירועים קרובים",
+      "pending_ratings": "דירוגים ממתינים",
       "vip_status": "סטטוס VIP",
       "active": "פעיל",
       "inactive": "לא פעיל"

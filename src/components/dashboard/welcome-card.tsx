@@ -6,6 +6,7 @@ import { CheckCircle2, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface WelcomeCardProps {
   firstName: string;
@@ -15,8 +16,8 @@ interface WelcomeCardProps {
 
 function getGreetingKey(): string {
   const hour = new Date().getHours();
-  if (hour < 12) return "dashboard.welcome_morning";
-  if (hour < 18) return "dashboard.welcome_afternoon";
+  if (hour >= 5 && hour < 12) return "dashboard.welcome_morning";
+  if (hour >= 12 && hour < 18) return "dashboard.welcome_afternoon";
   return "dashboard.welcome_evening";
 }
 
@@ -29,7 +30,11 @@ function getProgressColor(completion: number): string {
 
 export function WelcomeCard({ firstName, profileCompletion, completeHref }: WelcomeCardProps) {
   const t = useTranslations();
-  const greetingKey = getGreetingKey();
+  const [greetingKey, setGreetingKey] = useState("dashboard.welcome_morning");
+
+  useEffect(() => {
+    setGreetingKey(getGreetingKey());
+  }, []);
   const isComplete = profileCompletion >= 100;
 
   return (

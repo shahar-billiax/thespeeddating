@@ -3,6 +3,7 @@ import { getHostEventWithAttendees } from "@/lib/host/actions";
 import { AttendeeRow } from "./attendee-row";
 import { PrintButton } from "./print-button";
 import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 
 export default async function HostEventDetailPage({
@@ -15,7 +16,16 @@ export default async function HostEventDetailPage({
 
   if (isNaN(eventId)) notFound();
 
-  const { event, registrations } = await getHostEventWithAttendees(eventId);
+  const { event, registrations: rawRegistrations } = await getHostEventWithAttendees(eventId);
+
+  const isCancelled = (r: any) =>
+    r.status === "cancelled" || r.payment_status === "refunded";
+
+  const registrations = [...rawRegistrations].sort((a: any, b: any) => {
+    const aCancelled = isCancelled(a) ? 1 : 0;
+    const bCancelled = isCancelled(b) ? 1 : 0;
+    return aCancelled - bCancelled;
+  });
 
   const checkedInCount = registrations.filter(
     (r: any) => r.checked_in_at
@@ -98,42 +108,28 @@ export default async function HostEventDetailPage({
       {registrations.length === 0 ? (
         <p className="text-gray-500">No registrations yet.</p>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
-                  Name
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
-                  Age
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
-                  Gender
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
-                  Email
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
-                  Phone
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
-                  Payment
-                </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 print:hidden">
-                  Check-in
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
+        <div className="rounded-lg border overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Age</TableHead>
+                <TableHead className="hidden sm:table-cell">Gender</TableHead>
+                <TableHead className="hidden lg:table-cell">Email</TableHead>
+                <TableHead className="hidden lg:table-cell">Phone</TableHead>
+                <TableHead>Payment</TableHead>
+                <TableHead className="print:hidden">Check-in</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {registrations.map((registration: any) => (
                 <AttendeeRow
                   key={registration.id}
                   registration={registration}
                 />
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>

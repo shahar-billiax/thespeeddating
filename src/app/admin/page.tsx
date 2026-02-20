@@ -91,75 +91,69 @@ export default async function AdminDashboardPage() {
             </Link>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {upcomingEvents.length === 0 ? (
-            <p className="text-muted-foreground text-sm">{t("admin.no_upcoming_events")}</p>
+            <p className="text-muted-foreground text-sm px-6 pb-6">{t("admin.no_upcoming_events")}</p>
           ) : (
-            <div className="space-y-3">
-              {upcomingEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/admin/events/${event.id}`}
-                  className="block hover:bg-muted/50 rounded-lg p-3 -mx-3 transition-colors"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm">
-                        {event.date} {event.time && `at ${event.time}`}
+            <div className="divide-y divide-border">
+              {upcomingEvents.map((event) => {
+                const total = event.males + event.females;
+                const totalCapacity = (event.limitMale ?? 0) + (event.limitFemale ?? 0);
+                const maleBalancePct = total > 0 ? (event.males / total) * 100 : 50;
+
+                return (
+                  <Link
+                    key={event.id}
+                    href={`/admin/events/${event.id}`}
+                    className="block hover:bg-muted/30 transition-colors px-6 py-4 first:rounded-t-none last:rounded-b-lg"
+                  >
+                    {/* Event header */}
+                    <div className="flex items-start justify-between gap-3 mb-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-sm tabular-nums">
+                          {new Date(event.date + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                        </span>
+                        {event.time && (
+                          <span className="text-xs text-muted-foreground">{event.time}</span>
+                        )}
+                        <Badge variant="outline" className="text-xs capitalize">
+                          {event.type?.replace(/_/g, " ")}
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-muted-foreground text-right shrink-0">
+                        {event.city}{event.venue ? ` · ${event.venue}` : ""}
                       </span>
-                      <Badge variant="outline" className="text-xs">
-                        {event.type?.replace("_", " ")}
-                      </Badge>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {event.city} - {event.venue}
-                    </span>
-                  </div>
-                  <div className="flex gap-4 items-center">
-                    <div className="flex-1">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span>
-                          {t("admin.male")}: {event.males}
-                          {event.limitMale ? `/${event.limitMale}` : ""}
-                        </span>
-                        <span>
-                          {t("admin.female")}: {event.females}
-                          {event.limitFemale ? `/${event.limitFemale}` : ""}
-                        </span>
+
+                    {/* Gender counts + balance bar */}
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs tabular-nums text-blue-600 dark:text-blue-400 w-14 shrink-0">
+                        <span className="font-bold text-blue-500">M</span> {event.males}{event.limitMale ? `/${event.limitMale}` : ""}
+                      </span>
+
+                      <div className="flex-1 relative h-2.5 rounded-full overflow-hidden bg-muted flex">
+                        <div className="h-full bg-blue-500" style={{ width: `${maleBalancePct}%` }} />
+                        <div className="h-full bg-pink-500" style={{ width: `${100 - maleBalancePct}%` }} />
+                        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-background/70 -translate-x-px" />
                       </div>
-                      <div className="flex h-2 rounded-full overflow-hidden bg-muted">
-                        <div
-                          className="bg-blue-500 transition-all"
-                          style={{
-                            width: `${
-                              event.males + event.females > 0
-                                ? (event.males /
-                                    (event.males + event.females)) *
-                                  100
-                                : 50
-                            }%`,
-                          }}
-                        />
-                        <div
-                          className="bg-pink-500 transition-all"
-                          style={{
-                            width: `${
-                              event.males + event.females > 0
-                                ? (event.females /
-                                    (event.males + event.females)) *
-                                  100
-                                : 50
-                            }%`,
-                          }}
-                        />
-                      </div>
+
+                      <span className="text-xs tabular-nums text-pink-600 dark:text-pink-400 w-14 shrink-0 text-right">
+                        {event.females}{event.limitFemale ? `/${event.limitFemale}` : ""} <span className="font-bold text-pink-500">F</span>
+                      </span>
                     </div>
-                    <span className="text-sm font-medium">
-                      {event.males + event.females} {t("admin.total")}
-                    </span>
-                  </div>
-                </Link>
-              ))}
+
+                    {/* Total capacity text */}
+                    {totalCapacity > 0 && (
+                      <div className="mt-1.5 flex items-baseline gap-1">
+                        <span className="text-sm font-semibold tabular-nums">{total}</span>
+                        <span className="text-xs text-muted-foreground">/</span>
+                        <span className="text-sm font-semibold tabular-nums text-muted-foreground">{totalCapacity}</span>
+                        <span className="text-xs text-muted-foreground ml-0.5">places</span>
+                      </div>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </CardContent>

@@ -821,7 +821,7 @@ export function ProfileForm({ profile, countries, cities }: ProfileFormProps) {
 
         {/* ─── Sticky Save/Cancel Bar ────────────────── */}
         {hasUnsavedChanges && (
-          <div className="sticky bottom-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8 mt-6">
+          <div className="sticky bottom-0 z-20 -mx-4 sm:-mx-6 lg:-mx-8">
             <div className="border-t bg-background/95 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-amber-600 flex items-center gap-1.5">

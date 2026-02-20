@@ -358,31 +358,25 @@ export default async function EventsPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary/[0.04] via-secondary/50 to-background py-14 sm:py-18 border-b border-border/40">
+      {/* Header + filters */}
+      <section className="relative overflow-hidden bg-gradient-to-b from-primary/[0.04] via-secondary/50 to-background border-b border-border/40">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,oklch(0.48_0.16_12_/_0.06),transparent_70%)]" />
 
-        <div className="section-container relative">
-          <div className="mx-auto max-w-3xl text-center space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl md:text-5xl">
+        <div className="section-container relative py-8 sm:py-10">
+          <div className="mb-5">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
               {t("events.title")}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            <p className="mt-1 text-sm text-muted-foreground max-w-xl leading-relaxed">
               {t("events.hero_subtitle")}
             </p>
           </div>
+          <EventFilters cities={cities || []} />
         </div>
       </section>
 
-      {/* Sticky filter bar */}
-      <div className="sticky top-16 z-40 border-b border-border/40 bg-background/90 backdrop-blur-xl shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
-        <div className="section-container py-4">
-          <EventFilters cities={cities || []} />
-        </div>
-      </div>
-
       {/* Events listing */}
-      <section className="py-12 sm:py-16 bg-gradient-to-b from-muted/30 via-background to-background">
+      <section className="pt-8 pb-16 sm:pt-10 sm:pb-20 bg-gradient-to-b from-muted/30 via-background to-background">
         <div className="section-container">
           <Suspense fallback={
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">

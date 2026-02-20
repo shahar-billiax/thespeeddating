@@ -26,21 +26,25 @@ export default async function DashboardReviewPage({
 
   if ("error" in data) {
     return (
-      <div className="max-w-2xl">
-        <Card className="border-0 shadow-sm">
-          <CardContent className="pt-8 pb-8 text-center">
-            <div className="h-12 w-12 mx-auto rounded-xl bg-destructive/10 flex items-center justify-center mb-4">
-              <AlertCircle className="h-6 w-6 text-destructive" />
-            </div>
-            <p className="text-muted-foreground mb-4">{data.error}</p>
-            <Link
-              href="/dashboard/matches"
-              className="text-primary hover:underline text-sm"
-            >
-              {t("matches.back_to_matches")}
-            </Link>
-          </CardContent>
-        </Card>
+      <div className="space-y-6">
+        <div>
+          <Link
+            href="/dashboard/matches"
+            className="text-sm text-muted-foreground hover:text-primary mb-3 inline-flex items-center gap-1"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("matches.back_to_matches")}
+          </Link>
+          <h1 className="text-3xl font-bold mb-2">
+            {t("matches.review_choices")}
+          </h1>
+        </div>
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+          <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center">
+            <AlertCircle className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <p className="text-muted-foreground">{data.error}</p>
+        </div>
       </div>
     );
   }

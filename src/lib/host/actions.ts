@@ -116,7 +116,6 @@ export async function getHostEventWithAttendees(eventId: number) {
       end_time,
       event_type,
       dress_code,
-      notes,
       venue_id,
       venues ( id, name, address, transport_info, dress_code ),
       cities ( name )
@@ -141,7 +140,7 @@ export async function getHostEventWithAttendees(eventId: number) {
       status,
       payment_status,
       checked_in_at,
-      created_at,
+      registered_at,
       profiles (
         id,
         first_name,
@@ -154,7 +153,7 @@ export async function getHostEventWithAttendees(eventId: number) {
     `
     )
     .eq("event_id", eventId)
-    .order("created_at");
+    .order("registered_at");
 
   if (regError) throw regError;
 

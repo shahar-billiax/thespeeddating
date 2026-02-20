@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Calendar, Heart, Crown, TrendingUp } from "lucide-react";
+import { Calendar, CalendarClock, Crown, ClipboardList } from "lucide-react";
 import {
   getDashboardStats,
   getUpcomingRegisteredEvents,
@@ -121,16 +121,16 @@ export default async function DashboardHomePage() {
           iconClassName="bg-blue-50 text-blue-600"
         />
         <StatCard
-          icon={Heart}
-          label={t("dashboard.stats.mutual_matches")}
-          value={stats.mutualMatches}
-          iconClassName="bg-pink-50 text-pink-600"
+          icon={CalendarClock}
+          label={t("dashboard.stats.upcoming_events")}
+          value={upcomingEvents.length}
+          iconClassName="bg-green-50 text-green-600"
         />
         <StatCard
-          icon={TrendingUp}
-          label={t("dashboard.stats.compatibility_score")}
-          value={`${profileCompletion}%`}
-          iconClassName="bg-purple-50 text-purple-600"
+          icon={ClipboardList}
+          label={t("dashboard.stats.pending_ratings")}
+          value={pendingActions.filter((a) => a.type === "score").length}
+          iconClassName="bg-orange-50 text-orange-600"
         />
         <StatCard
           icon={Crown}

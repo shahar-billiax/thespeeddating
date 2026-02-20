@@ -526,8 +526,8 @@
     "settings": "Settings",
     "stats": {
       "events_attended": "Events Attended",
-      "mutual_matches": "Mutual Matches",
-      "compatibility_score": "Compatibility",
+      "upcoming_events": "Upcoming Events",
+      "pending_ratings": "Pending Ratings",
       "vip_status": "VIP Status",
       "active": "Active",
       "inactive": "Inactive"

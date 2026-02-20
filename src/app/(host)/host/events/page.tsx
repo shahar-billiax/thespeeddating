@@ -12,7 +12,7 @@ export default async function HostEventsPage() {
       {events.length === 0 ? (
         <p className="text-gray-500">No events found at your venues.</p>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
@@ -22,10 +22,10 @@ export default async function HostEventsPage() {
                 <th className="text-left px-4 py-3 font-medium text-gray-600">
                   Event
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">
                   Venue
                 </th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">
+                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">
                   Status
                 </th>
                 <th className="text-left px-4 py-3 font-medium text-gray-600">
@@ -44,10 +44,10 @@ export default async function HostEventsPage() {
                     })}
                   </td>
                   <td className="px-4 py-3">{event.event_type}</td>
-                  <td className="px-4 py-3 text-gray-500">
+                  <td className="px-4 py-3 text-gray-500 hidden sm:table-cell">
                     {event.venues?.name}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 hidden sm:table-cell">
                     {event.is_cancelled ? (
                       <Badge variant="destructive">Cancelled</Badge>
                     ) : event.is_published ? (

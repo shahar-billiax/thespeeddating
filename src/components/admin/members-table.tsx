@@ -120,13 +120,13 @@ function MemberRowItem({ member: m, isVip }: { member: MemberRow; isVip: boolean
   return (
     <>
       <TableRow
-        className="cursor-pointer lg:cursor-default"
+        className="cursor-pointer xl:cursor-default"
         onClick={() => setExpanded((prev) => !prev)}
       >
         <TableCell>
           <div className="flex items-center gap-1">
             <ChevronDown
-              className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform lg:hidden ${
+              className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform xl:hidden ${
                 expanded ? "rotate-180" : ""
               }`}
             />
@@ -145,7 +145,7 @@ function MemberRowItem({ member: m, isVip }: { member: MemberRow; isVip: boolean
             )}
           </div>
         </TableCell>
-        <TableCell className="text-sm hidden lg:table-cell max-w-[150px] truncate">{m.email}</TableCell>
+        <TableCell className="text-sm hidden xl:table-cell max-w-[150px] truncate">{m.email}</TableCell>
         <TableCell className="hidden md:table-cell">
           <Badge
             variant="outline"
@@ -154,8 +154,8 @@ function MemberRowItem({ member: m, isVip }: { member: MemberRow; isVip: boolean
             {m.gender}
           </Badge>
         </TableCell>
-        <TableCell className="hidden lg:table-cell">{age ?? "—"}</TableCell>
-        <TableCell className="hidden lg:table-cell">{m.cities?.name ?? "—"}</TableCell>
+        <TableCell className="hidden xl:table-cell">{age ?? "—"}</TableCell>
+        <TableCell className="hidden xl:table-cell">{m.cities?.name ?? "—"}</TableCell>
         <TableCell>
           <Badge variant={m.role === "admin" ? "default" : m.role === "host" || m.role === "host_plus" ? "outline" : "secondary"}>
             {m.role}
@@ -171,7 +171,7 @@ function MemberRowItem({ member: m, isVip }: { member: MemberRow; isVip: boolean
         </TableCell>
       </TableRow>
       {expanded && (
-        <TableRow className="lg:hidden bg-muted/30">
+        <TableRow className="xl:hidden bg-muted/30">
           <TableCell colSpan={8} className="py-2 px-4">
             <div className="flex flex-wrap gap-x-6 gap-y-1.5 text-sm">
               <div>
@@ -655,9 +655,9 @@ export function MembersTable({
   // ─── Render ─────────────────────────────────────────────
 
   return (
-    <div className="flex gap-4">
+    <div className="flex gap-4 h-[calc(100vh-160px)] min-h-[400px]">
       {/* ── Main content ── */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 overflow-y-auto">
         {/* Top bar */}
         <div className="flex items-center gap-2 mb-3 flex-wrap">
           {/* Mobile filter trigger */}
@@ -725,10 +725,10 @@ export function MembersTable({
               <TableHeader>
                 <TableRow>
                   <SortableHeader label="Name" sortKey="name" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
-                  <SortableHeader label="Email" sortKey="email" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+                  <SortableHeader label="Email" sortKey="email" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
                   <SortableHeader label="Gender" sortKey="gender" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
-                  <SortableHeader label="Age" sortKey="age" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
-                  <SortableHeader label="City" sortKey="city" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden lg:table-cell" />
+                  <SortableHeader label="Age" sortKey="age" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
+                  <SortableHeader label="City" sortKey="city" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
                   <SortableHeader label="Role" sortKey="role" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} />
                   <SortableHeader label="Status" sortKey="status" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden md:table-cell" />
                   <SortableHeader label="Joined" sortKey="joined" currentKey={sortKey} currentDir={sortDir} onSort={handleSort} className="hidden xl:table-cell" />
@@ -751,8 +751,8 @@ export function MembersTable({
       </div>
 
       {/* ── Desktop filter sidebar (right side, always visible on lg+) ── */}
-      <aside className="hidden lg:block w-[280px] xl:w-[300px] shrink-0">
-        <div className="sticky top-4 h-[calc(100vh-120px)] flex flex-col border rounded-lg overflow-hidden bg-background">
+      <aside className="hidden lg:flex lg:flex-col w-[280px] xl:w-[300px] shrink-0">
+        <div className="flex-1 flex flex-col border rounded-lg overflow-hidden bg-background">
           <MembersFilterPanel {...filterPanelProps} />
         </div>
       </aside>
